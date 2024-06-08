@@ -32,7 +32,7 @@ const SignInForm = props => {
 
   const [message, setMessage] = useTimeOutMessage();
 
-  const { signIn } = useAuth();
+  const { signIn, googleLogin } = useAuth();
 
   const onSignIn = async (values, setSubmitting) => {
     const { email, password } = values;
@@ -45,6 +45,15 @@ const SignInForm = props => {
     }
     setMessage(result?.message);
     setSubmitting(false);
+  };
+
+  const onGoogleLogin = async () => {
+    const result = await googleLogin();
+
+    if (result?.status === "failed") {
+      setMessage(result.message);
+    }
+    setMessage(result?.message);
   };
 
   return (
@@ -120,7 +129,10 @@ const SignInForm = props => {
                 <span>Don't have an account yet? </span>
                 <ActionLink to={signUpUrl}>Sign up</ActionLink>
               </div>
-              <RenderOtherSignIn isSubmitting={isSubmitting} />
+              <RenderOtherSignIn
+                isSubmitting={isSubmitting}
+                onGoogleLogin={onGoogleLogin}
+              />
             </FormContainer>
           </Form>
         )}
@@ -129,7 +141,7 @@ const SignInForm = props => {
   );
 };
 
-const RenderOtherSignIn = ({ isSubmitting }) => (
+const RenderOtherSignIn = ({ isSubmitting, onGoogleLogin }) => (
   <div style={{ width: "100%" }}>
     <Divider>
       <span className="text-muted font-size-base font-weight-normal">
@@ -138,7 +150,7 @@ const RenderOtherSignIn = ({ isSubmitting }) => (
     </Divider>
     <div className="flex justify-around mb-3">
       <AntButton
-        // onClick={() => onGoogleLogin()}
+        onClick={() => onGoogleLogin()}
         className="mr-2"
         disabled={isSubmitting}
         icon={<CustomIcon svg={GoogleSVG} />}

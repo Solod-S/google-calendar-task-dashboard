@@ -67,8 +67,8 @@ FirebaseAouthService.signInGoogleRequest = async () => {
       const userData = await FirebaseAouthService.handleNewUser({
         email,
         password: uniqid(),
-        userPhotoURL: photoURL,
-        name: displayName,
+        photoURL,
+        displayName,
         uid,
       });
       return { user: userData, token: savedToken };
@@ -98,8 +98,8 @@ FirebaseAouthService.signInFacebookRequest = async () => {
       const userData = await FirebaseAouthService.handleNewUser({
         email,
         password: uniqid(),
-        userPhotoURL: photoUrl,
-        name: displayName,
+        photoUrl,
+        displayName,
         uid,
       });
       return { user: userData, token: savedToken };

@@ -1,6 +1,11 @@
 import { useSelector, useDispatch } from "react-redux";
 import { setUser, initialState } from "store/auth/userSlice";
-import { apiSignIn, apiSignOut, apiSignUp } from "services/AuthService";
+import {
+  apiSignIn,
+  apiSignOut,
+  apiSignUp,
+  apigoogleLogin,
+} from "services/AuthService";
 import { onSignInSuccess, onSignOutSuccess } from "store/auth/sessionSlice";
 import appConfig from "configs/app.config";
 import { REDIRECT_URL_KEY } from "constants/app.constant";
@@ -15,6 +20,41 @@ function useAuth() {
   const query = useQuery();
 
   const { token, signedIn } = useSelector(state => state.auth.session);
+
+  const googleLogin = async () => {
+    try {
+      const resp = await apigoogleLogin();
+
+      if (resp) {
+        const { token } = resp;
+        dispatch(onSignInSuccess(token));
+        console.log(`resp.user`, resp.user);
+        if (resp.user) {
+          dispatch(
+            setUser(
+              resp.user || {
+                avatar: "",
+                userName: "Anonymous",
+                authority: ["USER"],
+                email: "",
+              }
+            )
+          );
+        }
+        const redirectUrl = query.get(REDIRECT_URL_KEY);
+        navigate(redirectUrl ? redirectUrl : appConfig.authenticatedEntryPath);
+        return {
+          status: "success",
+          message: "",
+        };
+      }
+    } catch (errors) {
+      return {
+        status: "failed",
+        message: errors?.response?.data?.message || errors.toString(),
+      };
+    }
+  };
 
   const signIn = async values => {
     try {
@@ -97,6 +137,7 @@ function useAuth() {
 
   return {
     authenticated: token && signedIn,
+    googleLogin,
     signIn,
     signUp,
     signOut,

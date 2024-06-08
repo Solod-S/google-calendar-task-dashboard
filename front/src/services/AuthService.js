@@ -11,6 +11,15 @@ export async function apiSignIn(data) {
   //   });
 }
 
+export async function apigoogleLogin() {
+  return await FirebaseAouthService.signInGoogleRequest();
+
+  //   return ApiService.fetchData({
+  //     url: "/sign-in",
+  //     method: "post",
+  //     data,
+  //   });
+}
 export async function apiSignUp(data) {
   return await FirebaseAouthService.signUpEmailRequest(data);
 
