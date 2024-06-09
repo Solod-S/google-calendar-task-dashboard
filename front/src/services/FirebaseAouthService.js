@@ -29,7 +29,6 @@ const FirebaseAouthService = {};
 
 FirebaseAouthService.signInEmailRequest = async data => {
   const { email, password } = data;
-  console.log(`email, password`, email, password);
 
   try {
     const { user } = await signInWithEmailAndPassword(auth, email, password);
@@ -55,7 +54,7 @@ FirebaseAouthService.signOutRequest = async () =>
 FirebaseAouthService.signInGoogleRequest = async () => {
   try {
     const { user } = await signInWithPopup(auth, googleAuthProvider);
-    console.log(`user`, user);
+
     const { email, displayName, photoURL, uid, accessToken } = user;
     const savedToken = accessToken;
 
@@ -159,18 +158,6 @@ FirebaseAouthService.handleNewUser = async ({
   name,
   uid,
 }) => {
-  console.log(
-    `  email,
-  password,
-  userPhotoURL,
-  name,
-  uid,`,
-    email,
-    password,
-    userPhotoURL,
-    name,
-    uid
-  );
   try {
     if (uid) {
       const newUser = {
@@ -179,7 +166,7 @@ FirebaseAouthService.handleNewUser = async ({
         displayName: name ? name : "",
         photoURL: userPhotoURL ? userPhotoURL : null,
       };
-      console.log(`newUser`, newUser);
+
       await setDoc(doc(db, "users", uid), newUser);
       return newUser;
     } else {

@@ -1,8 +1,8 @@
 import React from "react";
-
+import ProductList from "./ProductList";
 /** Example purpose only */
 const ProjectsView = () => {
-  return <div>Projects View</div>;
+  return <ProductList></ProductList>;
 };
 
 export default ProjectsView;

@@ -8,7 +8,11 @@ import {
 } from "services/AuthService";
 import { onSignInSuccess, onSignOutSuccess } from "store/auth/sessionSlice";
 import appConfig from "configs/app.config";
-import { REDIRECT_URL_KEY } from "constants/app.constant";
+import {
+  AUTH_TOKEN,
+  AUTH_USER_DATA,
+  REDIRECT_URL_KEY,
+} from "constants/app.constant";
 import { useNavigate } from "react-router-dom";
 import useQuery from "./useQuery";
 
@@ -27,8 +31,10 @@ function useAuth() {
 
       if (resp) {
         const { token } = resp;
+        localStorage.setItem(AUTH_TOKEN, token);
+        localStorage.setItem(AUTH_USER_DATA, JSON.stringify(resp.user));
         dispatch(onSignInSuccess(token));
-        console.log(`resp.user`, resp.user);
+        console.log(`user`, resp.user);
         if (resp.user) {
           dispatch(
             setUser(
@@ -63,6 +69,8 @@ function useAuth() {
 
       if (resp) {
         const { token } = resp;
+        localStorage.setItem(AUTH_TOKEN, token);
+        localStorage.setItem(AUTH_USER_DATA, JSON.stringify(resp.user));
         dispatch(onSignInSuccess(token));
         if (resp.user) {
           dispatch(
@@ -132,6 +140,8 @@ function useAuth() {
 
   const signOut = async () => {
     await apiSignOut();
+    localStorage.removeItem(AUTH_TOKEN);
+    localStorage.removeItem(AUTH_USER_DATA);
     handleSignOut();
   };
 

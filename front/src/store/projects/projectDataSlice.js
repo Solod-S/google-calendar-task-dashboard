@@ -1,19 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  apiGetSalesProducts,
-  apiDeleteSalesProducts,
-} from "services/SalesService";
+import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
+import { apiGetProjects, apiDeleteProjects } from "services/ProjectsService";
 
 export const getProducts = createAsyncThunk(
-  "salesProductList/data/getProducts",
+  "projectList/data/get",
   async data => {
-    const response = await apiGetSalesProducts(data);
-    return response.data;
+    const response = await FirebaseMyProjectsService.fetchProjects();
+    // const response = await apiGetProjects(data);
+
+    return response;
+    // return response.data;
   }
 );
 
-export const deleteProduct = async data => {
-  const response = await apiDeleteSalesProducts(data);
+export const deleteProject = async data => {
+  const response = await apiDeleteProjects(data);
   return response.data;
 };
 
@@ -30,22 +31,21 @@ export const initialTableData = {
 
 export const initialFilterData = {
   name: "",
-  category: ["bags", "cloths", "devices", "shoes", "watches"],
-  status: [0, 1, 2],
-  productStatus: 0,
+  category: ["sales"],
+  active: [true, false],
 };
 
-const dataSlice = createSlice({
-  name: "salesProductList/data",
+const projectDataSlice = createSlice({
+  name: "projectList/data",
   initialState: {
     loading: false,
-    productList: [],
+    projectList: [],
     tableData: initialTableData,
     filterData: initialFilterData,
   },
   reducers: {
     updateProductList: (state, action) => {
-      state.productList = action.payload;
+      state.projectList = action.payload;
     },
     setTableData: (state, action) => {
       state.tableData = action.payload;
@@ -56,8 +56,7 @@ const dataSlice = createSlice({
   },
   extraReducers: {
     [getProducts.fulfilled]: (state, action) => {
-      console.log(`action.payload.data`, action.payload.data);
-      state.productList = action.payload.data;
+      state.projectList = action.payload.data;
       state.tableData.total = action.payload.total;
       state.loading = false;
     },
@@ -72,6 +71,6 @@ export const {
   setTableData,
   setFilterData,
   setSortedColumn,
-} = dataSlice.actions;
+} = projectDataSlice.actions;
 
-export default dataSlice.reducer;
+export default projectDataSlice.reducer;
