@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "components/ui";
-import { HiDownload, HiPlusCircle } from "react-icons/hi";
+import { HiPlusCircle } from "react-icons/hi";
 import ProductTableSearch from "./ProductTableSearch";
 
 import { Link } from "react-router-dom";
@@ -11,7 +11,7 @@ const ProductTableTools = () => {
       <ProductTableSearch />
       <Link
         className="block lg:inline-block md:mx-2 md:mb-0 mb-4"
-        to="/app/sales/product-new"
+        to="/projects/new"
       >
         <Button block variant="solid" size="sm" icon={<HiPlusCircle />}>
           Add Project
