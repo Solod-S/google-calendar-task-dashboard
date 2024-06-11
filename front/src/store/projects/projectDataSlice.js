@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
 import { apiGetProjects, apiDeleteProjects } from "services/ProjectsService";
 
-export const getProducts = createAsyncThunk(
+export const fetchProjects = createAsyncThunk(
   "projectList/data/get",
   async data => {
     const response = await FirebaseMyProjectsService.fetchProjects();
@@ -44,7 +44,7 @@ const projectDataSlice = createSlice({
     filterData: initialFilterData,
   },
   reducers: {
-    updateProductList: (state, action) => {
+    updateProjectList: (state, action) => {
       state.projectList = action.payload;
     },
     setTableData: (state, action) => {
@@ -55,19 +55,19 @@ const projectDataSlice = createSlice({
     },
   },
   extraReducers: {
-    [getProducts.fulfilled]: (state, action) => {
+    [fetchProjects.fulfilled]: (state, action) => {
       state.projectList = action.payload.data;
       state.tableData.total = action.payload.total;
       state.loading = false;
     },
-    [getProducts.pending]: state => {
+    [fetchProjects.pending]: state => {
       state.loading = true;
     },
   },
 });
 
 export const {
-  updateProductList,
+  updateProjectList,
   setTableData,
   setFilterData,
   setSortedColumn,

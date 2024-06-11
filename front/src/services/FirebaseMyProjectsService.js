@@ -41,6 +41,32 @@ FirebaseMyProjectsService.fetchProjects = async () => {
   }
 };
 
+FirebaseMyProjectsService.fetchProjectsCategories = async () => {
+  try {
+    const { owner_uid } = JSON.parse(localStorage.getItem(AUTH_USER_DATA));
+
+    const categoriesDataCollectionRef = collection(
+      db,
+      `users/${owner_uid}/project-categories`
+    );
+    const querySnapshot = await getDocs(
+      query(
+        categoriesDataCollectionRef,
+        orderBy("dateCreated", "desc") // Sort by creation date in descending order
+      )
+    );
+
+    const categories = [];
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      categories.push(data);
+    });
+    return { data: categories, total: categories?.length || 0 };
+  } catch (error) {
+    throw error;
+  }
+};
+
 FirebaseMyProjectsService.getProjectById = async projectId => {
   try {
     const { owner_uid } = JSON.parse(localStorage.getItem(AUTH_USER_DATA));
@@ -74,7 +100,6 @@ FirebaseMyProjectsService.addProject = async data => {
 
     const newData = {
       ...data,
-      socialNetworks: data.socialNetworks ? data.socialNetworks : [],
       dateCreated: currentDate,
       dateUpdated: currentDate,
     };

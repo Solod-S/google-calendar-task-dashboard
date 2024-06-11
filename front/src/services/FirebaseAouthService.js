@@ -23,7 +23,7 @@ import {
   doc,
 } from "firebase/firestore";
 
-const BASE_FRONT_URL = process.env.BASE_FRONT_URL;
+const BASE_FRONT_URL = process.env.REACT_APP_BASE_FRONT_URL;
 
 const FirebaseAouthService = {};
 

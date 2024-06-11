@@ -3,7 +3,7 @@ import { Input } from "components/ui";
 import { HiOutlineSearch } from "react-icons/hi";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getProducts,
+  fetchProjects,
   setTableData,
 } from "../../../../store/projects/projectDataSlice";
 import debounce from "lodash/debounce";
@@ -33,7 +33,7 @@ const ProductTableSearch = () => {
 
   const fetchData = data => {
     dispatch(setTableData(data));
-    dispatch(getProducts(data));
+    dispatch(fetchProjects(data));
   };
 
   const onEdit = e => {

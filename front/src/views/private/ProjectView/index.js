@@ -19,13 +19,10 @@ const Settings = () => {
   const [currentTab, setCurrentTab] = useState("profile");
   const [data, setData] = useState({
     profile: {
-      name: "Ron Vargas",
-      email: "ronnie_vergas@infotech.io",
-      title: "UI/UX Designer",
-      avatar: "/img/avatars/thumb-3.jpg",
-      timeZone: "GMT+8",
-      lang: { value: "English", id: "1", label: "English" },
-      syncData: false,
+      name: "Sales Notifications",
+      img: "https://jeffreybosworth.com/wp-content/uploads/2024/02/Sales-101-2.jpg",
+      category: "1",
+      active: true,
     },
     loginHistory: [
       {

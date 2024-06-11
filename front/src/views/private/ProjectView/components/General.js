@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Avatar,
-  Upload,
   Button,
   Select,
   Switcher,
@@ -15,48 +14,54 @@ import FormRow from "./FormRow";
 import { Field, Form, Formik } from "formik";
 import { HiOutlineBriefcase, HiOutlineUser } from "react-icons/hi";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(3, "Too Short!")
-    .max(12, "Too Long!")
-    .required("User Name Required"),
-  lang: Yup.string().required("Language is required"),
+  name: Yup.string().min(3, "Too Short!").required("Name is Required"),
+  category: Yup.string(),
   description: Yup.string(),
-  text: Yup.string().required("Text is required"),
   active: Yup.bool(),
+  img: Yup.string().url("Invalid URL"),
 });
 
-const langOptions = [
-  { value: "English", id: "1", label: "English" },
-  { value: "French", id: "2", label: "French" },
-];
-
 const General = ({ data }) => {
+  const [categoriesList, setCategoriesList] = useState([]);
+  const navigate = useNavigate();
+
   useEffect(() => {
-    console.log(`data`, data);
+    const getCategories = async () => {
+      const result = await FirebaseMyProjectsService.fetchProjectsCategories();
+
+      if (result.data.length > 0) setCategoriesList(result.data);
+    };
+    getCategories();
   }, [data]);
 
-  const onSetFormFile = (form, field, file) => {
-    form.setFieldValue(field.name, URL.createObjectURL(file[0]));
-  };
+  const onFormSubmit = async (values, setSubmitting) => {
+    try {
+      await FirebaseMyProjectsService.addProject(values);
+      toast.push(<Notification title={"Profile updated"} type="success" />, {
+        placement: "top-center",
+      });
 
-  const onFormSubmit = (values, setSubmitting) => {
-    toast.push(<Notification title={"Profile updated"} type="success" />, {
-      placement: "top-center",
-    });
-    setSubmitting(false);
+      setSubmitting(false);
+      navigate(`/projects`);
+    } catch (error) {
+      console.log(`error`, error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <Formik
       initialValues={{
         name: data.name || "",
-        lang: data.lang.value || langOptions[0].value,
+        category: data.category || "",
         description: data.description || "",
-        text: data.text || "",
         active: data.active || false,
-        avatar: data.avatar || "",
+        img: data.img || "",
       }}
       enableReinitialize
       validationSchema={validationSchema}
@@ -76,12 +81,26 @@ const General = ({ data }) => {
         setFieldValue,
       }) => {
         const validatorProps = { touched, errors };
+
+        // Find selected category by ID
+        const selectedCategory = categoriesList.find(
+          category => category.id === values.category
+        );
+
+        const categoryOptions = [
+          { value: "", label: "None" },
+          ...categoriesList.map(({ id, label }) => ({
+            value: id,
+            label: label,
+          })),
+        ];
+
         return (
           <Form>
             <FormContainer>
               <FormDesription
                 title="General"
-                desc="Basic info, like your name and address that will be displayed in public"
+                desc="Basic info, like project name, short description and categories"
               />
               <FormRow
                 name="active"
@@ -101,46 +120,43 @@ const General = ({ data }) => {
                   prefix={<HiOutlineBriefcase className="text-xl" />}
                 />
               </FormRow>
-              <FormRow name="avatar" label="Avatar" {...validatorProps}>
-                <Field name="avatar">
-                  {({ field, form }) => {
-                    const avatarProps = field.value ? { src: field.value } : {};
-                    return (
-                      <Upload
-                        className="cursor-pointer"
-                        onChange={files => onSetFormFile(form, field, files)}
-                        onFileRemove={files =>
-                          onSetFormFile(form, field, files)
-                        }
-                        showList={false}
-                        uploadLimit={1}
-                      >
-                        <Avatar
-                          className="border-2 border-white dark:border-gray-800 shadow-lg"
-                          size={60}
-                          shape="circle"
-                          icon={<HiOutlineUser />}
-                          {...avatarProps}
-                        />
-                      </Upload>
-                    );
-                  }}
-                </Field>
+              <FormRow name="img" label="Image URL" {...validatorProps}>
+                <Field
+                  type="text"
+                  autoComplete="off"
+                  name="img"
+                  placeholder="Image URL"
+                  component={Input}
+                />
+                {values.img && (
+                  <Avatar
+                    className="border-2 border-white dark:border-gray-800 shadow-lg mt-4"
+                    size={60}
+                    shape="circle"
+                    src={values.img}
+                    icon={<HiOutlineUser />}
+                  />
+                )}
               </FormRow>
               <FormDesription
                 className="mt-8"
-                title="Preferences"
-                desc="Your personalized preference displayed in your account"
+                title="Additional Information"
+                desc="Additional information that helps to group your projects"
               />
-              <FormRow name="lang" label="Language" {...validatorProps}>
-                <Field name="lang">
+              <FormRow name="category" label="Category" {...validatorProps}>
+                <Field name="category">
                   {({ field, form }) => (
                     <Select
                       {...field}
-                      options={langOptions}
-                      value={langOptions.find(
-                        option => option.value === field.value
-                      )}
+                      options={categoryOptions}
+                      value={
+                        selectedCategory
+                          ? {
+                              value: selectedCategory.id,
+                              label: selectedCategory.label,
+                            }
+                          : { value: "", label: "None" }
+                      }
                       onChange={option =>
                         form.setFieldValue(field.name, option.value)
                       }
@@ -164,25 +180,15 @@ const General = ({ data }) => {
                   )}
                 </Field>
               </FormRow>
-              <FormRow name="text" label="Text" {...validatorProps}>
-                <Field name="text">
-                  {({ field }) => (
-                    <textarea
-                      {...field}
-                      placeholder="Text"
-                      className="w-full p-2 border rounded-md"
-                      rows={4}
-                    />
-                  )}
-                </Field>
-              </FormRow>
+
               <div className="mt-4 ltr:text-right">
                 <Button
                   className="ltr:mr-2 rtl:ml-2"
+                  color="red"
                   type="button"
-                  onClick={resetForm}
+                  onClick={() => navigate(`/projects`)}
                 >
-                  Reset
+                  Cancel
                 </Button>
                 <Button variant="solid" loading={isSubmitting} type="submit">
                   {isSubmitting ? "Saving" : "Save"}

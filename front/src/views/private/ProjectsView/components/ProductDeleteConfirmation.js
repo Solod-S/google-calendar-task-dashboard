@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { toggleDeleteConfirmation } from "../../../../store/projects/projectStateSlice";
 import {
   deleteProject,
-  getProducts,
+  fetchProjects,
 } from "../../../../store/projects/projectDataSlice";
 
 const ProductDeleteConfirmation = () => {
@@ -27,7 +27,7 @@ const ProductDeleteConfirmation = () => {
     const success = await deleteProject({ id: selectedProduct });
 
     if (success) {
-      dispatch(getProducts(tableData));
+      dispatch(fetchProjects(tableData));
       toast.push(
         <Notification
           title={"Successfuly Deleted"}

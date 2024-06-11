@@ -5,7 +5,7 @@ import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
 import { FiPackage } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getProducts,
+  fetchProjects,
   setTableData,
 } from "../../../../store/projects/projectDataSlice";
 import {
@@ -103,7 +103,7 @@ const ProductTable = () => {
   );
 
   const fetchData = () => {
-    dispatch(getProducts({ pageIndex, pageSize, sort, query, filterData }));
+    dispatch(fetchProjects({ pageIndex, pageSize, sort, query, filterData }));
   };
 
   const columns = useMemo(
