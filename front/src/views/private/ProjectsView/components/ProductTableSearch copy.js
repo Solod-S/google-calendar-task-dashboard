@@ -11,18 +11,16 @@ import cloneDeep from "lodash/cloneDeep";
 
 const ProductTableSearch = () => {
   const dispatch = useDispatch();
-
   const searchInput = useRef();
-
   const tableData = useSelector(state => state.projects.data.tableData);
-
   const debounceFn = debounce(handleDebounceFn, 500);
 
   function handleDebounceFn(val) {
     const newTableData = cloneDeep(tableData);
-
+    console.log("New table data before query update:", newTableData); // Отладочное сообщение
     newTableData.query = val;
     newTableData.pageIndex = 1;
+
     if (typeof val === "string" && val.length > 1) {
       fetchData(newTableData);
     }
@@ -33,13 +31,13 @@ const ProductTableSearch = () => {
   }
 
   const fetchData = data => {
-    console.log(`data`, data);
+    console.log("Fetching data with:", data); // Отладочное сообщение
     dispatch(setTableData(data));
-    // dispatch(fetchProjects(data));
+    dispatch(fetchProjects(data));
   };
 
   const onEdit = e => {
-    console.log(`e.target.value`, e.target.value);
+    console.log("Input value:", e.target.value); // Отладочное сообщение
     debounceFn(e.target.value);
   };
 

@@ -1,13 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
+import { apiGetProjects, apiDeleteProjects } from "services/ProjectsService";
 
 export const fetchProjects = createAsyncThunk(
   "projectList/data/get",
   async data => {
-    console.log("Fetching projects with data:", data); // Отладочное сообщение
-    const response = await FirebaseMyProjectsService.fetchProjects(data); // Передаем данные запроса
-    console.log(`response`, response);
-    console.log("Fetched projects response:", response); // Отладочное сообщение
+    const response = await FirebaseMyProjectsService.fetchProjects();
     return response;
   }
 );
@@ -47,29 +45,29 @@ const projectDataSlice = createSlice({
       state.projectList = action.payload;
     },
     setTableData: (state, action) => {
-      console.log("Setting table data:", action.payload); // Отладочное сообщение
       state.tableData = action.payload;
     },
     setFilterData: (state, action) => {
-      console.log("Setting filter data:", action.payload); // Отладочное сообщение
       state.filterData = action.payload;
     },
   },
-  extraReducers: builder => {
-    builder
-      .addCase(fetchProjects.pending, state => {
-        state.loading = true;
-      })
-      .addCase(fetchProjects.fulfilled, (state, action) => {
-        console.log("Fetch projects fulfilled with data:", action.payload); // Отладочное сообщение
-        state.projectList = action.payload.data;
-        state.tableData.total = action.payload.total;
-        state.loading = false;
-      });
+  extraReducers: {
+    [fetchProjects.fulfilled]: (state, action) => {
+      state.projectList = action.payload.data;
+      state.tableData.total = action.payload.total;
+      state.loading = false;
+    },
+    [fetchProjects.pending]: state => {
+      state.loading = true;
+    },
   },
 });
 
-export const { updateProjectList, setTableData, setFilterData } =
-  projectDataSlice.actions;
+export const {
+  updateProjectList,
+  setTableData,
+  setFilterData,
+  setSortedColumn,
+} = projectDataSlice.actions;
 
 export default projectDataSlice.reducer;

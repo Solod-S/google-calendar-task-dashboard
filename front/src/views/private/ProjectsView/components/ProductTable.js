@@ -18,6 +18,7 @@ import ProductDeleteConfirmation from "./ProductDeleteConfirmation";
 import { useNavigate } from "react-router-dom";
 import cloneDeep from "lodash/cloneDeep";
 import dayjs from "dayjs";
+import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
 
 const inventoryStatusColor = {
   true: {
@@ -41,9 +42,10 @@ const ActionColumn = ({ row }) => {
     navigate(`/app/sales/product-edit/${row.id}`);
   };
 
-  const onDelete = () => {
+  const onDelete = async () => {
+    console.log(`row.id`, row.projectId);
     dispatch(toggleDeleteConfirmation(true));
-    dispatch(setSelectedProduct(row.id));
+    dispatch(setSelectedProduct(row.projectId));
   };
 
   return (
@@ -128,7 +130,7 @@ const ProductTable = () => {
       },
       {
         Header: "Status",
-        accessor: "status",
+        accessor: "active",
         sortable: true,
         Cell: props => {
           const { active } = props.row.original;
@@ -146,7 +148,7 @@ const ProductTable = () => {
       },
       {
         Header: "Created",
-        accessor: "created",
+        accessor: "dateCreated",
         sortable: true,
         Cell: props => {
           const { dateCreated } = props.row.original;
@@ -159,7 +161,7 @@ const ProductTable = () => {
       },
       {
         Header: "Updated",
-        accessor: "updated",
+        accessor: "dateUpdated",
         sortable: true,
         Cell: props => {
           const { dateUpdated } = props.row.original;

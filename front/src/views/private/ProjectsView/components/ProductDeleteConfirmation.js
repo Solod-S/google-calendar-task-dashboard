@@ -55,8 +55,8 @@ const ProductDeleteConfirmation = () => {
       confirmButtonColor="red-600"
     >
       <p>
-        Are you sure you want to delete this product? All record related to this
-        product will be deleted as well. This action cannot be undone.
+        Are you sure you want to delete this project? All record related to this
+        project will be deleted as well. This action cannot be undone.
       </p>
     </ConfirmDialog>
   );
