@@ -26,5 +26,5 @@ const navigationConfig = [
     subMenu: [],
   },
 ];
-
+// projects/edit
 export default navigationConfig;

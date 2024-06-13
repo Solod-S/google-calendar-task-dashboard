@@ -15,7 +15,7 @@ const settingsMenu = {
   integration: { label: "Integration", path: "integration" },
 };
 
-const Settings = () => {
+const ProjectView = ({ handleOk, handleCancel }) => {
   const [currentTab, setCurrentTab] = useState("profile");
   const [data, setData] = useState({
     profile: {
@@ -97,7 +97,13 @@ const Settings = () => {
         </Tabs>
         <div className="px-4 py-6">
           <Suspense fallback={<></>}>
-            {currentTab === "profile" && <General data={data.profile} />}
+            {currentTab === "profile" && (
+              <General
+                data={data.profile}
+                handleOk={handleOk}
+                handleCancel={handleCancel}
+              />
+            )}
             {currentTab === "integration" && <Integration />}
           </Suspense>
         </div>
@@ -106,4 +112,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default ProjectView;

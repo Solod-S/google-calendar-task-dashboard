@@ -43,7 +43,6 @@ const ActionColumn = ({ row }) => {
   };
 
   const onDelete = async () => {
-    console.log(`row.id`, row.projectId);
     dispatch(toggleDeleteConfirmation(true));
     dispatch(setSelectedProduct(row.projectId));
   };
@@ -96,6 +95,7 @@ const ProductTable = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageIndex, pageSize, sort]);
   useEffect(() => {
+    console.log(`data`, data);
     setProjects(data);
   }, [data]);
 

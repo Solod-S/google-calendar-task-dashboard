@@ -25,8 +25,9 @@ const validationSchema = Yup.object().shape({
   img: Yup.string().url("Invalid URL"),
 });
 
-const General = ({ data, handleOk, handleCancel }) => {
+const General = ({ data }) => {
   const [categoriesList, setCategoriesList] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getCategories = async () => {
@@ -45,8 +46,7 @@ const General = ({ data, handleOk, handleCancel }) => {
       });
 
       setSubmitting(false);
-      handleOk();
-
+      // navigate(`/projects`);
     } catch (error) {
       console.log(`error`, error);
     } finally {
@@ -181,19 +181,19 @@ const General = ({ data, handleOk, handleCancel }) => {
                 </Field>
               </FormRow>
 
-              <div className="mt-4 ltr:text-right">
+              {/* <div className="mt-4 ltr:text-right">
                 <Button
                   className="ltr:mr-2 rtl:ml-2"
                   color="red"
                   type="button"
-                  onClick={() => handleCancel()}
+                  onClick={() => navigate(`/projects`)}
                 >
                   Cancel
                 </Button>
                 <Button variant="solid" loading={isSubmitting} type="submit">
                   {isSubmitting ? "Saving" : "Save"}
                 </Button>
-              </div>
+              </div> */}
             </FormContainer>
           </Form>
         );
