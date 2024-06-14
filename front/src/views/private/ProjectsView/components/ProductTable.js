@@ -18,7 +18,6 @@ import ProductDeleteConfirmation from "./ProductDeleteConfirmation";
 import { useNavigate } from "react-router-dom";
 import cloneDeep from "lodash/cloneDeep";
 import dayjs from "dayjs";
-import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
 
 const inventoryStatusColor = {
   true: {
@@ -46,7 +45,7 @@ const ActionColumn = ({ row }) => {
     dispatch(toggleDeleteConfirmation(true));
     dispatch(setSelectedProduct(row.projectId));
   };
-
+// TODO
   return (
     <div className="flex justify-end text-lg">
       <span
@@ -95,7 +94,6 @@ const ProductTable = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageIndex, pageSize, sort]);
   useEffect(() => {
-    console.log(`data`, data);
     setProjects(data);
   }, [data]);
 

@@ -17,47 +17,6 @@ const settingsMenu = {
 
 const ProjectView = ({ handleOk, handleCancel }) => {
   const [currentTab, setCurrentTab] = useState("profile");
-  const [data, setData] = useState({
-    profile: {
-      name: "Sales Notifications",
-      img: "https://jeffreybosworth.com/wp-content/uploads/2024/02/Sales-101-2.jpg",
-      category: "1",
-      active: true,
-    },
-    loginHistory: [
-      {
-        type: "Desktop",
-        deviceName: "Desktop FKL-278",
-        time: 1646818364,
-        location: "Manhattan, United State",
-      },
-      {
-        type: "Mobile",
-        deviceName: "iPhone 13 Pro Max",
-        time: 1646396117,
-        location: "Manhattan, United State",
-      },
-      {
-        type: "Tablet",
-        deviceName: "iPad Air",
-        time: 1646126117,
-        location: "New York, United State",
-      },
-    ],
-    notification: {
-      news: ["app"],
-      accountActivity: ["app"],
-      signIn: ["app"],
-      reminders: ["browser"],
-      mentioned: ["email"],
-      replies: ["email"],
-      taskUpdate: ["email"],
-      assigned: ["email", "app"],
-      newProduct: ["browser", "app"],
-      newOrder: ["browser"],
-    },
-    id: "1",
-  });
 
   const navigate = useNavigate();
 
@@ -98,11 +57,7 @@ const ProjectView = ({ handleOk, handleCancel }) => {
         <div className="px-4 py-6">
           <Suspense fallback={<></>}>
             {currentTab === "profile" && (
-              <General
-                data={data.profile}
-                handleOk={handleOk}
-                handleCancel={handleCancel}
-              />
+              <General handleOk={handleOk} handleCancel={handleCancel} />
             )}
             {currentTab === "integration" && <Integration />}
           </Suspense>

@@ -4,10 +4,8 @@ import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
 export const fetchProjects = createAsyncThunk(
   "projectList/data/get",
   async data => {
-    console.log("Fetching projects with data:", data); // Отладочное сообщение
-    const response = await FirebaseMyProjectsService.fetchProjects(data); // Передаем данные запроса
-    console.log(`response`, response);
-    console.log("Fetched projects response:", response); // Отладочное сообщение
+    const response = await FirebaseMyProjectsService.fetchProjects(data);
+
     return response;
   }
 );
@@ -47,11 +45,9 @@ const projectDataSlice = createSlice({
       state.projectList = action.payload;
     },
     setTableData: (state, action) => {
-      console.log("Setting table data:", action.payload); // Отладочное сообщение
       state.tableData = action.payload;
     },
     setFilterData: (state, action) => {
-      console.log("Setting filter data:", action.payload); // Отладочное сообщение
       state.filterData = action.payload;
     },
   },
@@ -61,7 +57,6 @@ const projectDataSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchProjects.fulfilled, (state, action) => {
-        console.log("Fetch projects fulfilled with data:", action.payload); // Отладочное сообщение
         state.projectList = action.payload.data;
         state.tableData.total = action.payload.total;
         state.loading = false;

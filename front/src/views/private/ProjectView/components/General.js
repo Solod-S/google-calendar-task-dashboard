@@ -14,8 +14,9 @@ import FormRow from "./FormRow";
 import { Field, Form, Formik } from "formik";
 import { HiOutlineBriefcase, HiOutlineUser } from "react-icons/hi";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
 import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProjects } from "store/projects/projectDataSlice";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().min(3, "Too Short!").required("Name is Required"),
@@ -26,6 +27,13 @@ const validationSchema = Yup.object().shape({
 });
 
 const General = ({ data, handleOk, handleCancel }) => {
+  const dispatch = useDispatch();
+
+  const { pageIndex, pageSize, sort, query, total } = useSelector(
+    state => state.projects.data.tableData
+  );
+  const filterData = useSelector(state => state.projects.data.filterData);
+
   const [categoriesList, setCategoriesList] = useState([]);
 
   useEffect(() => {
@@ -40,13 +48,13 @@ const General = ({ data, handleOk, handleCancel }) => {
   const onFormSubmit = async (values, setSubmitting) => {
     try {
       await FirebaseMyProjectsService.addProject(values);
+      dispatch(fetchProjects({ pageIndex, pageSize, sort, query, filterData }));
       toast.push(<Notification title={"Profile updated"} type="success" />, {
         placement: "top-center",
       });
 
       setSubmitting(false);
       handleOk();
-
     } catch (error) {
       console.log(`error`, error);
     } finally {
@@ -57,11 +65,11 @@ const General = ({ data, handleOk, handleCancel }) => {
   return (
     <Formik
       initialValues={{
-        name: data.name || "",
-        category: data.category || "",
-        description: data.description || "",
-        active: data.active || false,
-        img: data.img || "",
+        name: data?.name || "",
+        category: data?.category || "",
+        description: data?.description || "",
+        active: data?.active || false,
+        img: data?.img || "",
       }}
       enableReinitialize
       validationSchema={validationSchema}

@@ -33,7 +33,6 @@ const ProductTableSearch = () => {
   }
 
   const fetchData = data => {
-    console.log(`data`, data);
     dispatch(setTableData(data));
     // dispatch(fetchProjects(data));
   };

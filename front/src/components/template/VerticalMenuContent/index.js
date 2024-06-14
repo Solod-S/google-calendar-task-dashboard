@@ -37,9 +37,7 @@ const VerticalMenuContent = props => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activedRoute?.parentKey]);
-  useEffect(() => {
-    console.log(`activedRoute`, activedRoute);
-  }, [activedRoute]);
+  useEffect(() => {}, [activedRoute]);
 
   const handleLinkClick = () => {
     onMenuItemClick?.();
