@@ -15,9 +15,9 @@ import {
 import { toggleDeleteConfirmation } from "../../../../store/projects/projectStateSlice";
 import useThemeClass from "utils/hooks/useThemeClass";
 import ProductDeleteConfirmation from "./ProductDeleteConfirmation";
-import { useNavigate } from "react-router-dom";
 import cloneDeep from "lodash/cloneDeep";
 import dayjs from "dayjs";
+import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
 
 const inventoryStatusColor = {
   true: {
@@ -32,25 +32,20 @@ const inventoryStatusColor = {
   },
 };
 
-const ActionColumn = ({ row }) => {
+const ActionColumn = ({ row, onEdit }) => {
   const dispatch = useDispatch();
   const { textTheme } = useThemeClass();
-  const navigate = useNavigate();
-
-  const onEdit = () => {
-    navigate(`/app/sales/product-edit/${row.id}`);
-  };
 
   const onDelete = async () => {
     dispatch(toggleDeleteConfirmation(true));
     dispatch(setSelectedProduct(row.projectId));
   };
-// TODO
+
   return (
     <div className="flex justify-end text-lg">
       <span
         className={`cursor-pointer p-2 hover:${textTheme}`}
-        onClick={onEdit}
+        onClick={() => onEdit(row)}
       >
         <HiOutlinePencil />
       </span>
@@ -79,9 +74,10 @@ const ProductColumn = ({ row }) => {
   );
 };
 
-const ProductTable = () => {
+const ProductTable = ({ onEdit }) => {
   const dispatch = useDispatch();
   const [projects, setProjects] = useState([]);
+  const [categoriesList, setCategoriesList] = useState([]);
   const { pageIndex, pageSize, sort, query, total } = useSelector(
     state => state.projects.data.tableData
   );
@@ -96,6 +92,16 @@ const ProductTable = () => {
   useEffect(() => {
     setProjects(data);
   }, [data]);
+
+  useEffect(() => {
+    const getCategories = async () => {
+      const result = await FirebaseMyProjectsService.fetchProjectsCategories();
+      console.log(`Fetched categories:`, result.data); // Debugging output
+
+      if (result.data.length > 0) setCategoriesList(result.data);
+    };
+    getCategories();
+  }, []);
 
   const tableData = useMemo(
     () => ({ pageIndex, pageSize, sort, query, total }),
@@ -123,7 +129,11 @@ const ProductTable = () => {
         sortable: true,
         Cell: props => {
           const row = props.row.original;
-          return <span className="capitalize">{row.category}</span>;
+          if (!categoriesList.length) return null;
+          const currentCategoryValue =
+            categoriesList?.find(cat => cat.id === row.category)?.value ||
+            "none";
+          return <span className="capitalize">{currentCategoryValue}</span>;
         },
       },
       {
@@ -174,10 +184,12 @@ const ProductTable = () => {
         Header: "",
         id: "action",
         accessor: row => row,
-        Cell: props => <ActionColumn row={props.row.original} />,
+        Cell: props => (
+          <ActionColumn row={props.row.original} onEdit={onEdit} />
+        ),
       },
     ],
-    []
+    [categoriesList, onEdit]
   );
 
   const onPaginationChange = page => {
@@ -202,17 +214,21 @@ const ProductTable = () => {
 
   return (
     <>
-      <DataTable
-        columns={columns}
-        data={projects}
-        skeletonAvatarColumns={[0]}
-        skeletonAvatarProps={{ className: "rounded-md" }}
-        loading={loading}
-        pagingData={tableData}
-        onPaginationChange={onPaginationChange}
-        onSelectChange={onSelectChange}
-        onSort={onSort}
-      />
+      {categoriesList.length ? (
+        <DataTable
+          columns={columns}
+          data={projects}
+          skeletonAvatarColumns={[0]}
+          skeletonAvatarProps={{ className: "rounded-md" }}
+          loading={loading}
+          pagingData={tableData}
+          onPaginationChange={onPaginationChange}
+          onSelectChange={onSelectChange}
+          onSort={onSort}
+        />
+      ) : (
+        <div>Loading categories...</div>
+      )}
       <ProductDeleteConfirmation />
     </>
   );

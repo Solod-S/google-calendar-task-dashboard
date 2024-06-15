@@ -11,6 +11,12 @@ injectReducer("projects", reducer);
 
 const ProjectList = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentProjectData, setCurrentProjectData] = useState(null);
+
+  const onEdit = data => {
+    setIsModalVisible(true);
+    setCurrentProjectData(data);
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -22,6 +28,7 @@ const ProjectList = () => {
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setCurrentProjectData(null);
   };
 
   return (
@@ -30,7 +37,7 @@ const ProjectList = () => {
         <h3 className="mb-4 lg:mb-0">Projects</h3>
         <ProductTableTools showModal={showModal} />
       </div>
-      <ProductTable />
+      <ProductTable onEdit={onEdit} />
       <Modal
         footer={null}
         title="Add New Project"
@@ -38,7 +45,11 @@ const ProjectList = () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <ProjectView handleOk={handleOk} handleCancel={handleCancel} />
+        <ProjectView
+          handleOk={handleOk}
+          handleCancel={handleCancel}
+          currentProjectData={currentProjectData}
+        />
       </Modal>
     </AdaptableCard>
   );

@@ -26,7 +26,7 @@ const validationSchema = Yup.object().shape({
   img: Yup.string().url("Invalid URL"),
 });
 
-const General = ({ data, handleOk, handleCancel }) => {
+const General = ({ handleOk, handleCancel, currentProjectData }) => {
   const dispatch = useDispatch();
 
   const { pageIndex, pageSize, sort, query, total } = useSelector(
@@ -43,11 +43,19 @@ const General = ({ data, handleOk, handleCancel }) => {
       if (result.data.length > 0) setCategoriesList(result.data);
     };
     getCategories();
-  }, [data]);
+  }, []);
 
   const onFormSubmit = async (values, setSubmitting) => {
     try {
-      await FirebaseMyProjectsService.addProject(values);
+      if (!currentProjectData) {
+        await FirebaseMyProjectsService.addProject(values);
+      } else {
+        await FirebaseMyProjectsService.edditProject({
+          ...values,
+          projectId: currentProjectData.projectId,
+        });
+      }
+
       dispatch(fetchProjects({ pageIndex, pageSize, sort, query, filterData }));
       toast.push(<Notification title={"Profile updated"} type="success" />, {
         placement: "top-center",
@@ -65,11 +73,11 @@ const General = ({ data, handleOk, handleCancel }) => {
   return (
     <Formik
       initialValues={{
-        name: data?.name || "",
-        category: data?.category || "",
-        description: data?.description || "",
-        active: data?.active || false,
-        img: data?.img || "",
+        name: currentProjectData?.name || "",
+        category: currentProjectData?.category || "",
+        description: currentProjectData?.description || "",
+        active: currentProjectData?.active || false,
+        img: currentProjectData?.img || "",
       }}
       enableReinitialize
       validationSchema={validationSchema}

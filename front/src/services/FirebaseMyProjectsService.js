@@ -164,6 +164,7 @@ FirebaseMyProjectsService.addProject = async data => {
 };
 
 FirebaseMyProjectsService.edditProject = async data => {
+  console.log(`data`, data);
   try {
     const userUid = auth.currentUser.uid;
     const projectId = data.projectId;
@@ -172,7 +173,7 @@ FirebaseMyProjectsService.edditProject = async data => {
       db,
       `users/${userUid}/projectsData/${projectId}`
     );
-
+    console.log(`users/${userUid}/projectsData/${projectId}`);
     const newData = {
       ...data,
       dateUpdated: new Date(),

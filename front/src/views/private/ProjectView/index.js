@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Suspense, lazy } from "react";
 import { Tabs } from "components/ui";
 import { AdaptableCard, Container } from "components/shared";
-import { useNavigate, useLocation } from "react-router-dom";
+
 import isEmpty from "lodash/isEmpty";
 import { apiGetAccountSettingData } from "services/AccountServices";
 
@@ -15,17 +15,12 @@ const settingsMenu = {
   integration: { label: "Integration", path: "integration" },
 };
 
-const ProjectView = ({ handleOk, handleCancel }) => {
+const ProjectView = ({ handleOk, handleCancel, currentProjectData }) => {
   const [currentTab, setCurrentTab] = useState("profile");
-
-  const navigate = useNavigate();
-
-  const location = useLocation();
 
   const onTabChange = val => {
     console.log(`val`, val);
     setCurrentTab(val);
-    // navigate(`/app/account/settings/${val}`);
   };
 
   const fetchData = async () => {
@@ -57,7 +52,11 @@ const ProjectView = ({ handleOk, handleCancel }) => {
         <div className="px-4 py-6">
           <Suspense fallback={<></>}>
             {currentTab === "profile" && (
-              <General handleOk={handleOk} handleCancel={handleCancel} />
+              <General
+                handleOk={handleOk}
+                handleCancel={handleCancel}
+                currentProjectData={currentProjectData}
+              />
             )}
             {currentTab === "integration" && <Integration />}
           </Suspense>
