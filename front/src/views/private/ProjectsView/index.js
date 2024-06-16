@@ -40,7 +40,7 @@ const ProjectList = () => {
       <ProductTable onEdit={onEdit} />
       <Modal
         footer={null}
-        title="Add New Project"
+        title="Project settings"
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}

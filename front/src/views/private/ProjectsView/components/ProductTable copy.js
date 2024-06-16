@@ -128,7 +128,7 @@ const ProductTable = ({ onEdit }) => {
         sortable: true,
         Cell: props => {
           const row = props.row.original;
-          if (!categoriesList.length) return "none";
+          if (!categoriesList.length) return null;
 
           const currentCategoryValue =
             categoriesList?.find(cat => cat.id === row.category)?.value ||
@@ -214,18 +214,21 @@ const ProductTable = ({ onEdit }) => {
 
   return (
     <>
-      <DataTable
-        columns={columns}
-        data={projects}
-        skeletonAvatarColumns={[0]}
-        skeletonAvatarProps={{ className: "rounded-md" }}
-        loading={loading}
-        pagingData={tableData}
-        onPaginationChange={onPaginationChange}
-        onSelectChange={onSelectChange}
-        onSort={onSort}
-      />
-
+      {categoriesList.length ? (
+        <DataTable
+          columns={columns}
+          data={projects}
+          skeletonAvatarColumns={[0]}
+          skeletonAvatarProps={{ className: "rounded-md" }}
+          loading={loading}
+          pagingData={tableData}
+          onPaginationChange={onPaginationChange}
+          onSelectChange={onSelectChange}
+          onSort={onSort}
+        />
+      ) : (
+        <div>Loading categories...</div>
+      )}
       <ProductDeleteConfirmation />
     </>
   );

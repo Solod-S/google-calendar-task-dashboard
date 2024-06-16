@@ -113,6 +113,59 @@ FirebaseMyProjectsService.fetchProjectsCategories = async () => {
   }
 };
 
+FirebaseMyProjectsService.addCategory = async data => {
+  try {
+    const userUid = auth.currentUser.uid;
+
+    const categoriesDataCollectionRef = collection(
+      db,
+      `users/${userUid}/project-categories`
+    );
+    const currentDate = new Date();
+
+    const newCategory = {
+      ...data,
+      dateCreated: currentDate,
+      dateUpdated: currentDate,
+    };
+
+    const categoryRef = await addDoc(categoriesDataCollectionRef, newCategory);
+    const categoryId = categoryRef.id;
+
+    await updateDoc(categoryRef, {
+      id: categoryId,
+    });
+
+    return { ...newCategory, id: categoryId };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+FirebaseMyProjectsService.deleteCategory = async categoryId => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error("User is not authenticated");
+    }
+
+    const owner_uid = user.uid;
+    console.log(`owner_uid`, owner_uid);
+    const categoryDocRef = doc(
+      db,
+      `users/${owner_uid}/project-categories`,
+      categoryId
+    );
+    console.log("Attempting to delete category with ID:", categoryId);
+    await deleteDoc(categoryDocRef);
+    console.log("Category successfully deleted!");
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    throw error;
+  }
+};
+
 FirebaseMyProjectsService.getProjectById = async projectId => {
   try {
     const { owner_uid } = JSON.parse(localStorage.getItem(AUTH_USER_DATA));

@@ -26,6 +26,11 @@ const validationSchema = Yup.object().shape({
   img: Yup.string().url("Invalid URL"),
 });
 
+const capitalizeFirstLetter = string => {
+  if (!string) return string;
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
+
 const General = ({ handleOk, handleCancel, currentProjectData }) => {
   const dispatch = useDispatch();
 
@@ -39,7 +44,6 @@ const General = ({ handleOk, handleCancel, currentProjectData }) => {
   useEffect(() => {
     const getCategories = async () => {
       const result = await FirebaseMyProjectsService.fetchProjectsCategories();
-
       if (result.data.length > 0) setCategoriesList(result.data);
     };
     getCategories();
@@ -65,6 +69,48 @@ const General = ({ handleOk, handleCancel, currentProjectData }) => {
       handleOk();
     } catch (error) {
       console.log(`error`, error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteCategory = async categoryId => {
+    console.log(`delete category`);
+    try {
+      await FirebaseMyProjectsService.deleteCategory(categoryId);
+      setCategoriesList(prevList =>
+        prevList.filter(cat => cat.id !== categoryId)
+      );
+      toast.push(<Notification title={"Category deleted"} type="success" />, {
+        placement: "top-center",
+      });
+    } catch (error) {
+      toast.push(
+        <Notification title={"Failed to delete category"} type="error" />,
+        {
+          placement: "top-center",
+        }
+      );
+    }
+  };
+
+  const handleAddCategory = async (categoryName, setSubmitting) => {
+    try {
+      const newCategory = await FirebaseMyProjectsService.addCategory({
+        value: capitalizeFirstLetter(categoryName),
+        label: capitalizeFirstLetter(categoryName),
+      });
+      setCategoriesList(prevList => [...prevList, newCategory]);
+      toast.push(<Notification title={"Category added"} type="success" />, {
+        placement: "top-center",
+      });
+    } catch (error) {
+      toast.push(
+        <Notification title={"Failed to add category"} type="error" />,
+        {
+          placement: "top-center",
+        }
+      );
     } finally {
       setSubmitting(false);
     }
@@ -98,7 +144,7 @@ const General = ({ handleOk, handleCancel, currentProjectData }) => {
       }) => {
         const validatorProps = { touched, errors };
 
-        // Find selected category by ID
+        // Найти выбранную категорию по ID
         const selectedCategory = categoriesList.find(
           category => category.id === values.category
         );
@@ -116,7 +162,7 @@ const General = ({ handleOk, handleCancel, currentProjectData }) => {
             <FormContainer>
               <FormDesription
                 title="General"
-                desc="Basic info, like project name, short description and categories"
+                desc="Basic info, like name, avatar and status."
               />
               <FormRow
                 name="active"
@@ -157,26 +203,65 @@ const General = ({ handleOk, handleCancel, currentProjectData }) => {
               <FormDesription
                 className="mt-8"
                 title="Additional Information"
-                desc="Additional information that helps to group your projects"
+                desc="Additional information that helps to group and describe your projects"
               />
               <FormRow name="category" label="Category" {...validatorProps}>
                 <Field name="category">
                   {({ field, form }) => (
-                    <Select
-                      {...field}
-                      options={categoryOptions}
-                      value={
-                        selectedCategory
-                          ? {
-                              value: selectedCategory.id,
-                              label: selectedCategory.label,
-                            }
-                          : { value: "", label: "None" }
-                      }
-                      onChange={option =>
-                        form.setFieldValue(field.name, option.value)
-                      }
-                    />
+                    <div className="flex items-center gap-2">
+                      <Select
+                        {...field}
+                        options={categoryOptions}
+                        value={
+                          selectedCategory
+                            ? {
+                                value: selectedCategory.id,
+                                label: selectedCategory.label,
+                              }
+                            : { value: "", label: "None" }
+                        }
+                        onChange={option =>
+                          form.setFieldValue(field.name, option.value)
+                        }
+                      />
+                      {selectedCategory && (
+                        <Button
+                          color="red"
+                          type="button"
+                          onClick={() =>
+                            handleDeleteCategory(selectedCategory.id)
+                          }
+                        >
+                          Delete
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </Field>
+              </FormRow>
+              <FormRow
+                name="newCategory"
+                label="Add New Category"
+                {...validatorProps}
+              >
+                <Field name="newCategory">
+                  {({ field, form }) => (
+                    <div className="flex items-center gap-2">
+                      <Input {...field} placeholder="New Category Name" />
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          const categoryName = field.value;
+                          if (categoryName) {
+                            handleAddCategory(categoryName, form.setSubmitting);
+                            form.setFieldValue(field.name, "");
+                          }
+                        }}
+                        disabled={isSubmitting}
+                      >
+                        Add
+                      </Button>
+                    </div>
                   )}
                 </Field>
               </FormRow>

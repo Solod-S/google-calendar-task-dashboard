@@ -1,3 +1,4 @@
 .toast {
-    @apply fixed z-40;
+  @apply fixed z-40;
+  z-index: 99999;
 }
