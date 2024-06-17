@@ -13,6 +13,8 @@ const ProjectList = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentProjectData, setCurrentProjectData] = useState(null);
 
+  const [modalKey, setModalKey] = useState(0);
+
   const onEdit = data => {
     setIsModalVisible(true);
     setCurrentProjectData(data);
@@ -20,6 +22,7 @@ const ProjectList = () => {
 
   const showModal = () => {
     setIsModalVisible(true);
+    setModalKey(prevKey => prevKey + 1);
   };
 
   const handleOk = () => {
@@ -39,6 +42,7 @@ const ProjectList = () => {
       </div>
       <ProductTable onEdit={onEdit} />
       <Modal
+        key={modalKey}
         footer={null}
         title="Project settings"
         open={isModalVisible}
@@ -49,6 +53,7 @@ const ProjectList = () => {
           handleOk={handleOk}
           handleCancel={handleCancel}
           currentProjectData={currentProjectData}
+          setCurrentProjectData={setCurrentProjectData}
         />
       </Modal>
     </AdaptableCard>

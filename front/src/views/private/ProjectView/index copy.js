@@ -1,13 +1,10 @@
 import React, { useState, useEffect, lazy } from "react";
-import { Tabs, toast, Notification } from "components/ui";
+import { Tabs } from "components/ui";
 import { AdaptableCard, Container } from "components/shared";
 
 import isEmpty from "lodash/isEmpty";
 import { apiGetAccountSettingData } from "services/AccountServices";
 import { Button } from "antd";
-import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchProjects } from "store/projects/projectDataSlice";
 
 const General = lazy(() => import("./components/General"));
 const Integration = lazy(() => import("./components/Integration"));
@@ -19,21 +16,8 @@ const settingsMenu = {
   integration: { label: "Integration", path: "integration" },
 };
 
-const ProjectView = ({
-  handleOk,
-  handleCancel,
-  currentProjectData,
-  setCurrentProjectData,
-}) => {
-  const dispatch = useDispatch();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [generalData, setGeneralData] = useState({});
+const ProjectView = ({ handleOk, handleCancel, currentProjectData }) => {
   const [currentTab, setCurrentTab] = useState("profile");
-
-  const { pageIndex, pageSize, sort, query, total } = useSelector(
-    state => state.projects.data.tableData
-  );
-  const filterData = useSelector(state => state.projects.data.filterData);
 
   const onTabChange = val => {
     setCurrentTab(val);
@@ -44,44 +28,6 @@ const ProjectView = ({
     // console.log(`response`, response);
     // setData(response.data);
   };
-
-  const handleSubmit = async () => {
-    try {
-      if (generalData?.projectId) {
-        await FirebaseMyProjectsService.edditProject({
-          ...generalData,
-          projectId: generalData.projectId,
-        });
-      } else {
-        await FirebaseMyProjectsService.addProject(generalData);
-      }
-
-      dispatch(fetchProjects({ pageIndex, pageSize, sort, query, filterData }));
-      setCurrentProjectData(null);
-      toast.push(<Notification title={"Profile updated"} type="success" />, {
-        placement: "top-center",
-      });
-
-      setIsSubmitting(false);
-      handleOk();
-    } catch (error) {
-      console.log(`error`, error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-  useEffect(() => {
-    if (currentProjectData) {
-      setGeneralData(currentProjectData);
-    } else
-      setGeneralData({
-        name: "",
-        category: "",
-        description: "",
-        active: false,
-        img: "",
-      });
-  }, [currentProjectData]);
 
   useEffect(() => {
     setCurrentTab("profile");
@@ -108,8 +54,7 @@ const ProjectView = ({
             handleOk={handleOk}
             show={currentTab === "profile"}
             handleCancel={handleCancel}
-            generalData={generalData}
-            setGeneralData={setGeneralData}
+            currentProjectData={currentProjectData}
           />
           <Integration show={currentTab === "integration"} />
           <div className="mt-4 ltr:text-right">
@@ -121,13 +66,8 @@ const ProjectView = ({
             >
               Cancel
             </Button>
-            <Button
-              variant="solid"
-              type="button"
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Saving" : "Save"}
+            <Button variant="solid" type="submit">
+              Save
             </Button>
           </div>
         </div>

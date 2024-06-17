@@ -9,7 +9,6 @@ import {
   toast,
   FormContainer,
 } from "components/ui";
-
 import FormDesription from "./FormDesription";
 import FormRow from "./FormRow";
 import { Field, Form, Formik } from "formik";
@@ -32,13 +31,7 @@ const capitalizeFirstLetter = string => {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 };
 
-const General = ({
-  handleOk,
-  handleCancel,
-  generalData,
-  setGeneralData,
-  show,
-}) => {
+const General = ({ handleOk, handleCancel, currentProjectData, show }) => {
   const dispatch = useDispatch();
 
   const { pageIndex, pageSize, sort, query, total } = useSelector(
@@ -48,23 +41,22 @@ const General = ({
 
   const [categoriesList, setCategoriesList] = useState([]);
 
-  const fetchCategories = async () => {
-    const result = await FirebaseMyProjectsService.fetchProjectsCategories();
-    if (result.data.length > 0) setCategoriesList(result.data);
-  };
-
-  useState(() => {
-    fetchCategories();
+  useEffect(() => {
+    const getCategories = async () => {
+      const result = await FirebaseMyProjectsService.fetchProjectsCategories();
+      if (result.data.length > 0) setCategoriesList(result.data);
+    };
+    getCategories();
   }, []);
 
   const onFormSubmit = async (values, setSubmitting) => {
     try {
-      if (!generalData) {
+      if (!currentProjectData) {
         await FirebaseMyProjectsService.addProject(values);
       } else {
         await FirebaseMyProjectsService.edditProject({
           ...values,
-          projectId: generalData.projectId,
+          projectId: currentProjectData.projectId,
         });
       }
 
@@ -124,21 +116,14 @@ const General = ({
     }
   };
 
-  const handleFieldChange = (name, value) => {
-    setGeneralData(prevData => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
   return (
     <Formik
       initialValues={{
-        name: generalData?.name || "",
-        category: generalData?.category || "",
-        description: generalData?.description || "",
-        active: generalData?.active || false,
-        img: generalData?.img || "",
+        name: currentProjectData?.name || "",
+        category: currentProjectData?.category || "",
+        description: currentProjectData?.description || "",
+        active: currentProjectData?.active || false,
+        img: currentProjectData?.img || "",
       }}
       enableReinitialize
       validationSchema={validationSchema}
@@ -159,6 +144,7 @@ const General = ({
       }) => {
         const validatorProps = { touched, errors };
 
+        // Найти выбранную категорию по ID
         const selectedCategory = categoriesList.find(
           category => category.id === values.category
         );
@@ -190,13 +176,7 @@ const General = ({
                   {...validatorProps}
                   border={false}
                 >
-                  <Field
-                    name="active"
-                    component={Switcher}
-                    onClick={e =>
-                      handleFieldChange("active", e.target.value !== "true")
-                    }
-                  />
+                  <Field name="active" component={Switcher} />
                 </FormRow>
                 <FormRow name="name" label="Name" {...validatorProps}>
                   <Field
@@ -206,7 +186,6 @@ const General = ({
                     placeholder="Name"
                     component={Input}
                     prefix={<HiOutlineBriefcase className="text-xl" />}
-                    onChange={e => handleFieldChange("name", e.target.value)}
                   />
                 </FormRow>
                 <FormRow name="img" label="Image URL" {...validatorProps}>
@@ -216,7 +195,6 @@ const General = ({
                     name="img"
                     placeholder="Image URL"
                     component={Input}
-                    onChange={e => handleFieldChange("img", e.target.value)}
                   />
                   {values.img && (
                     <Avatar
@@ -249,7 +227,7 @@ const General = ({
                               : { value: "", label: "None" }
                           }
                           onChange={option =>
-                            handleFieldChange("category", option.value)
+                            form.setFieldValue(field.name, option.value)
                           }
                         />
                         {selectedCategory && (
@@ -308,9 +286,6 @@ const General = ({
                         placeholder="Description"
                         className="w-full p-2 border rounded-md"
                         rows={4}
-                        onChange={e =>
-                          handleFieldChange("description", e.target.value)
-                        }
                       />
                     )}
                   </Field>
