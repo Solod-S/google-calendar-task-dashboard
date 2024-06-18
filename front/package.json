@@ -29,6 +29,7 @@
     "firebase-tools": "^13.10.2",
     "formik": "^2.2.9",
     "framer-motion": "^4.1.17",
+    "gapi-script": "^1.2.0",
     "history": "^5.0.0",
     "html-react-parser": "^3.0.4",
     "http-proxy-middleware": "^2.0.6",

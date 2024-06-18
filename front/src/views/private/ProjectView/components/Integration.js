@@ -11,6 +11,7 @@ import {
 import isEmpty from "lodash/isEmpty";
 import { apiGetAccountSettingIntegrationData } from "services/AccountServices";
 import cloneDeep from "lodash/cloneDeep";
+import GoogleCalendar from "./GoogleCalendar";
 
 const Integration = ({ show }) => {
   const [data, setData] = useState({});
@@ -81,6 +82,7 @@ const Integration = ({ show }) => {
       }}
     >
       <h5>Installed</h5>
+      <GoogleCalendar />
       <div className="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 mt-4">
         {data?.installed?.map(app => (
           <Card
