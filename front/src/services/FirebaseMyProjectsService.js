@@ -188,6 +188,7 @@ FirebaseMyProjectsService.getProjectById = async projectId => {
 };
 
 FirebaseMyProjectsService.addProject = async data => {
+  console.log(`data`, data);
   try {
     const userUid = auth.currentUser.uid;
 

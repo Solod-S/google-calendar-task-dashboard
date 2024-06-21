@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
-  Dialog,
   Notification,
   toast,
   Switcher,
@@ -11,100 +10,17 @@ import {
 import isEmpty from "lodash/isEmpty";
 import { apiGetAccountSettingIntegrationData } from "services/AccountServices";
 import cloneDeep from "lodash/cloneDeep";
+import GoogleCalendar from "./GoogleCalendar";
+import { Modal } from "antd";
 
-const Integration = () => {
+const Integration = ({ show }) => {
   const [data, setData] = useState({
-    installed: [
-      {
-        name: "Google Drive",
-        desc: "Upload your files to Google Drive",
-        img: "/img/thumbs/google-drive.png",
-        type: "Cloud storage",
-        active: true,
-      },
-      {
-        name: "Slack",
-        desc: "Post to a Slack channel",
-        img: "/img/thumbs/slack.png",
-        type: "Notifications and events",
-        active: true,
-      },
-      {
-        name: "Notion",
-        desc: "Retrieve notion note to your project",
-        img: "/img/thumbs/notion.png",
-        type: "Content management",
-        active: false,
-      },
-    ],
+    installed: [],
     available: [
       {
-        name: "Jira",
-        desc: "Create Jira issues",
-        img: "/img/thumbs/jira.png",
-        type: "Project management",
-        active: false,
-      },
-      {
-        name: "Zendesk",
-        desc: "Exchange data with Zendesk",
-        img: "/img/thumbs/zendesk.png",
-        type: "Customer service",
-        active: false,
-      },
-      {
-        name: "Dropbox",
-        desc: "Exchange data with Dropbox",
-        img: "/img/thumbs/dropbox.png",
-        type: "Cloud storage",
-        active: false,
-      },
-      {
-        name: "Github",
-        desc: "Exchange files with a GitHub repository",
-        img: "/img/thumbs/github.png",
-        type: "Code repositories",
-        active: false,
-      },
-      {
-        name: "Gitlab",
-        desc: "Exchange files with a Gitlab repository",
-        type: "Code repositories",
-        img: "/img/thumbs/gitlab.png",
-        active: false,
-      },
-      {
-        name: "Figma",
-        desc: "Exchange screenshots with Figma",
-        img: "/img/thumbs/figma.png",
-        type: "Design tools",
-        active: false,
-      },
-      {
-        name: "Adobe XD",
-        desc: "Exchange screenshots with Adobe XD",
-        img: "/img/thumbs/adobe-xd.png",
-        type: "Design tools",
-        active: false,
-      },
-      {
-        name: "Sketch",
-        desc: "Exchange screenshots with Sketch",
-        img: "/img/thumbs/sketch.png",
-        type: "Design tools",
-        active: false,
-      },
-      {
-        name: "Hubspot",
-        desc: "Exchange data with Hubspot",
-        img: "/img/thumbs/hubspot.png",
-        type: "Content management",
-        active: false,
-      },
-      {
-        name: "Zapier",
-        desc: "Integrate with hundreds of services.",
-        img: "/img/thumbs/zapier.png",
+        name: "Google Calendar",
+        desc: "Integrate with Google Calendar",
+        img: "/img/thumbs/google-calendar.png",
         type: "Notifications and events",
         active: false,
       },
@@ -112,21 +28,20 @@ const Integration = () => {
     id: "1",
   });
   const [viewIntegration, setViewIntegration] = useState(false);
-  const [intergrationDetails, setIntergrationDetails] = useState({});
+  const [integrationDetails, setIntegrationDetails] = useState({});
   const [installing, setInstalling] = useState(false);
 
-  // const fetchData = async () => {
-  //   const response = await apiGetAccountSettingIntegrationData();
-  //   // setData(response.data);
-  //   console.log(`response.data`, response.data);
-  // };
+  const fetchData = async () => {
+    const response = await apiGetAccountSettingIntegrationData();
+    setData(response.data);
+  };
 
-  // useEffect(() => {
-  //   if (isEmpty(data)) {
-  //     fetchData();
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  useEffect(() => {
+    // if (isEmpty(data)) {
+    //   fetchData();
+    // }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleToggle = (bool, name, category) => {
     setData(prevState => {
@@ -144,7 +59,7 @@ const Integration = () => {
 
   const onViewIntegrationOpen = (details, installed) => {
     setViewIntegration(true);
-    setIntergrationDetails({ ...details, installed });
+    setIntegrationDetails({ ...details, installed });
   };
 
   const onViewIntegrationClose = () => {
@@ -172,8 +87,14 @@ const Integration = () => {
   };
 
   return (
-    <>
+    <div
+      style={{
+        visibility: show ? "visible" : "hidden",
+        position: show ? "" : "absolute",
+      }}
+    >
       <h5>Installed</h5>
+      <GoogleCalendar />
       <div className="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 mt-4">
         {data?.installed?.map(app => (
           <Card
@@ -186,7 +107,7 @@ const Integration = () => {
                 size="sm"
                 onClick={() => onViewIntegrationOpen(app, true)}
               >
-                View Intergration
+                View Integration
               </Button>
             }
           >
@@ -225,7 +146,7 @@ const Integration = () => {
                   size="sm"
                   onClick={() => onViewIntegrationOpen(app, false)}
                 >
-                  View Intergration
+                  View Integration
                 </Button>
               }
             >
@@ -245,25 +166,44 @@ const Integration = () => {
           ))}
         </div>
       </div>
-      <Dialog
+      <Modal
         width={650}
-        isOpen={viewIntegration}
-        onClose={onViewIntegrationClose}
-        onRequestClose={onViewIntegrationClose}
+        open={viewIntegration}
+        onCancel={onViewIntegrationClose}
+        footer={[
+          <Button key="cancel" onClick={onViewIntegrationClose}>
+            Cancel
+          </Button>,
+          integrationDetails.installed ? (
+            <Button key="installed" type="primary" disabled>
+              Installed
+            </Button>
+          ) : (
+            <Button
+              key="install"
+              type="primary"
+              onClick={() => handleInstall(integrationDetails)}
+              loading={installing}
+            >
+              Install
+            </Button>
+          ),
+        ]}
+        zIndex={1050} // Задаем z-index здесь
       >
         <div className="flex items-center">
           <Avatar
             className="bg-transparent dark:bg-transparent"
-            src={intergrationDetails.img}
+            src={integrationDetails.img}
           />
           <div className="ltr:ml-3 rtl:mr-3">
-            <h6>{intergrationDetails.name}</h6>
-            <span>{intergrationDetails.type}</span>
+            <h6>{integrationDetails.name}</h6>
+            <span>{integrationDetails.type}</span>
           </div>
         </div>
         <div className="mt-6">
           <span className="font-semibold text-gray-900 dark:text-gray-100">
-            About {intergrationDetails.name}
+            About {integrationDetails.name}
           </span>
           <p className="mt-2 mb-4">
             Wings medium plunger pot, redeye doppio siphon froth iced. Latte,
@@ -290,30 +230,8 @@ const Integration = () => {
             </li>
           </ul>
         </div>
-        <div className="text-right mt-6">
-          <Button
-            className="ltr:mr-2 rtl:ml-2"
-            variant="plain"
-            onClick={onViewIntegrationClose}
-          >
-            Cancel
-          </Button>
-          {intergrationDetails.installed ? (
-            <Button disabled variant="solid">
-              Installed
-            </Button>
-          ) : (
-            <Button
-              variant="solid"
-              onClick={() => handleInstall(intergrationDetails)}
-              loading={installing}
-            >
-              Install
-            </Button>
-          )}
-        </div>
-      </Dialog>
-    </>
+      </Modal>
+    </div>
   );
 };
 

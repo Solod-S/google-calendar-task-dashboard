@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
-  Dialog,
   Notification,
   toast,
   Switcher,
@@ -11,18 +10,83 @@ import {
 import isEmpty from "lodash/isEmpty";
 import { apiGetAccountSettingIntegrationData } from "services/AccountServices";
 import cloneDeep from "lodash/cloneDeep";
-import GoogleCalendar from "./GoogleCalendar";
+import { Modal } from "antd";
+import { gapi } from "gapi-script";
+import axios from "axios";
 
-const Integration = ({ show }) => {
-  const [data, setData] = useState({});
+const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+const SERVER_URL = process.env.REACT_APP_SERVER_URL;
+const SCOPES = [
+  "https://www.googleapis.com/auth/calendar.readonly",
+  "https://www.googleapis.com/auth/tasks.readonly",
+];
+
+const Integration = ({ show, generalData, setGeneralData }) => {
+  const [data, setData] = useState({
+    installed: [],
+    available: [
+      {
+        name: "Google Calendar",
+        key: "integration_google_calendar",
+        desc: "Integrate with Google Calendar",
+        detailet: `
+        <p class="font-semibold text-gray-900 dark:text-gray-100">Your Telegram bot can synchronize with tasks and events from Google Calendar! This functionality allows you to:</p>
+        <ul class="list-disc mt-2 ltr:ml-4 rtl:mr-4">
+        <li class="mb-1"><strong>Synchronize tasks and events:</strong> The bot automatically fetches and displays your tasks and events from Google Calendar in an easy-to-read format.</li>
+        <li class="mb-1"><strong>Set selectors:</strong> You can choose which tasks and events to display using various filters and criteria.</li>
+        <li class="mb-1"><strong>And much more:</strong> The bot enables you to manage your tasks and events, receive notifications about upcoming events, and much more.</li>
+        </ul>
+        <p class="font-semibold text-gray-900 dark:text-gray-100">Make managing your tasks and events simpler and more convenient with the integration of Google Calendar with your Telegram bot!</p>
+       `,
+        img: "/img/thumbs/google-calendar.png",
+        type: "Notifications and events",
+        active: false,
+      },
+    ],
+    id: "1",
+  });
   const [viewIntegration, setViewIntegration] = useState(false);
-  const [intergrationDetails, setIntergrationDetails] = useState({});
+  const [integrationDetails, setIntegrationDetails] = useState({});
   const [installing, setInstalling] = useState(false);
 
-  const fetchData = async () => {
-    const response = await apiGetAccountSettingIntegrationData();
-    setData(response.data);
+  const handleCalendarClick = async () => {
+    try {
+      const authInstance = gapi.auth2.getAuthInstance();
+      const response = await authInstance.grantOfflineAccess({
+        prompt: "consent",
+      });
+      console.log("Authorization Code:", response.code);
+
+      // Отправляем код авторизации на сервер для обмена на токены
+      const res = await axios.post(`${SERVER_URL}/exchange-code-to-token`, {
+        code: response.code,
+      });
+
+      return res.data;
+    } catch (error) {
+      console.error("Error exchanging code:", error);
+      return null;
+    }
   };
+
+  useEffect(() => {
+    function start() {
+      gapi.client
+        .init({
+          clientId: CLIENT_ID,
+          scope: SCOPES.join(" "),
+        })
+        .then(() => {
+          const authInstance = gapi.auth2.getAuthInstance();
+          console.log("authInstance", authInstance);
+        })
+        .catch(error => {
+          console.error("Error initializing gapi client:", error);
+        });
+    }
+
+    gapi.load("client:auth2", start);
+  }, []);
 
   useEffect(() => {
     // if (isEmpty(data)) {
@@ -47,16 +111,39 @@ const Integration = ({ show }) => {
 
   const onViewIntegrationOpen = (details, installed) => {
     setViewIntegration(true);
-    setIntergrationDetails({ ...details, installed });
+    setIntegrationDetails({ ...details, installed });
   };
 
   const onViewIntegrationClose = () => {
     setViewIntegration(false);
   };
 
-  const handleInstall = details => {
-    setInstalling(true);
-    setTimeout(() => {
+  const handleInstall = async details => {
+    try {
+      setInstalling(true);
+      toast.push(
+        <Notification
+          title="Installation of the application has started and it may take a few minutes."
+          type="success"
+        />,
+        {
+          placement: "top-center",
+        }
+      );
+      let credentials = null;
+      switch (details.name) {
+        case "Google Calendar":
+          credentials = await handleCalendarClick();
+          break;
+
+        default:
+          break;
+      }
+      console.log(`credentials`, credentials);
+      setGeneralData(prevData => ({
+        ...prevData,
+        [details.key]: { ...credentials, active: false },
+      }));
       setData(prevState => {
         const nextState = cloneDeep(prevState);
         const nextAvailableApp = prevState.available.filter(
@@ -71,7 +158,11 @@ const Integration = ({ show }) => {
       toast.push(<Notification title="App installed" type="success" />, {
         placement: "top-center",
       });
-    }, 1000);
+    } catch (error) {
+      console.log(`Error: ${error}`);
+    } finally {
+      setInstalling(false);
+    }
   };
 
   return (
@@ -82,7 +173,7 @@ const Integration = ({ show }) => {
       }}
     >
       <h5>Installed</h5>
-      <GoogleCalendar />
+
       <div className="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 mt-4">
         {data?.installed?.map(app => (
           <Card
@@ -95,7 +186,7 @@ const Integration = ({ show }) => {
                 size="sm"
                 onClick={() => onViewIntegrationOpen(app, true)}
               >
-                View Intergration
+                View Integration
               </Button>
             }
           >
@@ -134,7 +225,7 @@ const Integration = ({ show }) => {
                   size="sm"
                   onClick={() => onViewIntegrationOpen(app, false)}
                 >
-                  View Intergration
+                  View Integration
                 </Button>
               }
             >
@@ -154,74 +245,51 @@ const Integration = ({ show }) => {
           ))}
         </div>
       </div>
-      <Dialog
+      <Modal
         width={650}
-        isOpen={viewIntegration}
-        onClose={onViewIntegrationClose}
-        onRequestClose={onViewIntegrationClose}
-      >
-        <div className="flex items-center">
-          <Avatar
-            className="bg-transparent dark:bg-transparent"
-            src={intergrationDetails.img}
-          />
-          <div className="ltr:ml-3 rtl:mr-3">
-            <h6>{intergrationDetails.name}</h6>
-            <span>{intergrationDetails.type}</span>
-          </div>
-        </div>
-        <div className="mt-6">
-          <span className="font-semibold text-gray-900 dark:text-gray-100">
-            About {intergrationDetails.name}
-          </span>
-          <p className="mt-2 mb-4">
-            Wings medium plunger pot, redeye doppio siphon froth iced. Latte,
-            and, barista cultivar fair trade grinder caramelization spoon.
-            Whipped, grinder to go brewed est single shot half and half. Plunger
-            pot blue mountain et blue mountain grinder carajillo, saucer half
-            and half milk instant strong.
-          </p>
-          <span className="font-semibold text-gray-900 dark:text-gray-100">
-            Key Features
-          </span>
-          <ul className="list-disc mt-2 ltr:ml-4 rtl:mr-4">
-            <li className="mb-1">
-              Fair trade, cortado con panna, crema foam cinnamon aged.{" "}
-            </li>
-            <li className="mb-1">
-              Mug saucer acerbic, caffeine organic kopi-luwak galão siphon.{" "}
-            </li>
-            <li className="mb-1">
-              To go half and half cultivar single origin ut, french press.{" "}
-            </li>
-            <li className="mb-1">
-              Mocha latte flavour cortado cup kopi-luwak.{" "}
-            </li>
-          </ul>
-        </div>
-        <div className="text-right mt-6">
-          <Button
-            className="ltr:mr-2 rtl:ml-2"
-            variant="plain"
-            onClick={onViewIntegrationClose}
-          >
+        open={viewIntegration}
+        onCancel={onViewIntegrationClose}
+        footer={[
+          <Button key="cancel" onClick={onViewIntegrationClose}>
             Cancel
-          </Button>
-          {intergrationDetails.installed ? (
-            <Button disabled variant="solid">
+          </Button>,
+          integrationDetails.installed ? (
+            <Button key="installed" type="primary" disabled>
               Installed
             </Button>
           ) : (
             <Button
-              variant="solid"
-              onClick={() => handleInstall(intergrationDetails)}
+              key="install"
+              type="primary"
+              onClick={() => handleInstall(integrationDetails)}
               loading={installing}
             >
-              Install
+              {installing ? "Installing" : "Install"}
             </Button>
-          )}
+          ),
+        ]}
+        // zIndex={1050}
+      >
+        <div className="flex items-center">
+          <Avatar
+            className="bg-transparent dark:bg-transparent"
+            src={integrationDetails.img}
+          />
+          <div className="ltr:ml-3 rtl:mr-3">
+            <h6>{integrationDetails.name}</h6>
+            <span>{integrationDetails.type}</span>
+          </div>
         </div>
-      </Dialog>
+        <div className="mt-6">
+          <span className="font-semibold text-gray-900 dark:text-gray-100">
+            About {integrationDetails.name}
+          </span>
+          <div
+            className="mt-2 mb-4"
+            dangerouslySetInnerHTML={{ __html: integrationDetails.detailet }}
+          />
+        </div>
+      </Modal>
     </div>
   );
 };

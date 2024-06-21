@@ -42,6 +42,7 @@ const ProjectList = () => {
       </div>
       <ProductTable onEdit={onEdit} />
       <Modal
+        width="80%"
         key={modalKey}
         footer={null}
         title="Project settings"

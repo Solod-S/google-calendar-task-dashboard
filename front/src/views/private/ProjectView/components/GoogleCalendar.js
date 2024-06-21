@@ -82,7 +82,6 @@ const GoogleCalendar = () => {
 
   return (
     <div>
-      <h1>Google Calendar Integration</h1>
       {!isAuthorized ? (
         <button onClick={handleAuthClick}>Authorize Google Calendar</button>
       ) : (

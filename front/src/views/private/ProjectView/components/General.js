@@ -32,13 +32,7 @@ const capitalizeFirstLetter = string => {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 };
 
-const General = ({
-  handleOk,
-  handleCancel,
-  generalData,
-  setGeneralData,
-  show,
-}) => {
+const General = ({ handleOk, generalData, setGeneralData, show }) => {
   const dispatch = useDispatch();
 
   const { pageIndex, pageSize, sort, query, total } = useSelector(

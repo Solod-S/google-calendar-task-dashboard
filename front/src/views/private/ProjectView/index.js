@@ -107,11 +107,14 @@ const ProjectView = ({
           <General
             handleOk={handleOk}
             show={currentTab === "profile"}
-            handleCancel={handleCancel}
             generalData={generalData}
             setGeneralData={setGeneralData}
           />
-          <Integration show={currentTab === "integration"} />
+          <Integration
+            show={currentTab === "integration"}
+            generalData={generalData}
+            setGeneralData={setGeneralData}
+          />
           <div className="mt-4 ltr:text-right">
             <Button
               className="ltr:mr-2 rtl:ml-2"
