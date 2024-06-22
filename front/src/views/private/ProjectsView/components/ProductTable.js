@@ -100,7 +100,7 @@ const ProductTable = ({ onEdit }) => {
       if (result.data.length > 0) setCategoriesList(result.data);
     };
     getCategories();
-  }, []);
+  }, [projects]);
 
   const tableData = useMemo(
     () => ({ pageIndex, pageSize, sort, query, total }),

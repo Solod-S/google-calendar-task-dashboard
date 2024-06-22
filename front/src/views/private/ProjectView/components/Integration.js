@@ -21,15 +21,14 @@ const SCOPES = [
   "https://www.googleapis.com/auth/tasks.readonly",
 ];
 
-const Integration = ({ show, generalData, setGeneralData }) => {
-  const [data, setData] = useState({
-    installed: [],
-    available: [
-      {
-        name: "Google Calendar",
-        key: "integration_google_calendar",
-        desc: "Integrate with Google Calendar",
-        detailet: `
+const initialData = {
+  installed: [],
+  available: [
+    {
+      name: "Google Calendar",
+      key: "google_calendar",
+      desc: "Integrate with Google Calendar",
+      detailet: `
         <p class="font-semibold text-gray-900 dark:text-gray-100">Your Telegram bot can synchronize with tasks and events from Google Calendar! This functionality allows you to:</p>
         <ul class="list-disc mt-2 ltr:ml-4 rtl:mr-4">
         <li class="mb-1"><strong>Synchronize tasks and events:</strong> The bot automatically fetches and displays your tasks and events from Google Calendar in an easy-to-read format.</li>
@@ -38,13 +37,16 @@ const Integration = ({ show, generalData, setGeneralData }) => {
         </ul>
         <p class="font-semibold text-gray-900 dark:text-gray-100">Make managing your tasks and events simpler and more convenient with the integration of Google Calendar with your Telegram bot!</p>
        `,
-        img: "/img/thumbs/google-calendar.png",
-        type: "Notifications and events",
-        active: false,
-      },
-    ],
-    id: "1",
-  });
+      img: "/img/thumbs/google-calendar.png",
+      type: "Notifications and events",
+      active: false,
+    },
+  ],
+  id: "1",
+};
+
+const Integration = ({ show, generalData, setGeneralData }) => {
+  const [data, setData] = useState(initialData);
   const [viewIntegration, setViewIntegration] = useState(false);
   const [integrationDetails, setIntegrationDetails] = useState({});
   const [installing, setInstalling] = useState(false);
@@ -55,9 +57,7 @@ const Integration = ({ show, generalData, setGeneralData }) => {
       const response = await authInstance.grantOfflineAccess({
         prompt: "consent",
       });
-      console.log("Authorization Code:", response.code);
 
-      // Отправляем код авторизации на сервер для обмена на токены
       const res = await axios.post(`${SERVER_URL}/exchange-code-to-token`, {
         code: response.code,
       });
@@ -77,8 +77,7 @@ const Integration = ({ show, generalData, setGeneralData }) => {
           scope: SCOPES.join(" "),
         })
         .then(() => {
-          const authInstance = gapi.auth2.getAuthInstance();
-          console.log("authInstance", authInstance);
+          gapi.auth2.getAuthInstance();
         })
         .catch(error => {
           console.error("Error initializing gapi client:", error);
@@ -89,24 +88,39 @@ const Integration = ({ show, generalData, setGeneralData }) => {
   }, []);
 
   useEffect(() => {
-    // if (isEmpty(data)) {
-    //   fetchData();
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (generalData?.integrations) {
+      const newData = { ...initialData, installed: [], available: [] };
+
+      initialData.available.forEach(availableItem => {
+        const integrationItem = generalData.integrations.find(
+          integration => integration.key === availableItem.key
+        );
+
+        if (integrationItem) {
+          const mergedItem = { ...availableItem, ...integrationItem };
+          newData.installed.push(mergedItem);
+        } else {
+          newData.available.push(availableItem);
+        }
+      });
+
+      setData(newData);
+    }
+  }, [generalData]);
 
   const handleToggle = (bool, name, category) => {
-    setData(prevState => {
-      const nextState = cloneDeep(prevState);
-      const nextCategoryValue = prevState[category].map(app => {
-        if (app.name === name) {
-          app.active = !bool;
-        }
-        return app;
-      });
-      nextState[category] = nextCategoryValue;
-      return nextState;
-    });
+    // Обновление generalData должно быть за пределами setData
+    const updatedIntegrations = data[category].map(app => ({
+      ...generalData.integrations.find(
+        integration => integration.key === app.key
+      ),
+      active: !bool,
+    }));
+
+    setGeneralData(prevData => ({
+      ...prevData,
+      integrations: updatedIntegrations,
+    }));
   };
 
   const onViewIntegrationOpen = (details, installed) => {
@@ -140,10 +154,21 @@ const Integration = ({ show, generalData, setGeneralData }) => {
           break;
       }
       console.log(`credentials`, credentials);
-      setGeneralData(prevData => ({
-        ...prevData,
-        [details.key]: { ...credentials, active: false },
-      }));
+      setGeneralData(prevData => {
+        const integrations = prevData?.integrations ?? [];
+        return {
+          ...prevData,
+          integrations: [
+            ...integrations,
+            {
+              ...credentials,
+              active: false,
+              key: details.key,
+              name: details.name,
+            },
+          ],
+        };
+      });
       setData(prevState => {
         const nextState = cloneDeep(prevState);
         const nextAvailableApp = prevState.available.filter(
@@ -161,6 +186,48 @@ const Integration = ({ show, generalData, setGeneralData }) => {
     } catch (error) {
       console.log(`Error: ${error}`);
     } finally {
+      setInstalling(false);
+    }
+  };
+
+  const handleUninstall = async details => {
+    try {
+      setInstalling(true);
+      toast.push(
+        <Notification
+          title="Uninstall process started, it may take a few minutes."
+          type="success"
+        />,
+        {
+          placement: "top-center",
+        }
+      );
+
+      setTimeout(() => {
+        setGeneralData(prevData => {
+          const integrations = prevData?.integrations ?? [];
+          const result = integrations.filter(
+            integration => integration.key !== details.key
+          );
+
+          return {
+            ...prevData,
+            integrations: result,
+          };
+        });
+
+        toast.push(
+          <Notification title="App was successfully removed" type="success" />,
+          {
+            placement: "top-center",
+          }
+        );
+
+        setInstalling(false);
+        onViewIntegrationClose();
+      }, 2000);
+    } catch (error) {
+      console.log(`Error: ${error}`);
       setInstalling(false);
     }
   };
@@ -254,8 +321,18 @@ const Integration = ({ show, generalData, setGeneralData }) => {
             Cancel
           </Button>,
           integrationDetails.installed ? (
-            <Button key="installed" type="primary" disabled>
-              Installed
+            // <Button key="installed" type="primary" disabled>
+            //   Installed
+            // </Button>
+            <Button
+              key="uninstall"
+              type="primary"
+              danger
+              style={{ background: "red", color: "white" }}
+              loading={installing}
+              onClick={() => handleUninstall(integrationDetails)}
+            >
+              {installing ? "Uninstalling" : "Uninstall"}
             </Button>
           ) : (
             <Button

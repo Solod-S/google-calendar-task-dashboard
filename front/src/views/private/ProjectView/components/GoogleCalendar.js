@@ -22,7 +22,6 @@ const GoogleCalendar = () => {
         })
         .then(() => {
           const authInstance = gapi.auth2.getAuthInstance();
-          console.log("authInstance", authInstance);
         })
         .catch(error => {
           console.error("Error initializing gapi client:", error);

@@ -39,12 +39,6 @@ const ProjectView = ({
     setCurrentTab(val);
   };
 
-  const fetchData = async () => {
-    // const response = await apiGetAccountSettingData();
-    // console.log(`response`, response);
-    // setData(response.data);
-  };
-
   const handleSubmit = async () => {
     try {
       if (generalData?.projectId) {
@@ -58,16 +52,18 @@ const ProjectView = ({
 
       dispatch(fetchProjects({ pageIndex, pageSize, sort, query, filterData }));
       setCurrentProjectData(null);
-      toast.push(<Notification title={"Profile updated"} type="success" />, {
+      toast.push(<Notification title={"Project updated"} type="success" />, {
         placement: "top-center",
       });
 
       setIsSubmitting(false);
+
       handleOk();
     } catch (error) {
       console.log(`error`, error);
     } finally {
       setIsSubmitting(false);
+      setCurrentTab("profile");
     }
   };
   useEffect(() => {
