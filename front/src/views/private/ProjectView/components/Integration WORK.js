@@ -14,7 +14,10 @@ import { Modal } from "antd";
 import { gapi } from "gapi-script";
 import axios from "axios";
 
-const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+const GOOGLE_CALENDAR_CLIENT_ID =
+  process.env.REACT_APP_GOOGLE_CALENDAR_CLIENT_ID;
+const GOOGLE_CALENDAR_SECRET_ID =
+  process.env.REACT_APP_GOOGLE_CALENDAR_SECRET_ID;
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 const SCOPES = [
   "https://www.googleapis.com/auth/calendar.readonly",
@@ -73,8 +76,14 @@ const Integration = ({ show, generalData, setGeneralData }) => {
     function start() {
       gapi.client
         .init({
-          clientId: CLIENT_ID,
+          clientId: GOOGLE_CALENDAR_CLIENT_ID,
           scope: SCOPES.join(" "),
+        })
+        .then(() => {
+          return gapi.client.load("calendar", "v3");
+        })
+        .then(() => {
+          return gapi.client.load("tasks", "v1");
         })
         .then(() => {
           gapi.auth2.getAuthInstance();
@@ -110,7 +119,6 @@ const Integration = ({ show, generalData, setGeneralData }) => {
   }, [generalData]);
 
   const handleToggle = (bool, name, category) => {
-    // Обновление generalData должно быть за пределами setData
     const updatedIntegrations = data[category].map(app => ({
       ...generalData.integrations.find(
         integration => integration.key === app.key
@@ -233,6 +241,162 @@ const Integration = ({ show, generalData, setGeneralData }) => {
     }
   };
 
+  // const listUpcomingEvents = credentials => {
+  //   gapi.client.setToken({ access_token: credentials.access_token });
+  //   gapi.client.calendar.events
+  //     .list({
+  //       calendarId: "primary",
+  //       timeMin: new Date().toISOString(),
+  //       showDeleted: false,
+  //       singleEvents: true,
+  //       maxResults: 99,
+  //       showCompleted: false,
+  //       orderBy: "startTime",
+  //     })
+  //     .then(response => {
+  //       const events = response.result.items;
+  //       console.log("Upcoming events:");
+  //       if (events.length > 0) {
+  //         events.forEach(event => {
+  //           console.log("Event details:");
+  //           console.log("ID:", event.id);
+  //           console.log("Summary:", event.summary);
+  //           console.log("Description:", event.description || "No description");
+  //           console.log("Location:", event.location || "No location");
+  //           console.log("Start:", event.start.dateTime || event.start.date);
+  //           console.log("End:", event.end.dateTime || event.end.date);
+  //           console.log("Status:", event.status);
+  //           console.log("HTML Link:", event.htmlLink);
+  //           console.log("---");
+  //         });
+  //       } else {
+  //         console.log("No upcoming events found.");
+  //       }
+  //     })
+  //     .catch(error => {
+  //       console.error("Error listing events:", error);
+  //     });
+  // };
+
+  async function refreshGoogleCalendarTokens(credentials) {
+    const response = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        client_id: GOOGLE_CALENDAR_CLIENT_ID,
+        client_secret: GOOGLE_CALENDAR_SECRET_ID,
+        refresh_token: credentials.refresh_token,
+        grant_type: "refresh_token",
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to refresh access token");
+    }
+
+    const data = await response.json();
+    return data;
+  }
+
+  const listUpcomingEvents = async credentials => {
+    try {
+      gapi.client.setToken({ access_token: credentials.access_token });
+
+      // Proceed with listing upcoming events
+      const response = await gapi.client.calendar.events.list({
+        calendarId: "primary",
+        timeMin: new Date().toISOString(),
+        showDeleted: false,
+        singleEvents: true,
+        maxResults: 99,
+        showCompleted: false,
+        orderBy: "startTime",
+      });
+
+      const events = response.result.items;
+      console.log("Upcoming events:");
+      if (events.length > 0) {
+        events.forEach(event => {
+          console.log("Event details:");
+          console.log("ID:", event.id);
+          console.log("Summary:", event.summary);
+          console.log("Description:", event.description || "No description");
+          console.log("Location:", event.location || "No location");
+          console.log("Start:", event.start.dateTime || event.start.date);
+          console.log("End:", event.end.dateTime || event.end.date);
+          console.log("Status:", event.status);
+          console.log("HTML Link:", event.htmlLink);
+          console.log("---");
+        });
+      } else {
+        console.log("No upcoming events found.");
+      }
+    } catch (error) {
+      console.error("Error listing events:", error);
+    }
+  };
+
+  const listTasks = credentials => {
+    gapi.client.setToken({ access_token: credentials.access_token });
+    gapi.client.tasks.tasks
+      .list({
+        tasklist: "@default",
+        maxResults: 99,
+        showCompleted: false, // Исключить завершенные задачи
+      })
+      .then(response => {
+        const tasks = response.result.items;
+        console.log("Tasks:");
+        if (tasks && tasks.length > 0) {
+          const now = new Date();
+          const upcomingTasks = tasks.filter(task => {
+            if (!task.due) return true; // Включить задачи без даты завершения
+            const dueDate = new Date(task.due);
+            return dueDate >= now;
+          });
+
+          if (upcomingTasks.length > 0) {
+            upcomingTasks.forEach(task => {
+              console.log(`Task: ${task.title}`);
+              console.log("Task details:", task); // Вывод всех параметров задачи
+            });
+          } else {
+            console.log("No upcoming tasks found.");
+          }
+        } else {
+          console.log("No tasks found.");
+        }
+      })
+      .catch(error => {
+        console.error("Error listing tasks:", error);
+      });
+  };
+
+  const handleGetEventsAndTasks = async () => {
+    const googleCalendarCredentials = generalData.integrations.find(
+      integration => integration.key === "google_calendar"
+    );
+
+    if (googleCalendarCredentials) {
+      const updatedCredentials = await refreshGoogleCalendarTokens(
+        googleCalendarCredentials
+      );
+
+      listUpcomingEvents({
+        ...googleCalendarCredentials,
+        ...updatedCredentials,
+      });
+      // listTasks({
+      //   ...googleCalendarCredentials,
+      //   ...updatedCredentials,
+      // });
+    } else {
+      console.error("Google Calendar credentials not found.");
+    }
+  };
+
   return (
     <div
       style={{
@@ -275,6 +439,13 @@ const Integration = ({ show, generalData, setGeneralData }) => {
                 />
               </div>
               <p className="mt-6">{app.desc}</p>
+              <Button
+                variant="plain"
+                size="sm"
+                onClick={handleGetEventsAndTasks}
+              >
+                Get Events and Tasks
+              </Button>
             </div>
           </Card>
         ))}
@@ -322,9 +493,6 @@ const Integration = ({ show, generalData, setGeneralData }) => {
             Cancel
           </Button>,
           integrationDetails.installed ? (
-            // <Button key="installed" type="primary" disabled>
-            //   Installed
-            // </Button>
             <Button
               key="uninstall"
               type="primary"
@@ -346,7 +514,6 @@ const Integration = ({ show, generalData, setGeneralData }) => {
             </Button>
           ),
         ]}
-        // zIndex={1050}
       >
         <div className="flex items-center">
           <Avatar

@@ -9,14 +9,19 @@ import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "store/projects/projectDataSlice";
 
-const General = lazy(() => import("./components/General"));
-const Integration = lazy(() => import("./components/Integration"));
+import General from "./components/General";
+import Integration from "./components/Integration";
+import Calendar from "./components/Calendar";
+// const General = lazy(() => import("./components/General"));
+// const Integration = lazy(() => import("./components/Integration"));
+// const Calendar = lazy(() => import("./components/Calendar"));
 
 const { TabNav, TabList } = Tabs;
 
 const settingsMenu = {
   profile: { label: "General", path: "profile" },
   integration: { label: "Integration", path: "integration" },
+  Calendar: { label: "Calendar", path: "calendar" },
 };
 
 const ProjectView = ({
@@ -111,6 +116,7 @@ const ProjectView = ({
             generalData={generalData}
             setGeneralData={setGeneralData}
           />
+          <Calendar show={currentTab === "Calendar"} />
           <div className="mt-4 ltr:text-right">
             <Button
               className="ltr:mr-2 rtl:ml-2"
