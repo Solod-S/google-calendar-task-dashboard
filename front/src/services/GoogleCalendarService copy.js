@@ -70,18 +70,19 @@ export const listUpcomingEvents = async credentials => {
     const events = response.result.items;
     console.log("Upcoming events:");
     if (events.length > 0) {
-      events.forEach(event => {
-        console.log("Event details:");
-        console.log("ID:", event.id);
-        console.log("Summary:", event.summary);
-        console.log("Description:", event.description || "No description");
-        console.log("Location:", event.location || "No location");
-        console.log("Start:", event.start.dateTime || event.start.date);
-        console.log("End:", event.end.dateTime || event.end.date);
-        console.log("Status:", event.status);
-        console.log("HTML Link:", event.htmlLink);
-        console.log("---");
-      });
+      console.log(`events`, events);
+      // events.forEach(event => {
+      //   console.log("Event details:");
+      //   console.log("ID:", event.id);
+      //   console.log("Summary:", event.summary);
+      //   console.log("Description:", event.description || "No description");
+      //   console.log("Location:", event.location || "No location");
+      //   console.log("Start:", event.start.dateTime || event.start.date);
+      //   console.log("End:", event.end.dateTime || event.end.date);
+      //   console.log("Status:", event.status);
+      //   console.log("HTML Link:", event.htmlLink);
+      //   console.log("---");
+      // });
     } else {
       console.log("No upcoming events found.");
     }

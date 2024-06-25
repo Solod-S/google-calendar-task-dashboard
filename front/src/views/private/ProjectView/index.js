@@ -1,9 +1,8 @@
-import React, { useState, useEffect, lazy } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, toast, Notification } from "components/ui";
 import { AdaptableCard, Container } from "components/shared";
 
 import isEmpty from "lodash/isEmpty";
-import { apiGetAccountSettingData } from "services/AccountServices";
 import { Button } from "antd";
 import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,9 +11,6 @@ import { fetchProjects } from "store/projects/projectDataSlice";
 import General from "./components/General";
 import Integration from "./components/Integration";
 import Calendar from "./components/Calendar";
-// const General = lazy(() => import("./components/General"));
-// const Integration = lazy(() => import("./components/Integration"));
-// const Calendar = lazy(() => import("./components/Calendar"));
 
 const { TabNav, TabList } = Tabs;
 
@@ -116,7 +112,11 @@ const ProjectView = ({
             generalData={generalData}
             setGeneralData={setGeneralData}
           />
-          <Calendar show={currentTab === "Calendar"} />
+          <Calendar
+            show={currentTab === "Calendar"}
+            generalData={generalData}
+            setGeneralData={setGeneralData}
+          />
           <div className="mt-4 ltr:text-right">
             <Button
               className="ltr:mr-2 rtl:ml-2"

@@ -8,8 +8,39 @@ const SCOPES = [
   "https://www.googleapis.com/auth/tasks.readonly",
 ];
 
+const transformEvents = events => {
+  return events.map(event => {
+    const { id, summary, colorId = 1, htmlLink, hangoutLink } = event;
+
+    // Определение цвета события на основе colorId (здесь можно добавить свои цвета)
+    const eventColor = getColorFromId(colorId);
+
+    return {
+      id,
+      title: summary,
+      start: event?.start?.dateTime?.split("T")[0] || event.start.date,
+      time: event?.start?.dateTime?.split("T")[1] || "11:00:00+03:00",
+      description: event?.description || "",
+      eventColor,
+      link: htmlLink || hangoutLink || "",
+    };
+  });
+};
+
+const getColorFromId = colorId => {
+  const colorMap = {
+    1: "blue",
+    2: "green",
+    3: "red",
+    4: "yellow",
+    5: "purple",
+  };
+
+  return colorMap[colorId] || "defaultColor";
+};
+
 const GoogleCalendarService = {
-  initGoogleCalendar() {
+  async initGoogleCalendar() {
     return new Promise((resolve, reject) => {
       function start() {
         gapi.client
@@ -57,35 +88,41 @@ const GoogleCalendarService = {
   async getGoogleCalendarEvents(credentials) {
     try {
       gapi.client.setToken({ access_token: credentials.access_token });
+      // Определяем текущую дату и дату через год
+      const now = new Date();
+      const oneYearFromNow = new Date(now);
+      oneYearFromNow.setFullYear(now.getFullYear() + 1);
 
       const response = await gapi.client.calendar.events.list({
         calendarId: "primary",
         timeMin: new Date().toISOString(),
         showDeleted: false,
         singleEvents: true,
-        maxResults: 99,
+        // maxResults: 99,
         showCompleted: false,
         orderBy: "startTime",
+        timeMax: oneYearFromNow.toISOString(), // Добавляем параметр timeMax
       });
 
-      const events = response.result.items;
-      console.log("Upcoming events:");
-      if (events.length > 0) {
-        events.forEach(event => {
-          console.log("Event details:");
-          console.log("ID:", event.id);
-          console.log("Summary:", event.summary);
-          console.log("Description:", event.description || "No description");
-          console.log("Location:", event.location || "No location");
-          console.log("Start:", event.start.dateTime || event.start.date);
-          console.log("End:", event.end.dateTime || event.end.date);
-          console.log("Status:", event.status);
-          console.log("HTML Link:", event.htmlLink);
-          console.log("---");
-        });
-      } else {
-        console.log("No upcoming events found.");
-      }
+      const events = transformEvents(response.result.items);
+      console.log("Upcoming events:", events[0]);
+      return events;
+      //   if (events.length > 0) {
+      //     // events.forEach(event => {
+      //     //   console.log("Event details:");
+      //     //   console.log("ID:", event.id);
+      //     //   console.log("Summary:", event.summary);
+      //     //   console.log("Description:", event.description || "No description");
+      //     //   console.log("Location:", event.location || "No location");
+      //     //   console.log("Start:", event.start.dateTime || event.start.date);
+      //     //   console.log("End:", event.end.dateTime || event.end.date);
+      //     //   console.log("Status:", event.status);
+      //     //   console.log("HTML Link:", event.htmlLink);
+      //     //   console.log("---");
+      //     // });
+      //   } else {
+      //     console.log("No upcoming events found.");
+      //   }
     } catch (error) {
       console.error("Error listing events:", error);
     }

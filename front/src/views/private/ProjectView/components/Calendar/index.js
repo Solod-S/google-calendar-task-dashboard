@@ -7,18 +7,52 @@ import { getEvents, updateEvent } from "./store/dataSlice";
 import { setSelected, openDialog } from "./store/stateSlice";
 import { useDispatch, useSelector } from "react-redux";
 import cloneDeep from "lodash/cloneDeep";
+import GoogleCalendarService from "services/GoogleCalendarService";
+
+const {
+  exchangeCodeForTokens,
+  initGoogleCalendar,
+  getGoogleCalendarEvents,
+  refreshGoogleCalendarTokens,
+  getGoogleCalendarTasks,
+} = GoogleCalendarService;
 
 injectReducer("crmCalendar", reducer);
 
-const Calendar = ({ show }) => {
+const Calendar = ({ show, generalData, setGeneralDatas }) => {
   const dispatch = useDispatch();
   const storeEvents = useSelector(state => state.crmCalendar.data.eventList);
   const [events, setEvents] = useState([]);
   const calendarRef = useRef(null);
 
   useEffect(() => {
-    dispatch(getEvents());
+    const getGoogleEvents = async () => {
+      const updatedCredentials = await refreshGoogleCalendarTokens(
+        googleCalendarCredentials
+      );
+      dispatch(
+        getEvents({
+          ...googleCalendarCredentials,
+          ...updatedCredentials,
+        })
+      );
+    };
+    const googleCalendarCredentials = generalData?.integrations?.find(
+      integration => integration.key === "google_calendar"
+    );
+
+    if (googleCalendarCredentials) {
+      setTimeout(() => {
+        getGoogleEvents(googleCalendarCredentials);
+      }, 1000);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, generalData]);
+
+  useEffect(() => {
+    initGoogleCalendar().catch(error => {
+      console.error("Error initializing Google API:", error);
+    });
   }, []);
 
   useEffect(() => {
