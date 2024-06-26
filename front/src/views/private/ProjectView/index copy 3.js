@@ -14,6 +14,12 @@ import Calendar from "./components/Calendar";
 
 const { TabNav, TabList } = Tabs;
 
+// const settingsMenu = {
+//   profile: { label: "General", path: "profile" },
+//   integration: { label: "Integration", path: "integration" },
+//   Calendar: { label: "Calendar", path: "calendar" },
+// };
+
 const ProjectView = ({
   handleOk,
   handleCancel,
@@ -69,35 +75,31 @@ const ProjectView = ({
   useEffect(() => {
     if (currentProjectData) {
       setGeneralData(currentProjectData);
-    } else {
+    } else
       setGeneralData({
         name: "",
         category: "",
         description: "",
         active: false,
         img: "",
-        integrations: [],
       });
-    }
   }, [currentProjectData]);
 
   useEffect(() => {
-    const hasGoogleCalendar = generalData?.integrations?.find(
-      integration => integration.key === "google_calendar"
-    );
+    const menu = {
+      profile: { label: "General", path: "profile" },
+      integration: { label: "Integration", path: "integration" },
+    };
 
-    if (hasGoogleCalendar) {
-      setSettingsMenu({
-        profile: { label: "General", path: "profile" },
-        integration: { label: "Integration", path: "integration" },
-        calendar: { label: "Calendar", path: "calendar" },
-      });
-    } else {
-      setSettingsMenu({
-        profile: { label: "General", path: "profile" },
-        integration: { label: "Integration", path: "integration" },
-      });
+    if (
+      generalData.integrations?.find(
+        integration => integration.key === "google_calendar"
+      )
+    ) {
+      menu.calendar = { label: "Calendar", path: "calendar" };
     }
+
+    setSettingsMenu(menu);
   }, [generalData]);
 
   return (
@@ -124,13 +126,11 @@ const ProjectView = ({
             generalData={generalData}
             setGeneralData={setGeneralData}
           />
-          {settingsMenu.calendar && (
-            <Calendar
-              show={currentTab === "calendar"}
-              generalData={generalData}
-              setGeneralData={setGeneralData}
-            />
-          )}
+          <Calendar
+            show={currentTab === "Calendar"}
+            generalData={generalData}
+            setGeneralData={setGeneralData}
+          />
           <div className="mt-4 ltr:text-right">
             <Button
               className="ltr:mr-2 rtl:ml-2"

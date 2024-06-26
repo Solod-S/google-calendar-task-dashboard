@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Tabs, toast, Notification } from "components/ui";
 import { AdaptableCard, Container } from "components/shared";
-
-import isEmpty from "lodash/isEmpty";
 import { Button } from "antd";
 import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "store/projects/projectDataSlice";
-
 import General from "./components/General";
 import Integration from "./components/Integration";
 import Calendar from "./components/Calendar";
@@ -40,8 +37,9 @@ const ProjectView = ({
 
   const handleSubmit = async () => {
     try {
+      setIsSubmitting(true);
       if (generalData?.projectId) {
-        await FirebaseMyProjectsService.edditProject({
+        await FirebaseMyProjectsService.editProject({
           ...generalData,
           projectId: generalData.projectId,
         });
@@ -56,12 +54,11 @@ const ProjectView = ({
       });
 
       setIsSubmitting(false);
-
       handleOk();
     } catch (error) {
       console.log(`error`, error);
-    } finally {
       setIsSubmitting(false);
+    } finally {
       setCurrentTab("profile");
     }
   };
@@ -82,22 +79,20 @@ const ProjectView = ({
   }, [currentProjectData]);
 
   useEffect(() => {
-    const hasGoogleCalendar = generalData?.integrations?.find(
-      integration => integration.key === "google_calendar"
-    );
+    const menu = {
+      profile: { label: "General", path: "profile" },
+      integration: { label: "Integration", path: "integration" },
+    };
 
-    if (hasGoogleCalendar) {
-      setSettingsMenu({
-        profile: { label: "General", path: "profile" },
-        integration: { label: "Integration", path: "integration" },
-        calendar: { label: "Calendar", path: "calendar" },
-      });
-    } else {
-      setSettingsMenu({
-        profile: { label: "General", path: "profile" },
-        integration: { label: "Integration", path: "integration" },
-      });
+    if (
+      generalData.integrations?.find(
+        integration => integration.key === "google_calendar"
+      )
+    ) {
+      menu.calendar = { label: "Calendar", path: "calendar" };
     }
+
+    setSettingsMenu(menu);
   }, [generalData]);
 
   return (

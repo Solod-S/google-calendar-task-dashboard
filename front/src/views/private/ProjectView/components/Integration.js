@@ -16,7 +16,6 @@ import GoogleCalendarService from "services/GoogleCalendarService";
 
 const {
   exchangeCodeForTokens,
-  initGoogleCalendar,
   getGoogleCalendarEvents,
   refreshGoogleCalendarTokens,
   getGoogleCalendarTasks,
@@ -51,12 +50,6 @@ const Integration = ({ show, generalData, setGeneralData }) => {
   const [viewIntegration, setViewIntegration] = useState(false);
   const [integrationDetails, setIntegrationDetails] = useState({});
   const [installing, setInstalling] = useState(false);
-
-  useEffect(() => {
-    initGoogleCalendar().catch(error => {
-      console.error("Error initializing Google API:", error);
-    });
-  }, []);
 
   useEffect(() => {
     if (generalData?.integrations) {

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { gapi } from "gapi-script";
 
+const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 const GOOGLE_CALENDAR_CLIENT_ID =
   process.env.REACT_APP_GOOGLE_CALENDAR_CLIENT_ID;
 const SCOPES = [
@@ -67,7 +68,7 @@ const GoogleCalendarService = {
     });
   },
 
-  async exchangeCodeForTokens(SERVER_URL) {
+  async exchangeCodeForTokens() {
     try {
       const authInstance = gapi.auth2.getAuthInstance();
       const response = await authInstance.grantOfflineAccess({
