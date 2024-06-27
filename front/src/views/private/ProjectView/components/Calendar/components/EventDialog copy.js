@@ -58,14 +58,6 @@ const CustomControl = ({ children, ...props }) => {
   );
 };
 
-const stripHtmlTags = str => {
-  if (!str) return "";
-  return str
-    .replace(/<br\s*\/?>/g, "\n")
-    .replace(/<[^>]*>/g, "")
-    .replace(/&nbsp;/g, " ");
-};
-
 const validationSchema = Yup.object().shape({
   // title: Yup.string().required("Event title Required"),
   // startDate: Yup.string().required("Start Date Required"),
@@ -95,9 +87,6 @@ const EventDialog = ({ submit }) => {
     if (values.endDate) {
       eventData.end = values.endDate;
     }
-    if (values.description) {
-      eventData.description = values.description;
-    }
     submit?.(eventData, selected.type);
     dispatch(closeDialog());
   };
@@ -108,12 +97,17 @@ const EventDialog = ({ submit }) => {
 
   return (
     <Modal
+      // width="80%"
       footer={null}
+      // title="Project settings"
       open={open}
       onOk={handleDialogClose}
       onCancel={handleDialogClose}
     >
-      <h5 className="mb-4">Event settings</h5>
+      <h5 className="mb-4">
+        {/* {selected.type === "NEW" ? "Add New Event" : "Edit Event"} */}
+        Event settings
+      </h5>
       <div>
         <Formik
           enableReinitialize
@@ -122,7 +116,7 @@ const EventDialog = ({ submit }) => {
             startDate: selected.start || "",
             endDate: selected.end || "",
             color: selected.eventColor || colorOptions[0].value,
-            description: stripHtmlTags(selected.description) || "",
+            description: selected.description || "",
             time: selected.time || "",
           }}
           validationSchema={validationSchema}
@@ -204,32 +198,10 @@ const EventDialog = ({ submit }) => {
                     </Field>
                   </FormItem>
                 )}
-                {selected.description && (
-                  <FormItem
-                    label="📝 Description"
-                    invalid={errors.description && touched.description}
-                    errorMessage={errors.description}
-                  >
-                    <Field
-                      as="textarea"
-                      disabled={true}
-                      name="description"
-                      placeholder="Please enter description"
-                      className="form-textarea"
-                      style={{
-                        resize: "none",
-                        width: "100%",
-                        padding: "8px 11px",
-                        backgroundColor: "#F3F4F6",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "5px",
-                        height: "150px",
-                      }}
-                    />
-                  </FormItem>
-                )}
+
                 <FormItem
                   label="🌈 Color"
+                  // asterisk={true}
                   invalid={errors.color && touched.color}
                   errorMessage={errors.color}
                 >

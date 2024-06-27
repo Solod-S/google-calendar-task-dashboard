@@ -61,9 +61,9 @@ const CustomControl = ({ children, ...props }) => {
 const stripHtmlTags = str => {
   if (!str) return "";
   return str
-    .replace(/<br\s*\/?>/g, "\n")
     .replace(/<[^>]*>/g, "")
-    .replace(/&nbsp;/g, " ");
+    .replace(/&nbsp;/g, " ")
+    .replace(/<br\s*\/?>/g, "\n");
 };
 
 const validationSchema = Yup.object().shape({

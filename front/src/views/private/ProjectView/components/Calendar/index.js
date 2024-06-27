@@ -78,7 +78,9 @@ const Calendar = ({ show, generalData, setGeneralDatas }) => {
   };
 
   const onEventClick = arg => {
-    const { start, end, id, title, extendedProps } = arg.event;
+    const { start, end, id, title, extendedProps, time, description } =
+      arg.event;
+
     dispatch(
       setSelected({
         type: "EDIT",
@@ -87,6 +89,8 @@ const Calendar = ({ show, generalData, setGeneralDatas }) => {
         start,
         end,
         id,
+        description: extendedProps.description,
+        time: extendedProps.time,
       })
     );
     dispatch(openDialog());

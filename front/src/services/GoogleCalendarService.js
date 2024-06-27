@@ -15,13 +15,18 @@ const transformEvents = events => {
 
     // Определение цвета события на основе colorId (здесь можно добавить свои цвета)
     const eventColor = getColorFromId(colorId);
-
     return {
       id,
       title: summary,
       start: event?.start?.dateTime?.split("T")[0] || event.start.date,
-      time: event?.start?.dateTime?.split("T")[1] || "11:00:00+03:00",
-      description: event?.description || "",
+      end: event?.end?.dateTime || null,
+      time:
+        event?.start?.dateTime
+          ?.split("T")[1]
+          .replace(/\+.*/, "")
+          .substring(0, 5) ||
+        "11:00:00+03:00".replace(/\+.*/, "").substring(0, 5),
+      description: event?.description || null,
       eventColor,
       link: htmlLink || hangoutLink || "",
     };

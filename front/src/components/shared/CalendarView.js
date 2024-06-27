@@ -107,6 +107,7 @@ const CalendarView = forwardRef((props, ref) => {
           right: "dayGridMonth,timeGridWeek,timeGridDay prev,next",
         }}
         eventContent={arg => {
+          // console.log(`arg.event`, arg.event);
           const { extendedProps } = arg.event;
           const { isEnd, isStart } = arg;
           return (
