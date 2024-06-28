@@ -14,12 +14,7 @@ import { Modal } from "antd";
 
 import GoogleCalendarService from "services/GoogleCalendarService";
 
-const {
-  exchangeCodeForTokens,
-  getGoogleCalendarEvents,
-  refreshGoogleCalendarTokens,
-  getGoogleCalendarTasks,
-} = GoogleCalendarService;
+const { exchangeCodeForTokens } = GoogleCalendarService;
 
 const initialData = {
   installed: [],
@@ -129,6 +124,7 @@ const Integration = ({ show, generalData, setGeneralData }) => {
               active: false,
               key: details.key,
               name: details.name,
+              tgSelectors: [],
             },
           ],
         };
@@ -196,29 +192,6 @@ const Integration = ({ show, generalData, setGeneralData }) => {
     }
   };
 
-  const handleGetEventsAndTasks = async () => {
-    const googleCalendarCredentials = generalData.integrations.find(
-      integration => integration.key === "google_calendar"
-    );
-
-    if (googleCalendarCredentials) {
-      const updatedCredentials = await refreshGoogleCalendarTokens(
-        googleCalendarCredentials
-      );
-
-      getGoogleCalendarEvents({
-        ...googleCalendarCredentials,
-        ...updatedCredentials,
-      });
-      // getGoogleCalendarTasks({
-      //   ...googleCalendarCredentials,
-      //   ...updatedCredentials,
-      // });
-    } else {
-      console.error("Google Calendar credentials not found.");
-    }
-  };
-
   return (
     <div
       style={{
@@ -261,13 +234,6 @@ const Integration = ({ show, generalData, setGeneralData }) => {
                 />
               </div>
               <p className="mt-6">{app.desc}</p>
-              <Button
-                variant="plain"
-                size="sm"
-                onClick={handleGetEventsAndTasks}
-              >
-                Get Events and Tasks
-              </Button>
             </div>
           </Card>
         ))}

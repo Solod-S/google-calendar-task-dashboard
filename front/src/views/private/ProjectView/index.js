@@ -85,8 +85,11 @@ const ProjectView = ({
     const hasGoogleCalendar = generalData?.integrations?.find(
       integration => integration.key === "google_calendar"
     );
+    const googleCalendarIsActive = generalData?.integrations?.find(
+      integration => integration.active === true
+    );
 
-    if (hasGoogleCalendar) {
+    if (hasGoogleCalendar && googleCalendarIsActive) {
       setSettingsMenu({
         profile: { label: "General", path: "profile" },
         integration: { label: "Integration", path: "integration" },

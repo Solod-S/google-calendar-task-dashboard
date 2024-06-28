@@ -64,7 +64,10 @@ const stripHtmlTags = str => {
 };
 
 const validationSchema = Yup.object().shape({
-  // Add your validation schema here as needed
+  // title: Yup.string().required("Event title Required"),
+  // startDate: Yup.string().required("Start Date Required"),
+  // endDate: Yup.string(),
+  // color: Yup.string().required("Color Required"),
 });
 
 const SelectWordModal = ({ title, onSelect, onClose, open, selectedWords }) => {
@@ -200,24 +203,6 @@ const EventDialog = ({ submit, generalData, setGeneralData }) => {
                       </Button>
                     </div>
                   </FormItem>
-                  {/* Display selected words */}
-                  {selectedWords.length > 0 && (
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Selector(s):
-                      </label>
-                      <div className="flex flex-wrap mt-2">
-                        {selectedWords.map((word, index) => (
-                          <Badge
-                            key={index}
-                            className="mr-2 mb-2 bg-blue-100 text-blue-800"
-                          >
-                            {word}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                   <FormItem
                     label="🏁 Start Date"
                     invalid={errors.startDate && touched.startDate}
@@ -326,7 +311,9 @@ const EventDialog = ({ submit, generalData, setGeneralData }) => {
                     </Field>
                   </FormItem>
                   <FormItem className="mb-0 text-right rtl:text-left">
-                    {/* Additional buttons or actions can be placed here if needed */}
+                    {/* <Button variant="solid" type="submit">
+                    Submit
+                  </Button> */}
                   </FormItem>
                 </FormContainer>
               </Form>

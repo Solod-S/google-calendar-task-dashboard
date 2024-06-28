@@ -19,7 +19,7 @@ const {
 
 injectReducer("crmCalendar", reducer);
 
-const Calendar = ({ show, generalData, setGeneralDatas }) => {
+const Calendar = ({ show, generalData, setGeneralData }) => {
   const dispatch = useDispatch();
   const storeEvents = useSelector(state => state.crmCalendar.data.eventList);
   const [events, setEvents] = useState([]);
@@ -148,7 +148,11 @@ const Calendar = ({ show, generalData, setGeneralDatas }) => {
           selectable
           eventDrop={onEventChange}
         />
-        <EventDialog submit={onSubmit} />
+        <EventDialog
+          generalData={generalData}
+          setGeneralData={setGeneralData}
+          submit={onSubmit}
+        />
       </Container>
     </div>
   );

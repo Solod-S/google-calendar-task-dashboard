@@ -8,13 +8,17 @@ const SCOPES = [
   "https://www.googleapis.com/auth/calendar.readonly",
   "https://www.googleapis.com/auth/tasks.readonly",
 ];
+const hasTag = (tags, title) => {
+  return tags.some(tag => title.includes(tag));
+};
 
-const transformEvents = events => {
+const transformEvents = ({ events, tgSelectors }) => {
   return events.map(event => {
-    const { id, summary, colorId = 1, htmlLink, hangoutLink } = event;
+    const { id, summary, colorId = 3, htmlLink, hangoutLink } = event;
 
     // Определение цвета события на основе colorId (здесь можно добавить свои цвета)
-    const eventColor = getColorFromId(colorId);
+    // const eventColor = getColorFromId(colorId);
+    const eventColor = getColorFromId(3);
     return {
       id,
       title: summary,
@@ -27,7 +31,9 @@ const transformEvents = events => {
           .substring(0, 5) ||
         "11:00:00+03:00".replace(/\+.*/, "").substring(0, 5),
       description: event?.description || null,
-      eventColor,
+      eventColor: hasTag(tgSelectors, summary)
+        ? getColorFromId(1)
+        : getColorFromId(3),
       link: htmlLink || hangoutLink || "",
     };
   });
@@ -110,7 +116,10 @@ const GoogleCalendarService = {
         timeMax: oneYearFromNow.toISOString(), // Добавляем параметр timeMax
       });
 
-      const events = transformEvents(response.result.items);
+      const events = transformEvents({
+        events: response.result.items,
+        tgSelectors: credentials.tgSelectors,
+      });
       console.log("Upcoming events:", events[0]);
       return events;
       //   if (events.length > 0) {
