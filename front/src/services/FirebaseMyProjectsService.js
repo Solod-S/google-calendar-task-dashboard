@@ -151,7 +151,6 @@ FirebaseMyProjectsService.deleteCategory = async categoryId => {
     }
 
     const owner_uid = user.uid;
-    console.log(`owner_uid`, owner_uid);
     const categoryDocRef = doc(
       db,
       `users/${owner_uid}/project-categories`,
@@ -162,6 +161,85 @@ FirebaseMyProjectsService.deleteCategory = async categoryId => {
     console.log("Category successfully deleted!");
   } catch (error) {
     console.error("Error deleting category:", error);
+    throw error;
+  }
+};
+
+FirebaseMyProjectsService.fetchTelegramGroups = async () => {
+  try {
+    const { owner_uid } = JSON.parse(localStorage.getItem(AUTH_USER_DATA));
+
+    const tgGroupsDataCollectionRef = collection(
+      db,
+      `users/${owner_uid}/project-tg-groups`
+    );
+    const querySnapshot = await getDocs(
+      query(
+        tgGroupsDataCollectionRef,
+        orderBy("dateCreated", "desc") // Sort by creation date in descending order
+      )
+    );
+
+    const tgGroups = [];
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      tgGroups.push(data);
+    });
+    return { data: tgGroups, total: tgGroups?.length || 0 };
+  } catch (error) {
+    throw error;
+  }
+};
+
+FirebaseMyProjectsService.addTelegramGroup = async data => {
+  try {
+    const userUid = auth.currentUser.uid;
+
+    const tgGroupsDataCollectionRef = collection(
+      db,
+      `users/${userUid}/project-tg-groups`
+    );
+    const currentDate = new Date();
+
+    const newTgGroup = {
+      ...data,
+      dateCreated: currentDate,
+      dateUpdated: currentDate,
+    };
+
+    const tgGroupRef = await addDoc(tgGroupsDataCollectionRef, newTgGroup);
+    const tgGroupId = tgGroupRef.id;
+
+    await updateDoc(tgGroupRef, {
+      id: tgGroupId,
+    });
+
+    return { ...newTgGroup, id: tgGroupId };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+FirebaseMyProjectsService.deleteTelegramGroup = async tgGroupId => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error("User is not authenticated");
+    }
+
+    const owner_uid = user.uid;
+
+    const tgGroupDocRef = doc(
+      db,
+      `users/${owner_uid}/project-tg-groups`,
+      tgGroupId
+    );
+    console.log("Attempting to delete telegram group with ID:", tgGroupId);
+    await deleteDoc(tgGroupDocRef);
+    console.log("Telegram group successfully deleted!");
+  } catch (error) {
+    console.error("Error deleting telegram group:", error);
     throw error;
   }
 };
