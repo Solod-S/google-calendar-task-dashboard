@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Tabs, toast, Notification } from "components/ui";
 import { AdaptableCard, Container } from "components/shared";
 
@@ -23,9 +23,9 @@ const ProjectView = ({
   const dispatch = useDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generalData, setGeneralData] = useState({});
-  const [currentTab, setCurrentTab] = useState("profile");
+  const [currentTab, setCurrentTab] = useState("general");
   const [settingsMenu, setSettingsMenu] = useState({
-    profile: { label: "General", path: "profile" },
+    general: { label: "General", path: "general" },
     integration: { label: "Integration", path: "integration" },
   });
 
@@ -38,7 +38,20 @@ const ProjectView = ({
     setCurrentTab(val);
   };
 
+  const generalRef = useRef();
+
   const handleSubmit = async () => {
+    if (generalRef.current) {
+      const isValid = await generalRef.current.validateForm();
+      if (!isValid) {
+        toast.push(<Notification title={"Validation failed"} type="danger" />, {
+          placement: "top-center",
+        });
+        setCurrentTab("general");
+        return;
+      }
+      await generalRef.current.submitForm();
+    }
     try {
       if (generalData?.projectId) {
         await FirebaseMyProjectsService.edditProject({
@@ -62,7 +75,7 @@ const ProjectView = ({
       console.log(`error`, error);
     } finally {
       setIsSubmitting(false);
-      setCurrentTab("profile");
+      setCurrentTab("general");
     }
   };
 
@@ -91,13 +104,13 @@ const ProjectView = ({
 
     if (hasGoogleCalendar && googleCalendarIsActive) {
       setSettingsMenu({
-        profile: { label: "General", path: "profile" },
+        general: { label: "General", path: "general" },
         integration: { label: "Integration", path: "integration" },
         calendar: { label: "Calendar", path: "calendar" },
       });
     } else {
       setSettingsMenu({
-        profile: { label: "General", path: "profile" },
+        general: { label: "General", path: "general" },
         integration: { label: "Integration", path: "integration" },
       });
     }
@@ -117,8 +130,9 @@ const ProjectView = ({
         </Tabs>
         <div className="px-4 py-6">
           <General
+            ref={generalRef}
             handleOk={handleOk}
-            show={currentTab === "profile"}
+            show={currentTab === "general"}
             generalData={generalData}
             setGeneralData={setGeneralData}
           />

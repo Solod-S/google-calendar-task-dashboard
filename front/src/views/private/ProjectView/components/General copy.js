@@ -25,6 +25,8 @@ const validationSchema = Yup.object().shape({
   description: Yup.string(),
   active: Yup.bool(),
   img: Yup.string().url("Invalid URL"),
+  newTgGroupName: Yup.string().required("Name is Required"),
+  newTgGroupId: Yup.string().required("ID is Required"),
 });
 
 const capitalizeFirstLetter = string => {
@@ -93,7 +95,7 @@ const General = ({ handleOk, generalData, setGeneralData, show }) => {
       });
     } catch (error) {
       toast.push(
-        <Notification title={"Failed to delete category"} type="error" />,
+        <Notification title={"Failed to delete category"} type="danger" />,
         {
           placement: "top-center",
         }
@@ -114,7 +116,10 @@ const General = ({ handleOk, generalData, setGeneralData, show }) => {
       );
     } catch (error) {
       toast.push(
-        <Notification title={"Failed to delete telegram group"} type="error" />,
+        <Notification
+          title={"Failed to delete telegram group"}
+          type="danger"
+        />,
         {
           placement: "top-center",
         }
@@ -134,7 +139,7 @@ const General = ({ handleOk, generalData, setGeneralData, show }) => {
       });
     } catch (error) {
       toast.push(
-        <Notification title={"Failed to add category"} type="error" />,
+        <Notification title={"Failed to add category"} type="danger" />,
         {
           placement: "top-center",
         }
@@ -143,11 +148,12 @@ const General = ({ handleOk, generalData, setGeneralData, show }) => {
       setSubmitting(false);
     }
   };
-  const handleAddTgGroup = async (categoryName, setSubmitting) => {
+  const handleAddTgGroup = async (tgGroupName, tgGroupId, setSubmitting) => {
     try {
       const newTgGroup = await FirebaseMyProjectsService.addTelegramGroup({
-        value: capitalizeFirstLetter(categoryName),
-        label: capitalizeFirstLetter(categoryName),
+        value: capitalizeFirstLetter(tgGroupName),
+        label: capitalizeFirstLetter(tgGroupName),
+        id: tgGroupId,
       });
       setTgGroupsList(prevList => [...prevList, newTgGroup]);
 
@@ -159,7 +165,7 @@ const General = ({ handleOk, generalData, setGeneralData, show }) => {
       );
     } catch (error) {
       toast.push(
-        <Notification title={"Failed to add telegram group"} type="error" />,
+        <Notification title={"Failed to add telegram group"} type="danger" />,
         {
           placement: "top-center",
         }
@@ -185,6 +191,8 @@ const General = ({ handleOk, generalData, setGeneralData, show }) => {
         description: generalData?.description || "",
         active: generalData?.active || false,
         img: generalData?.img || "",
+        newTgGroupName: "",
+        newTgGroupId: "",
       }}
       enableReinitialize
       validationSchema={validationSchema}
@@ -256,7 +264,12 @@ const General = ({ handleOk, generalData, setGeneralData, show }) => {
                     }
                   />
                 </FormRow>
-                <FormRow name="name" label="🔤 Name" {...validatorProps}>
+                <FormRow
+                  name="name"
+                  label="🔤 Name"
+                  {...validatorProps}
+                  required={true}
+                >
                   <Field
                     type="text"
                     autoComplete="off"
@@ -362,11 +375,12 @@ const General = ({ handleOk, generalData, setGeneralData, show }) => {
                     )}
                   </Field>
                 </FormRow>
-                {/* ! */}
                 <FormRow
                   name="tgGroup"
                   label={
-                    <span style={{ color: "black" }}>📲 Select Group</span>
+                    <span style={{ color: "black" }}>
+                      📲 Select Telegram Group
+                    </span>
                   }
                   {...validatorProps}
                 >
@@ -412,29 +426,61 @@ const General = ({ handleOk, generalData, setGeneralData, show }) => {
                   }
                   {...validatorProps}
                 >
-                  <Field name="newTgGroup">
-                    {({ field, form }) => (
-                      <div className="flex items-center gap-2">
-                        <Input
-                          {...field}
-                          placeholder="New Telegram Group Name"
-                        />
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            const tgGroupName = field.value;
-                            if (tgGroupName) {
-                              handleAddTgGroup(tgGroupName, form.setSubmitting);
-                              form.setFieldValue(field.name, "");
-                            }
-                          }}
-                          disabled={isSubmitting}
-                        >
-                          Add
-                        </Button>
-                      </div>
-                    )}
-                  </Field>
+                  <div style={{ display: "flex" }}>
+                    <Field name="newTgGroupName">
+                      {({ field, form }) => (
+                        <div className="flex items-center gap-2 mr-2">
+                          <Input {...field} placeholder="Telegram Group Name" />
+                        </div>
+                      )}
+                    </Field>
+                    <Field name="newTgGroupId">
+                      {({ field, form }) => (
+                        <div className="flex items-center gap-2 ">
+                          <Input {...field} placeholder="Telegram Group ID" />
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              const tgGroupName = form.values.newTgGroupName;
+                              const tgGroupId = form.values.newTgGroupId;
+                              if (tgGroupName && tgGroupId) {
+                                handleAddTgGroup(
+                                  tgGroupName,
+                                  tgGroupId,
+                                  form.setSubmitting
+                                );
+                                form.setFieldValue("newTgGroupName", "");
+                                form.setFieldValue("newTgGroupId", "");
+                              } else {
+                                // TODO
+                                // toast.push(
+                                //   <Notification
+                                //     title={"Two fields are required"}
+                                //     type="success"
+                                //   />,
+                                //   {
+                                //     placement: "top-center",
+                                //   }
+                                // );
+                                toast.push(
+                                  <Notification
+                                    title={"Two fields are required"}
+                                    type="warning"
+                                  />,
+                                  {
+                                    placement: "top-center",
+                                  }
+                                );
+                              }
+                            }}
+                            disabled={isSubmitting}
+                          >
+                            Add
+                          </Button>
+                        </div>
+                      )}
+                    </Field>
+                  </div>
                 </FormRow>
                 <FormRow
                   name="description"

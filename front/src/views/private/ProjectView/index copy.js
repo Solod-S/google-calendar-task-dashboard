@@ -14,12 +14,6 @@ import Calendar from "./components/Calendar";
 
 const { TabNav, TabList } = Tabs;
 
-const settingsMenu = {
-  profile: { label: "General", path: "profile" },
-  integration: { label: "Integration", path: "integration" },
-  Calendar: { label: "Calendar", path: "calendar" },
-};
-
 const ProjectView = ({
   handleOk,
   handleCancel,
@@ -30,6 +24,10 @@ const ProjectView = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generalData, setGeneralData] = useState({});
   const [currentTab, setCurrentTab] = useState("profile");
+  const [settingsMenu, setSettingsMenu] = useState({
+    profile: { label: "General", path: "profile" },
+    integration: { label: "Integration", path: "integration" },
+  });
 
   const { pageIndex, pageSize, sort, query, total } = useSelector(
     state => state.projects.data.tableData
@@ -67,18 +65,43 @@ const ProjectView = ({
       setCurrentTab("profile");
     }
   };
+
   useEffect(() => {
     if (currentProjectData) {
       setGeneralData(currentProjectData);
-    } else
+    } else {
       setGeneralData({
         name: "",
         category: "",
         description: "",
         active: false,
         img: "",
+        integrations: [],
       });
+    }
   }, [currentProjectData]);
+
+  useEffect(() => {
+    const hasGoogleCalendar = generalData?.integrations?.find(
+      integration => integration.key === "google_calendar"
+    );
+    const googleCalendarIsActive = generalData?.integrations?.find(
+      integration => integration.active === true
+    );
+
+    if (hasGoogleCalendar && googleCalendarIsActive) {
+      setSettingsMenu({
+        profile: { label: "General", path: "profile" },
+        integration: { label: "Integration", path: "integration" },
+        calendar: { label: "Calendar", path: "calendar" },
+      });
+    } else {
+      setSettingsMenu({
+        profile: { label: "General", path: "profile" },
+        integration: { label: "Integration", path: "integration" },
+      });
+    }
+  }, [generalData]);
 
   return (
     <Container>
@@ -104,11 +127,13 @@ const ProjectView = ({
             generalData={generalData}
             setGeneralData={setGeneralData}
           />
-          <Calendar
-            show={currentTab === "Calendar"}
-            generalData={generalData}
-            setGeneralData={setGeneralData}
-          />
+          {settingsMenu.calendar && (
+            <Calendar
+              show={currentTab === "calendar"}
+              generalData={generalData}
+              setGeneralData={setGeneralData}
+            />
+          )}
           <div className="mt-4 ltr:text-right">
             <Button
               className="ltr:mr-2 rtl:ml-2"
