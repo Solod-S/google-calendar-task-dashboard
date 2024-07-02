@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import reducer from "../../../store/projects";
 import { injectReducer } from "store/index";
 import { AdaptableCard } from "components/shared";
@@ -6,14 +6,26 @@ import ProductTable from "./components/ProductTable";
 import ProductTableTools from "./components/ProductTableTools";
 import { Modal } from "antd";
 import ProjectView from "../ProjectView";
+import isEqual from "lodash/isEqual";
 import { updateEvent } from "../ProjectView/components/Calendar/store/dataSlice";
 import { useDispatch } from "react-redux";
 
 injectReducer("projects", reducer);
 
+const initialUserData = {
+  name: "",
+  category: "",
+  description: "",
+  active: false,
+  img: "",
+  integrations: [],
+};
+
 const ProjectList = () => {
   const dispatch = useDispatch();
+  const projectViewRef = useRef(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isWarningVisible, setisWarningVisible] = useState(false);
   const [currentProjectData, setCurrentProjectData] = useState(null);
   const [modalKey, setModalKey] = useState(0);
 
@@ -34,9 +46,31 @@ const ProjectList = () => {
   };
 
   const handleCancel = () => {
+    const data = projectViewRef.current?.getGeneralData();
+    console.log(`data`, data);
+    console.log(`currentProjectData`, currentProjectData);
+    console.log(`isEqual`, isEqual(data, currentProjectData));
+    console.log(
+      `isEqual(data, initialUserData`,
+      isEqual(data, initialUserData)
+    );
+    console.log(
+      `currentProjectData !== null && !isEqual(data, initialUserData)`,
+      currentProjectData !== null && !isEqual(data, initialUserData)
+    );
+    console.log(`currentProjectData !== null`, currentProjectData !== null);
+    if (!isEqual(data, currentProjectData)) {
+      setisWarningVisible(true);
+    } else {
+      closeAndReset();
+    }
+  };
+
+  const closeAndReset = async () => {
+    await setisWarningVisible(false);
     dispatch(updateEvent([]));
     setIsModalVisible(false);
-    setCurrentProjectData(null); // Reset the data
+    setCurrentProjectData(null);
   };
 
   return (
@@ -46,6 +80,7 @@ const ProjectList = () => {
         <ProductTableTools showModal={showModal} />
       </div>
       <ProductTable onEdit={onEdit} />
+
       <Modal
         width="80%"
         key={modalKey} // Key to force re-render
@@ -55,8 +90,26 @@ const ProjectList = () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
+        <Modal
+          title="Warning"
+          okButtonProps={{
+            style: { backgroundColor: "#4F46E5" },
+          }}
+          open={isWarningVisible}
+          onOk={() => {
+            // setTimeout(() => {
+            //   setisWarningVisible(false);
+            // }, 1000);
+
+            closeAndReset();
+          }}
+          onCancel={() => setisWarningVisible(false)}
+        >
+          <p>Are you sure you want to close the window without saving?</p>
+        </Modal>
         <ProjectView
           handleOk={handleOk}
+          ref={projectViewRef}
           handleCancel={handleCancel}
           currentProjectData={currentProjectData}
           setCurrentProjectData={setCurrentProjectData}
