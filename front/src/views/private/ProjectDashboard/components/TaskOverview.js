@@ -19,6 +19,7 @@ const ChartLegend = ({ label, value, badgeClass, showBadge = true }) => {
 };
 
 const TaskOverview = ({ data = {}, className }) => {
+  console.log(`data`, data);
   const [timeRange, setTimeRange] = useState(["weekly"]);
 
   const [repaint, setRepaint] = useState(false);
@@ -28,7 +29,7 @@ const TaskOverview = ({ data = {}, className }) => {
   );
 
   useEffect(() => {
-    console.log(`sideNavCollapse`, sideNavCollapse);
+  
     setRepaint(true);
     const timer1 = setTimeout(() => setRepaint(false), 300);
 
