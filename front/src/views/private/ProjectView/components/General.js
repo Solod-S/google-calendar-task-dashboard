@@ -23,8 +23,6 @@ import { HiOutlineBriefcase, HiOutlineUser } from "react-icons/hi";
 import * as Yup from "yup";
 import isEmpty from "lodash/isEmpty"; // Добавьте этот импорт
 import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchProjects } from "store/projects/projectDataSlice";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().min(3, "Too Short!").required("Name is Required"),
@@ -43,13 +41,6 @@ const capitalizeFirstLetter = string => {
 
 const General = forwardRef(
   ({ handleOk, generalData, setGeneralData, show }, ref) => {
-    const dispatch = useDispatch();
-
-    const { pageIndex, pageSize, sort, query, total } = useSelector(
-      state => state.projects.data.tableData
-    );
-    const filterData = useSelector(state => state.projects.data.filterData);
-
     const [categoriesList, setCategoriesList] = useState([]);
     const [tgGroupsList, setTgGroupsList] = useState([]);
 
@@ -67,39 +58,13 @@ const General = forwardRef(
       fetchTgGroups();
     }, []);
 
-    const onFormSubmit = async (values, setSubmitting) => {
-      try {
-        if (!generalData) {
-          await FirebaseMyProjectsService.addProject(values);
-        } else {
-          await FirebaseMyProjectsService.edditProject({
-            ...values,
-            projectId: generalData.projectId,
-          });
-        }
-
-        dispatch(
-          fetchProjects({ pageIndex, pageSize, sort, query, filterData })
-        );
-        toast.push(<Notification title={"Profile updated"} type="success" />, {
-          placement: "top-center",
-        });
-
-        setSubmitting(false);
-        handleOk();
-      } catch (error) {
-        console.log(`error`, error);
-      } finally {
-        setSubmitting(false);
-      }
-    };
-
     const handleDeleteCategory = async categoryId => {
       try {
         await FirebaseMyProjectsService.deleteCategory(categoryId);
         setCategoriesList(prevList =>
           prevList.filter(cat => cat.id !== categoryId)
         );
+        handleFieldChange("category", "");
         toast.push(<Notification title={"Category deleted"} type="success" />, {
           placement: "top-center",
         });
@@ -118,6 +83,7 @@ const General = forwardRef(
         setTgGroupsList(prevList =>
           prevList.filter(tgGroup => tgGroup.id !== categoryId)
         );
+        handleFieldChange("tgGroup", "");
         toast.push(
           <Notification title={"Telegram group deleted"} type="success" />,
           {
@@ -163,7 +129,7 @@ const General = forwardRef(
         const newTgGroup = await FirebaseMyProjectsService.addTelegramGroup({
           value: capitalizeFirstLetter(tgGroupName),
           label: capitalizeFirstLetter(tgGroupName),
-          id: tgGroupId,
+          chatId: tgGroupId,
         });
         setTgGroupsList(prevList => [...prevList, newTgGroup]);
 
@@ -231,9 +197,6 @@ const General = forwardRef(
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {
           setSubmitting(true);
-          setTimeout(() => {
-            onFormSubmit(values, setSubmitting);
-          }, 1000);
         }}
       >
         {({

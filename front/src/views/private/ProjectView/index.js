@@ -65,6 +65,7 @@ const ProjectView = forwardRef(
             projectId: generalData.projectId,
           });
         } else {
+          console.log(`2`);
           await FirebaseMyProjectsService.addProject(generalData);
         }
 

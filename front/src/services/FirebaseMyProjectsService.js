@@ -159,6 +159,23 @@ FirebaseMyProjectsService.deleteCategory = async categoryId => {
     console.log("Attempting to delete category with ID:", categoryId);
     await deleteDoc(categoryDocRef);
     console.log("Category successfully deleted!");
+
+    // Получение данных пользователя
+    const userProjectsRef = collection(db, `users/${owner_uid}/projectsData`);
+    const userProjectsSnapshot = await getDocs(userProjectsRef);
+
+    // Проход по проектам и удаление tgGroupId
+    for (const projectDoc of userProjectsSnapshot.docs) {
+      const projectData = projectDoc.data();
+      if (projectData.category === categoryId) {
+        // Обновление проекта, удаление categoryId
+        await updateDoc(projectDoc.ref, {
+          category: "",
+        });
+      }
+    }
+
+    console.log("Category ID removed from your projects.");
   } catch (error) {
     console.error("Error deleting category:", error);
     throw error;
@@ -230,6 +247,7 @@ FirebaseMyProjectsService.deleteTelegramGroup = async tgGroupId => {
 
     const owner_uid = user.uid;
 
+    // Удаление группы Telegram
     const tgGroupDocRef = doc(
       db,
       `users/${owner_uid}/project-tg-groups`,
@@ -238,6 +256,23 @@ FirebaseMyProjectsService.deleteTelegramGroup = async tgGroupId => {
     console.log("Attempting to delete telegram group with ID:", tgGroupId);
     await deleteDoc(tgGroupDocRef);
     console.log("Telegram group successfully deleted!");
+
+    // Получение данных пользователя
+    const userProjectsRef = collection(db, `users/${owner_uid}/projectsData`);
+    const userProjectsSnapshot = await getDocs(userProjectsRef);
+
+    // Проход по проектам и удаление tgGroupId
+    for (const projectDoc of userProjectsSnapshot.docs) {
+      const projectData = projectDoc.data();
+      if (projectData.tgGroup === tgGroupId) {
+        // Обновление проекта, удаление tgGroupId
+        await updateDoc(projectDoc.ref, {
+          tgGroup: "",
+        });
+      }
+    }
+
+    console.log("Telegram group ID removed from your projects.");
   } catch (error) {
     console.error("Error deleting telegram group:", error);
     throw error;
