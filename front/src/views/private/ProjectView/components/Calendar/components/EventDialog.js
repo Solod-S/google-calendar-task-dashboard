@@ -204,17 +204,19 @@ const EventDialog = ({ submit, generalData, setGeneralData }) => {
                   {selectedWords.length > 0 && (
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-gray-700">
-                        Selector(s):
+                        🎯 Selector(s):
                       </label>
                       <div className="flex flex-wrap mt-2">
-                        {selectedWords.map((word, index) => (
-                          <Badge
-                            key={index}
-                            className="mr-2 mb-2 bg-blue-100 text-blue-800"
-                          >
-                            {word}
-                          </Badge>
-                        ))}
+                        {selectedWords
+                          .filter(word => selected.title.includes(word))
+                          .map((word, index) => (
+                            <Badge
+                              key={index}
+                              className="mr-2 mb-2 bg-blue-100 text-blue-800"
+                            >
+                              {word}
+                            </Badge>
+                          ))}
                       </div>
                     </div>
                   )}

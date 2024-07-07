@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import classNames from "classnames";
 import { Badge } from "components/ui";
 import FullCalendar from "@fullcalendar/react";
@@ -93,12 +93,13 @@ export const eventColors = {
   },
 };
 
-const CalendarView = props => {
+const CalendarView = forwardRef((props, ref) => {
   const { wrapperClass, ...rest } = props;
 
   return (
     <div className={classNames("calendar", wrapperClass)}>
       <FullCalendar
+        ref={ref}
         initialView="dayGridMonth"
         headerToolbar={{
           left: "title",
@@ -106,6 +107,7 @@ const CalendarView = props => {
           right: "dayGridMonth,timeGridWeek,timeGridDay prev,next",
         }}
         eventContent={arg => {
+          // console.log(`arg.event`, arg.event);
           const { extendedProps } = arg.event;
           const { isEnd, isStart } = arg;
           return (
@@ -148,6 +150,6 @@ const CalendarView = props => {
       />
     </div>
   );
-};
+});
 
 export default CalendarView;

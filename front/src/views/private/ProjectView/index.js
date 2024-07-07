@@ -8,7 +8,7 @@ import React, {
 import { Tabs, toast, Notification } from "components/ui";
 import { AdaptableCard, Container } from "components/shared";
 
-import { Button } from "antd";
+import Button from "../../../components/ui/Buttons";
 import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "store/projects/projectDataSlice";

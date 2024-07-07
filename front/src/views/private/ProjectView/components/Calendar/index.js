@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { HiClipboardList } from "react-icons/hi";
 import { CalendarView, Container } from "components/shared";
 import EventDialog from "./components/EventDialog";
 import reducer from "./store";
@@ -8,6 +9,8 @@ import { setSelected, openDialog } from "./store/stateSlice";
 import { useDispatch, useSelector } from "react-redux";
 import cloneDeep from "lodash/cloneDeep";
 import GoogleCalendarService from "services/GoogleCalendarService";
+import Button from "../../../../../components/ui/Buttons";
+import { Modal } from "antd";
 
 const {
   exchangeCodeForTokens,
@@ -19,32 +22,88 @@ const {
 
 injectReducer("crmCalendar", reducer);
 
+const ManageSelectorsModal = ({ selectors, onSelect, onClose, open }) => {
+  return (
+    <Modal
+      title="Choose the selector you want to remove"
+      open={open}
+      onCancel={onClose}
+      footer={null}
+    >
+      <div className="flex flex-wrap">
+        {selectors.map((word, index) => (
+          <Button
+            variant="solid"
+            color="red-600"
+            key={index}
+            className="m-1"
+            onClick={() => onSelect(word)}
+          >
+            {word}
+          </Button>
+        ))}
+      </div>
+    </Modal>
+  );
+};
+
 const Calendar = ({ show, generalData, setGeneralData }) => {
   const dispatch = useDispatch();
   const storeEvents = useSelector(state => state.crmCalendar.data.eventList);
+  const [manageSelectorsModalOpen, setManageSelectorsModalOpen] =
+    useState(false);
+  const [selectors, setSelectors] = useState([]);
   const [events, setEvents] = useState([]);
   const calendarRef = useRef(null);
 
-  useEffect(() => {
-    const getGoogleEvents = async () => {
-      const updatedCredentials = await refreshGoogleCalendarTokens(
-        googleCalendarCredentials
-      );
-      dispatch(
-        getEvents({
-          ...googleCalendarCredentials,
-          ...updatedCredentials,
-        })
-      );
-    };
-    const googleCalendarCredentials = generalData?.integrations?.find(
-      integration => integration.key === "google_calendar"
+  const handleRemoveSelector = word => {
+    setGeneralData(prevState => {
+      const updatedIntegrations = prevState.integrations.map(integration => {
+        if (integration.key === "google_calendar") {
+          const isWordInSelectors = integration.tgSelectors.includes(word);
+          return {
+            ...integration,
+            tgSelectors: isWordInSelectors
+              ? integration.tgSelectors.filter(w => w !== word)
+              : [...integration.tgSelectors, word],
+          };
+        }
+        return integration;
+      });
+      return {
+        ...prevState,
+        integrations: updatedIntegrations,
+      };
+    });
+  };
+  const getGoogleEvents = async googleCalendarCredentials => {
+    const updatedCredentials = await refreshGoogleCalendarTokens(
+      googleCalendarCredentials
     );
+    dispatch(
+      getEvents({
+        ...googleCalendarCredentials,
+        ...updatedCredentials,
+      })
+    );
+  };
 
-    if (googleCalendarCredentials) {
-      setTimeout(() => {
-        getGoogleEvents(googleCalendarCredentials);
-      }, 1000);
+  useEffect(() => {
+    try {
+      const googleCalendarCredentials = generalData?.integrations?.find(
+        integration => integration.key === "google_calendar"
+      );
+
+      if (googleCalendarCredentials) {
+        if (googleCalendarCredentials?.tgSelectors)
+          setSelectors(googleCalendarCredentials.tgSelectors);
+
+        setTimeout(() => {
+          getGoogleEvents(googleCalendarCredentials);
+        }, 1000);
+      }
+    } catch (error) {
+      console.log(`error in fetching events: ${error}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, generalData]);
@@ -139,10 +198,20 @@ const Calendar = ({ show, generalData, setGeneralData }) => {
       }}
     >
       <Container className="h-full">
+        <ManageSelectorsModal
+          open={manageSelectorsModalOpen}
+          selectors={selectors}
+          onSelect={handleRemoveSelector}
+          onClose={() => setManageSelectorsModalOpen(false)}
+        />
+
         <CalendarView
           ref={calendarRef}
           events={events}
           eventClick={onEventClick}
+          setManageSelectorsModalOpen={setManageSelectorsModalOpen}
+          onRefresh={getGoogleEvents}
+          generalData={generalData}
           select={onCellSelect}
           editable
           selectable

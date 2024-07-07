@@ -1,6 +1,7 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
+import { ReloadOutlined } from "@ant-design/icons";
 import classNames from "classnames";
-import { Badge } from "components/ui";
+import { Badge, Notification, toast, Button } from "components/ui";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -9,6 +10,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import "@fullcalendar/common/main.css";
 import "@fullcalendar/daygrid/main.css";
 import "@fullcalendar/timegrid/main.css";
+import { HiClipboardList } from "react-icons/hi";
 
 export const eventColors = {
   red: {
@@ -94,10 +96,63 @@ export const eventColors = {
 };
 
 const CalendarView = forwardRef((props, ref) => {
-  const { wrapperClass, ...rest } = props;
+  const {
+    wrapperClass,
+    onRefresh,
+    generalData,
+    setManageSelectorsModalOpen,
+    ...rest
+  } = props;
+  const [isRefresing, setisRefresing] = useState(false);
+
+  const handleRefresh = async () => {
+    try {
+      const googleCalendarCredentials = generalData?.integrations?.find(
+        integration => integration.key === "google_calendar"
+      );
+      if (isRefresing && googleCalendarCredentials) return;
+      setisRefresing(true);
+      await onRefresh(googleCalendarCredentials);
+      toast.push(
+        <Notification
+          title={"Calendar events have been successfully updated"}
+          type="success"
+        />,
+        {
+          placement: "top-center",
+        }
+      );
+    } catch (error) {
+      console.log(`Error in calendar events update: ${error}`);
+      toast.push(
+        <Notification title={"Oops, something went wrong"} type="danger" />,
+        {
+          placement: "top-center",
+        }
+      );
+    } finally {
+      setisRefresing(false);
+    }
+  };
 
   return (
     <div className={classNames("calendar", wrapperClass)}>
+      <div className="flex justify-between items-center mb-4 ">
+        <h1 className=" font-bold">Calendar</h1>
+        <div className="flex justify-between items-center">
+          <Button
+            className="block mr-1"
+            icon={<HiClipboardList />}
+            variant="twoTone"
+            onClick={() => setManageSelectorsModalOpen(true)}
+          >
+            Manage selectors
+          </Button>
+          <Button onClick={handleRefresh}>
+            <ReloadOutlined spin={isRefresing} /> {" " && "Refresh"}
+          </Button>
+        </div>
+      </div>
       <FullCalendar
         ref={ref}
         initialView="dayGridMonth"
@@ -107,7 +162,6 @@ const CalendarView = forwardRef((props, ref) => {
           right: "dayGridMonth,timeGridWeek,timeGridDay prev,next",
         }}
         eventContent={arg => {
-          // console.log(`arg.event`, arg.event);
           const { extendedProps } = arg.event;
           const { isEnd, isStart } = arg;
           return (
