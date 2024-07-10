@@ -1,88 +1,85 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-// import { apiGetProjectDashboardData } from "services/ProjectService";
+import FirebaseDashboardService from "services/FirebaseDashboardService";
 
 export const getProjectDashboardData = createAsyncThunk(
   "projectDashboard/data/getProjectDashboardData",
   async () => {
-    // const response = await apiGetProjectDashboardData()
-    // return response.data
+    const { weekly, displayName } =
+      await FirebaseDashboardService.fetchTaskOverview();
 
     const data = {
-      userName: "Carolyn Perkins",
-      taskCount: 5,
+      userName: displayName,
+      taskCount: weekly.total,
       projectOverviewData: {
         chart: {
-          daily: {
-            onGoing: 13,
-            finished: 9,
-            total: 21,
-            series: [
-              {
-                name: "On Going",
-                data: [20, 19, 18, 14, 12, 10],
-              },
-              {
-                name: "Finished",
-                data: [1, 4, 8, 15, 16, 18],
-              },
-            ],
-            range: [
-              "6:00am",
-              "9:00am",
-              "12:00pm",
-              "03:00pm",
-              "06:00pm",
-              "09:00pm",
-            ],
-          },
-          weekly: {
-            onGoing: 126,
-            finished: 87,
-            total: 213,
-            series: [
-              {
-                name: "On Going",
-                data: [45, 52, 68, 84, 103, 112, 126],
-              },
-              {
-                name: "Finished",
-                data: [35, 41, 62, 62, 75, 81, 87],
-              },
-            ],
-            range: [
-              "21 Jan",
-              "22 Jan",
-              "23 Jan",
-              "24 Jan",
-              "25 Jan",
-              "26 Jan",
-              "27 Jan",
-            ],
-          },
-          monthly: {
-            onGoing: 270,
-            finished: 113,
-            total: 383,
-            series: [
-              {
-                name: "On Going",
-                data: [28, 52, 91, 154, 227, 256, 270],
-              },
-              {
-                name: "Finished",
-                data: [22, 31, 74, 88, 97, 107, 113],
-              },
-            ],
-            range: [
-              "01 Jan",
-              "05 Jan",
-              "10 Jan",
-              "15 Jan",
-              "20 Jan",
-              "25 Jan",
-              "27 Jan",
-            ],
-          },
+          // daily: {
+          //   onGoing: 13,
+          //   notSelected: 9,
+          //   total: 21,
+          //   series: [
+          //     {
+          //       name: "On Going",
+          //       data: [20, 19, 18, 14, 12, 10],
+          //     },
+          //     {
+          //       name: "Not Selected",
+          //       data: [1, 4, 8, 15, 16, 18],
+          //     },
+          //   ],
+          //   range: [
+          //     "6:00am",
+          //     "9:00am",
+          //     "12:00pm",
+          //     "03:00pm",
+          //     "06:00pm",
+          //     "09:00pm",
+          //   ],
+          // },
+          // 1!!!!!
+          weekly,
+          // weekly: {
+          //   total: 999,
+          //   series: [
+          //     {
+          //       name: "Project 1",
+          //       data: [1, 1, 1, 1, 2, 2, 3],
+          //     },
+          //   ],
+          //   range: [
+          //     "21 Jan",
+          //     "22 Jan",
+          //     "23 Jan",
+          //     "24 Jan",
+          //     "25 Jan",
+          //     "26 Jan",
+          //     "27 Jan",
+          //   ],
+          // },
+          // 11!!!!
+          // monthly: {
+          //   onGoing: 270,
+          //   notSelected: 113,
+          //   total: 383,
+          //   series: [
+          //     {
+          //       name: "On Going",
+          //       data: [28, 52, 91, 154, 227, 256, 270],
+          //     },
+          //     {
+          //       name: "Not Selected",
+          //       data: [22, 31, 74, 88, 97, 107, 113],
+          //     },
+          //   ],
+          //   range: [
+          //     "01 Jan",
+          //     "05 Jan",
+          //     "10 Jan",
+          //     "15 Jan",
+          //     "20 Jan",
+          //     "25 Jan",
+          //     "27 Jan",
+          //   ],
+          // },
         },
       },
       myTasksData: [

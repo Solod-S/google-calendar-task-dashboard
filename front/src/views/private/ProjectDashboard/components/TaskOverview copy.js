@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, Segment, Badge } from "components/ui";
 import { Loading } from "components/shared";
 import { Chart } from "components/shared";
-import { COLORS, COLORS_CLASSNAMES } from "constants/chart.constant";
+import { COLORS } from "constants/chart.constant";
 import isEmpty from "lodash/isEmpty";
 import { useSelector } from "react-redux";
 
@@ -19,6 +19,7 @@ const ChartLegend = ({ label, value, badgeClass, showBadge = true }) => {
 };
 
 const TaskOverview = ({ data = {}, className }) => {
+  // console.log(`data`, data);
   const [timeRange, setTimeRange] = useState(["weekly"]);
 
   const [repaint, setRepaint] = useState(false);
@@ -45,7 +46,9 @@ const TaskOverview = ({ data = {}, className }) => {
           onChange={val => setTimeRange(val)}
           size="sm"
         >
+          <Segment.Item value="monthly">Monthly</Segment.Item>
           <Segment.Item value="weekly">Weekly</Segment.Item>
+          <Segment.Item value="daily">Daily</Segment.Item>
         </Segment>
       </div>
       {!isEmpty(data) && !repaint && (
@@ -59,34 +62,27 @@ const TaskOverview = ({ data = {}, className }) => {
               />
             </div>
             <div className="flex gap-x-6">
-              {data.chart[timeRange[0]].series.length > 0 &&
-                data.chart[timeRange[0]].series.map((data, index) => {
-                  return (
-                    <ChartLegend
-                      key={index}
-                      badgeClass={
-                        COLORS_CLASSNAMES[index % COLORS_CLASSNAMES.length]
-                      }
-                      label={data.name}
-                      value={data.data.reduce(
-                        (accumulator, currentValue) =>
-                          accumulator + currentValue,
-                        0
-                      )}
-                    />
-                  );
-                })}
+              <ChartLegend
+                badgeClass="bg-blue-600"
+                label={data.chart[timeRange[0]].series[0].name}
+                value={data.chart[timeRange[0]].onGoing}
+              />
+              <ChartLegend
+                badgeClass="bg-red-500"
+                label={data.chart[timeRange[0]].series[1].name}
+                value={data.chart[timeRange[0]].notSelected}
+              />
             </div>
           </div>
           <div>
             <Chart
               series={data.chart[timeRange[0]].series}
               xAxis={data.chart[timeRange[0]].range}
-              type="area"
-              // customOptions={{
-              //   colors: [COLORS[1], COLORS[4]],
-              //   legend: { show: false },
-              // }}
+              type="bar"
+              customOptions={{
+                colors: [COLORS[1], COLORS[4]],
+                legend: { show: false },
+              }}
             />
           </div>
         </>

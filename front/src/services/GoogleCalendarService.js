@@ -18,7 +18,7 @@ const transformEvents = ({ events, tgSelectors }) => {
 
     // Определение цвета события на основе colorId (здесь можно добавить свои цвета)
     // const eventColor = getColorFromId(colorId);
-    const eventColor = getColorFromId(3);
+    // const eventColor = getColorFromId(3);
     return {
       id,
       title: summary,
@@ -120,7 +120,7 @@ const GoogleCalendarService = {
         events: response.result.items,
         tgSelectors: credentials.tgSelectors,
       });
-      console.log("Upcoming events:", events[0]);
+      // console.log("Upcoming events:", events[0]);
       return events;
       //   if (events.length > 0) {
       //     // events.forEach(event => {

@@ -87,15 +87,6 @@ const Chart = props => {
     }
   }
 
-  // Add this part to format Y axis labels
-  if (notDonut.includes(type)) {
-    options.yaxis = {
-      labels: {
-        formatter: value => value.toFixed(0),
-      },
-    };
-  }
-
   return (
     <div
       style={direction === DIR_RTL ? { direction: "ltr" } : {}}
