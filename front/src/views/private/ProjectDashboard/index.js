@@ -21,6 +21,7 @@ const ProjectDashboard = () => {
     projectOverviewData,
     myTasksData,
     scheduleData,
+    activeEventsData,
     projectsData,
     activitiesData,
   } = useSelector(state => state.projectDashboard.data.dashboardData);
@@ -46,7 +47,10 @@ const ProjectDashboard = () => {
           </div>
           <div className="flex flex-col gap-4">
             <div className="xl:w-[380px]">
-              <Schedule data={scheduleData} />
+              <Schedule
+                data={scheduleData}
+                activeEventsData={activeEventsData}
+              />
             </div>
           </div>
         </div>

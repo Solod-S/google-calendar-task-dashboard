@@ -74,6 +74,7 @@ FirebaseDashboardService.fetchTaskOverview = async () => {
     );
 
     const projectsData = [];
+    const activeEventsData = [];
     const range = getWeekDates();
     // Проходим по каждому документу в коллекции
     for (const doc of querySnapshot.docs) {
@@ -114,9 +115,12 @@ FirebaseDashboardService.fetchTaskOverview = async () => {
 
       if (activeEvents.length <= 0) continue;
 
+      activeEventsData.push(
+        ...activeEvents.map(event => ({ ...event, name: project.name }))
+      );
+
       const taskCounts = new Array(7).fill(0);
 
-      // Подсчитываем количество событий на каждый день недели
       // Подсчитываем количество событий на каждый день недели
       for (const event of activeEvents) {
         const eventDate = startOfDay(new Date(event.start));
@@ -135,12 +139,14 @@ FirebaseDashboardService.fetchTaskOverview = async () => {
         data: taskCounts,
       });
     }
+
     const total = projectsData.reduce((total, project) => {
       return total + project.data.reduce((sum, value) => sum + value, 0);
     }, 0);
     const result = {
       displayName:
         userData?.displayName?.length > 0 ? userData.displayName : "User",
+      activeEventsData,
       weekly: { series: projectsData, total, range },
     };
     return result;

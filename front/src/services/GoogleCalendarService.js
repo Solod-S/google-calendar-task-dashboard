@@ -1,4 +1,5 @@
 import axios from "axios";
+import { isAfter } from "date-fns";
 import { gapi } from "gapi-script";
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
@@ -9,11 +10,16 @@ const SCOPES = [
   "https://www.googleapis.com/auth/tasks.readonly",
 ];
 const hasTag = (tags, title) => {
-  return tags.some(tag => title.includes(tag));
+  return tags.some(tag => title?.includes(tag));
 };
 
 const transformEvents = ({ events, tgSelectors }) => {
-  return events.map(event => {
+  const filteredEvents = events.filter(
+    event => event?.summary && event?.description && event?.start
+  );
+
+  console.log(`filteredEvents`, filteredEvents[0]);
+  return filteredEvents.map(event => {
     const { id, summary, colorId = 3, htmlLink, hangoutLink } = event;
 
     // Определение цвета события на основе colorId (здесь можно добавить свои цвета)
@@ -96,10 +102,10 @@ const GoogleCalendarService = {
       return null;
     }
   },
-
   async getGoogleCalendarEvents(credentials) {
     try {
       gapi.client.setToken({ access_token: credentials.access_token });
+
       // Определяем текущую дату и дату через год
       const now = new Date();
       const oneYearFromNow = new Date(now);
@@ -107,41 +113,66 @@ const GoogleCalendarService = {
 
       const response = await gapi.client.calendar.events.list({
         calendarId: "primary",
-        timeMin: new Date().toISOString(),
+        timeMin: now.toISOString(),
+        timeMax: oneYearFromNow.toISOString(),
         showDeleted: false,
         singleEvents: true,
-        // maxResults: 99,
-        showCompleted: false,
         orderBy: "startTime",
-        timeMax: oneYearFromNow.toISOString(), // Добавляем параметр timeMax
       });
 
-      const events = transformEvents({
-        events: response.result.items,
+      const events = response.result.items.filter(event => {
+        if (
+          !event?.summary ||
+          !event?.description ||
+          !event?.start ||
+          !event?.start?.dateTime
+        ) {
+          return false; // Фильтруем, если нет необходимых полей
+        }
+
+        const eventStartDateTime = new Date(event.start.dateTime);
+
+        return isAfter(eventStartDateTime, now); // Фильтруем, если событие начинается позже текущей даты и времени
+      });
+
+      const transformedEvents = transformEvents({
+        events,
         tgSelectors: credentials.tgSelectors,
       });
-      // console.log("Upcoming events:", events[0]);
-      return events;
-      //   if (events.length > 0) {
-      //     // events.forEach(event => {
-      //     //   console.log("Event details:");
-      //     //   console.log("ID:", event.id);
-      //     //   console.log("Summary:", event.summary);
-      //     //   console.log("Description:", event.description || "No description");
-      //     //   console.log("Location:", event.location || "No location");
-      //     //   console.log("Start:", event.start.dateTime || event.start.date);
-      //     //   console.log("End:", event.end.dateTime || event.end.date);
-      //     //   console.log("Status:", event.status);
-      //     //   console.log("HTML Link:", event.htmlLink);
-      //     //   console.log("---");
-      //     // });
-      //   } else {
-      //     console.log("No upcoming events found.");
-      //   }
+
+      return transformedEvents;
     } catch (error) {
       console.error("Error listing events:", error);
     }
   },
+  // async getGoogleCalendarEvents(credentials) {
+  //   try {
+  //     gapi.client.setToken({ access_token: credentials.access_token });
+  //     // Определяем текущую дату и дату через год
+  //     const now = new Date();
+  //     const oneYearFromNow = new Date(now);
+  //     oneYearFromNow.setFullYear(now.getFullYear() + 1);
+
+  //     const response = await gapi.client.calendar.events.list({
+  //       calendarId: "primary",
+  //       timeMin: new Date().toISOString(),
+  //       showDeleted: false,
+  //       singleEvents: true,
+  //       // maxResults: 99,
+  //       showCompleted: false,
+  //       orderBy: "startTime",
+  //       timeMax: oneYearFromNow.toISOString(), // Добавляем параметр timeMax
+  //     });
+
+  //     const events = transformEvents({
+  //       events: response.result.items,
+  //       tgSelectors: credentials.tgSelectors,
+  //     });
+  //     return events;
+  //   } catch (error) {
+  //     console.error("Error listing events:", error);
+  //   }
+  // },
 
   async getGoogleCalendarTasks(credentials) {
     gapi.client.setToken({ access_token: credentials.access_token });

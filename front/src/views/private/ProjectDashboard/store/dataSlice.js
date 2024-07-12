@@ -4,12 +4,13 @@ import FirebaseDashboardService from "services/FirebaseDashboardService";
 export const getProjectDashboardData = createAsyncThunk(
   "projectDashboard/data/getProjectDashboardData",
   async () => {
-    const { weekly, displayName } =
+    const { weekly, displayName, activeEventsData } =
       await FirebaseDashboardService.fetchTaskOverview();
-
+    console.log(`activeEventsData`, activeEventsData);
     const data = {
       userName: displayName,
       taskCount: weekly.total,
+      activeEventsData,
       projectOverviewData: {
         chart: {
           // daily: {
