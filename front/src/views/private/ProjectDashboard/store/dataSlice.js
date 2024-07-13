@@ -6,7 +6,7 @@ export const getProjectDashboardData = createAsyncThunk(
   async () => {
     const { weekly, displayName, activeEventsData } =
       await FirebaseDashboardService.fetchTaskOverview();
-    console.log(`activeEventsData`, activeEventsData);
+    console.log(`activeEventsData`, activeEventsData[0]);
     const data = {
       userName: displayName,
       taskCount: weekly.total,
@@ -85,8 +85,8 @@ export const getProjectDashboardData = createAsyncThunk(
       },
       myTasksData: [
         {
-          taskId: "KCM-1393",
-          taskSubject: "Design sign up flow",
+          tgGroup: "Armors-sale",
+          projectName: "Sales notifications",
           priority: 0,
           assignees: [
             {
@@ -104,8 +104,8 @@ export const getProjectDashboardData = createAsyncThunk(
           ],
         },
         {
-          taskId: "KCM-2039",
-          taskSubject: "Update contact page",
+          tgGroup: "Armors-general",
+          projectName: "Update contact page",
           priority: 1,
           assignees: [
             {
@@ -117,8 +117,8 @@ export const getProjectDashboardData = createAsyncThunk(
           ],
         },
         {
-          taskId: "KCM-2155",
-          taskSubject: "Document features 2.0",
+          tgGroup: "Armors-team",
+          projectName: "Document features 2.0",
           priority: 1,
           assignees: [
             {
@@ -142,8 +142,8 @@ export const getProjectDashboardData = createAsyncThunk(
           ],
         },
         {
-          taskId: "KCM-2270",
-          taskSubject: "Fix typo in home page",
+          tgGroup: "Armors-content",
+          projectName: "Fix typo in home page",
           priority: 2,
           assignees: [
             {
@@ -161,8 +161,8 @@ export const getProjectDashboardData = createAsyncThunk(
           ],
         },
         {
-          taskId: "KCM-1957",
-          taskSubject: "Fix broken API",
+          tgGroup: "Armors-marketing",
+          projectName: "Fix broken API",
           priority: 0,
           assignees: [
             {
@@ -172,36 +172,6 @@ export const getProjectDashboardData = createAsyncThunk(
               img: "/img/avatars/thumb-1.jpg",
             },
           ],
-        },
-      ],
-      scheduleData: [
-        {
-          id: "0",
-          time: "10:00am",
-          eventName: "Sprint Planning",
-          desciption: "via Zoom",
-          type: "meeting",
-        },
-        {
-          id: "1",
-          time: "1:00pm",
-          eventName: "Design discussion",
-          desciption: "via Microsoft Teams",
-          type: "meeting",
-        },
-        {
-          id: "2",
-          time: "3:00pm",
-          eventName: "Create daily report",
-          desciption: "Daily task",
-          type: "task",
-        },
-        {
-          id: "3",
-          time: "4:00pm",
-          eventName: "MySql online workshop",
-          desciption: "Online workshop",
-          type: "workshop",
         },
       ],
       projectsData: [

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { format, parseISO, isToday, parse } from "date-fns";
 import classNames from "classnames";
-import { Card, Calendar, Badge, Dialog } from "components/ui";
+import { Card, Calendar, Badge } from "components/ui";
 import useThemeClass from "utils/hooks/useThemeClass";
 import { HiVideoCamera, HiDocumentText, HiChatAlt2 } from "react-icons/hi";
 
@@ -61,8 +61,6 @@ const Schedule = ({ activeEventsData = [] }) => {
   const [value, setValue] = useState();
   const [allEvents, setallEvents] = useState([]);
   const [activeEvents, setactiveEvents] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const { textTheme } = useThemeClass();
 
@@ -84,21 +82,10 @@ const Schedule = ({ activeEventsData = [] }) => {
     }
   };
 
-  const handleClickOpen = event => {
-    setSelectedEvent(JSON.stringify(event.desciption).slice(1, -1));
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedEvent(null);
-  };
-
   useEffect(() => {
     if (activeEventsData.length > 0) {
       const formatedData = activeEventsData.map(event => ({
         id: event.id,
-        title: event.title,
         date: event.start,
         time: event.time,
         eventName: event.name,
@@ -184,27 +171,17 @@ const Schedule = ({ activeEventsData = [] }) => {
         <div
           key={event.id}
           className="flex items-center justify-between rounded-md mb-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-600/40 cursor-pointer user-select"
-          onClick={() => handleClickOpen(event)}
         >
           <div className="flex items-center gap-3">
             <EventIcon type={event.type} />
             <div>
-              <h6 className="text-sm font-bold">{event.title}</h6>
-              <p>{event.eventName}</p>
+              <h6 className="text-sm font-bold">{event.eventName}</h6>
+              {/* <p>{event.desciption}</p> */}
             </div>
           </div>
           <span>{event.time}</span>
         </div>
       ))}
-
-      <Dialog isOpen={open} closable={false} onRequestClose={handleClose}>
-        <h5 className="mb-4 text-center">Current task description</h5>
-
-        <div
-          className="mb-4 text-center"
-          dangerouslySetInnerHTML={{ __html: selectedEvent }}
-        />
-      </Dialog>
     </Card>
   );
 };

@@ -20,7 +20,6 @@ const ProjectDashboard = () => {
     taskCount,
     projectOverviewData,
     myTasksData,
-    scheduleData,
     activeEventsData,
     projectsData,
     activitiesData,
@@ -47,10 +46,7 @@ const ProjectDashboard = () => {
           </div>
           <div className="flex flex-col gap-4">
             <div className="xl:w-[380px]">
-              <Schedule
-                data={scheduleData}
-                activeEventsData={activeEventsData}
-              />
+              <Schedule activeEventsData={activeEventsData} />
             </div>
           </div>
         </div>
