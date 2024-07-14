@@ -20,6 +20,7 @@ import {
   differenceInCalendarDays,
   startOfDay,
 } from "date-fns";
+import FirebaseMyProjectsService from "./FirebaseMyProjectsService";
 
 const {
   getGoogleCalendarEvents,
@@ -150,6 +151,78 @@ FirebaseDashboardService.fetchTaskOverview = async () => {
       weekly: { series: projectsData, total, range },
     };
     return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+FirebaseDashboardService.fetchProjectsData = async () => {
+  try {
+    // Получаем данные о пользователе из localStorage
+    const { owner_uid } = JSON.parse(localStorage.getItem(AUTH_USER_DATA));
+
+    // Ссылка на коллекцию данных проектов пользователя
+    const projectsDataCollectionRef = collection(
+      db,
+      `users/${owner_uid}/projectsData`
+    );
+    const userDocRef = doc(db, `users/${owner_uid}`);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      throw new Error("User not found");
+    }
+
+    // Определяем порядок сортировки
+    const orderByField = "dateCreated"; // Сортируем по "dateCreated" по умолчанию, если ключ не указан
+    const orderByDirection = "desc"; // Направление сортировки, по умолчанию "desc"
+
+    // Создаем запрос с сортировкой
+    const queryConstraints = [orderBy(orderByField, orderByDirection)];
+
+    const querySnapshot = await getDocs(
+      query(projectsDataCollectionRef, ...queryConstraints)
+    );
+    const projectsData = [];
+
+    // Проходим по каждому документу в коллекции
+    for (const doc of querySnapshot.docs) {
+      const project = doc.data();
+      const result = {
+        tgGroup: "",
+        tgGroupId: "",
+        projectName: project.name,
+        active: project.active,
+        integrations: [],
+      };
+
+      const googleCalendarIntegration = project.integrations.find(
+        integration => integration.name === "Google Calendar"
+      );
+
+      if (googleCalendarIntegration) {
+        result.integrations.push({
+          id: googleCalendarIntegration.expiry_date,
+          name: "Google Calendar",
+          img: "/img/thumbs/google-calendar.png",
+        });
+      }
+      const tgGroups = await FirebaseMyProjectsService.fetchTelegramGroups();
+      // // project.tgGroup
+
+      const tgGroup = await tgGroups.data.find(
+        group => group.id === project.tgGroup
+      );
+
+      if (tgGroup && tgGroup.label) {
+        result.tgGroup = tgGroup.label;
+        result.tgGroupId = tgGroup.chatId;
+      }
+
+      projectsData.push(result);
+    }
+
+    return projectsData;
   } catch (error) {
     throw error;
   }

@@ -8,13 +8,12 @@ export const protectedRoutes = [
     key: "home",
     path: "/home",
     component: React.lazy(() => import("views/private/ProjectDashboard")),
-    // component: React.lazy(() => import("views/private/Home")),
-    authority: [],
+    authority: ["user", "admin"],
   },
   {
     key: "projects",
     path: "/projects",
     component: React.lazy(() => import("views/private/ProjectsView")),
-    authority: [],
+    authority: ["admin"],
   },
 ];

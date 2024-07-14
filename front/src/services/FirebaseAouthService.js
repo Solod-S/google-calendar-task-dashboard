@@ -165,6 +165,7 @@ FirebaseAouthService.handleNewUser = async ({
         email: email,
         displayName: name ? name : "",
         photoURL: userPhotoURL ? userPhotoURL : null,
+        authority: ["user"],
       };
 
       await setDoc(doc(db, "users", uid), newUser);
@@ -191,6 +192,7 @@ FirebaseAouthService.handleNewUser = async ({
         email: email,
         displayName: displayName ? displayName : "",
         photoURL,
+        authority: ["user"],
       };
 
       await setDoc(doc(db, "users", uid), newUser);

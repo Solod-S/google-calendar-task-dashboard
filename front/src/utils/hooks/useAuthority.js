@@ -1,17 +1,21 @@
-import { useMemo } from 'react'
-import isEmpty from 'lodash/isEmpty'
+import { useMemo } from "react";
+import isEmpty from "lodash/isEmpty";
 
 function useAuthority(userAuthority = [], authority = [], emptyCheck = false) {
+  const roleMatched = useMemo(() => {
+    return authority.some(role => userAuthority.includes(role));
+  }, [authority, userAuthority]);
 
-    const roleMatched = useMemo(() => {
-		return authority.some(role => userAuthority.includes(role))
-	}, [authority, userAuthority])
-    
-    if (isEmpty(authority) || isEmpty(userAuthority) || typeof authority === 'undefined') {
-		return !emptyCheck
-	}
+  if (
+    isEmpty(authority) ||
+    isEmpty(userAuthority) ||
+    typeof authority === "undefined"
+  ) {
+    console.log(`invalid`);
+    return !emptyCheck;
+  }
 
-    return roleMatched
+  return roleMatched;
 }
 
-export default useAuthority
+export default useAuthority;

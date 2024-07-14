@@ -1,38 +1,25 @@
 import React, { useMemo } from "react";
-import { Card, Button, Table, Tag } from "components/ui";
+import { Card, Button, Table, Badge } from "components/ui";
 import { useNavigate } from "react-router-dom";
 import { UsersAvatarGroup, ActionLink } from "components/shared";
 import { useTable } from "react-table";
 
 const { Tr, Th, Td, THead, TBody } = Table;
 
-const PriorityTag = ({ priority }) => {
-  switch (priority) {
-    case 0:
-      return (
-        <Tag className="text-red-600 bg-red-100 dark:text-red-100 dark:bg-red-500/20 rounded border-0">
-          High
-        </Tag>
-      );
-    case 1:
-      return (
-        <Tag className="text-amber-600 bg-amber-100 dark:text-amber-100 dark:bg-amber-500/20 rounded border-0">
-          Medium
-        </Tag>
-      );
-    case 2:
-      return (
-        <Tag className="bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-100 rounded border-0">
-          Low
-        </Tag>
-      );
-    default:
-      return null;
-  }
+const inventoryStatusColor = {
+  true: {
+    label: "Enabled",
+    dotClass: "bg-emerald-500",
+    textClass: "text-emerald-500",
+  },
+  false: {
+    label: "Disabled",
+    dotClass: "bg-red-500",
+    textClass: "text-red-500",
+  },
 };
 
-const MyTasks = ({ data = [] }) => {
-  console.log(`data`, data);
+const MyProjects = ({ data = [] }) => {
   const navigate = useNavigate();
 
   const columns = useMemo(
@@ -41,12 +28,13 @@ const MyTasks = ({ data = [] }) => {
         Header: "Telegram Group",
         accessor: "tgGroup",
         Cell: props => {
-          const { tgGroup } = props.row.original;
+          const { tgGroup, tgGroupId } = props.row.original;
           return (
             <ActionLink
               themeColor={false}
               className="font-semibold"
-              to="/app/project/scrum-board"
+              to="#"
+              title={`Group ID: ${tgGroupId}`}
             >
               {tgGroup}
             </ActionLink>
@@ -58,19 +46,29 @@ const MyTasks = ({ data = [] }) => {
         accessor: "projectName",
       },
       {
-        Header: "Priority",
+        Header: "Status",
         accessor: "priority",
         Cell: props => {
-          const { priority } = props.row.original;
-          return <PriorityTag priority={priority} />;
+          const { active } = props.row.original;
+
+          return (
+            <div className="flex items-center gap-2">
+              <Badge className={inventoryStatusColor[active].dotClass} />
+              <span
+                className={`capitalize font-semibold ${inventoryStatusColor[active].textClass}`}
+              >
+                {inventoryStatusColor[active].label}
+              </span>
+            </div>
+          );
         },
       },
       {
-        Header: "Assignees",
-        accessor: "Assignees",
+        Header: "Integration",
+        accessor: "integrations",
         Cell: props => {
-          const { assignees } = props.row.original;
-          return <UsersAvatarGroup users={assignees} />;
+          const { integrations } = props.row.original;
+          return <UsersAvatarGroup users={integrations} />;
         },
       },
     ],
@@ -81,13 +79,13 @@ const MyTasks = ({ data = [] }) => {
     useTable({ columns, data, initialState: { pageIndex: 0 } });
 
   const onViewAllTask = () => {
-    navigate("/app/project/issue");
+    navigate("/projects");
   };
 
   return (
     <Card>
       <div className="flex items-center justify-between mb-6">
-        <h4>Active project(s)</h4>
+        <h4>My project(s)</h4>
         <Button onClick={onViewAllTask} size="sm">
           View All
         </Button>
@@ -121,4 +119,4 @@ const MyTasks = ({ data = [] }) => {
   );
 };
 
-export default MyTasks;
+export default MyProjects;

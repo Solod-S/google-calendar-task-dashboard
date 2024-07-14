@@ -5,7 +5,7 @@ import { getProjectDashboardData } from "./store/dataSlice";
 import { Loading } from "components/shared";
 import ProjectDashboardHeader from "./components/ProjectDashboardHeader";
 import TaskOverview from "./components/TaskOverview";
-import MyTasks from "./components/MyTasks";
+import MyProjects from "./components/MyProjects";
 import Schedule from "./components/Schedule";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -19,10 +19,10 @@ const ProjectDashboard = () => {
     userName,
     taskCount,
     projectOverviewData,
-    myTasksData,
+    myProjects,
     activeEventsData,
-    projectsData,
-    activitiesData,
+    // projectsData,
+    // activitiesData,
   } = useSelector(state => state.projectDashboard.data.dashboardData);
   const loading = useSelector(state => state.projectDashboard.data.loading);
 
@@ -42,7 +42,7 @@ const ProjectDashboard = () => {
         <div className="flex flex-col xl:flex-row gap-4">
           <div className="flex flex-col gap-4 flex-auto">
             <TaskOverview data={projectOverviewData} />
-            <MyTasks data={myTasksData} />
+            <MyProjects data={myProjects} />
           </div>
           <div className="flex flex-col gap-4">
             <div className="xl:w-[380px]">

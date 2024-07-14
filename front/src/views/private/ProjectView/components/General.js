@@ -19,7 +19,12 @@ import {
 import FormDesription from "./FormDesription";
 import FormRow from "./FormRow";
 import { Field, Form, Formik } from "formik";
-import { HiOutlineBriefcase, HiOutlineUser } from "react-icons/hi";
+
+import {
+  HiOutlineBriefcase,
+  HiOutlineUser,
+  HiPaperAirplane,
+} from "react-icons/hi";
 import * as Yup from "yup";
 import isEmpty from "lodash/isEmpty"; // Добавьте этот импорт
 import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
@@ -402,6 +407,20 @@ const General = forwardRef(
                               handleFieldChange("tgGroup", option.value)
                             }
                           />
+                          {selectedTgGroup?.chatId && (
+                            <Field
+                              type="text"
+                              autoComplete="off"
+                              value={selectedTgGroup?.chatId}
+                              disabled={true}
+                              component={Input}
+                              className="inline-flex w-auto"
+                              prefix={
+                                <HiPaperAirplane className="text-xl rotate-90" />
+                              }
+                            />
+                          )}
+
                           {selectedTgGroup && (
                             <Button
                               color="red"

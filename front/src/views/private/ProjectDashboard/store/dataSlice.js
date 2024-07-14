@@ -6,7 +6,8 @@ export const getProjectDashboardData = createAsyncThunk(
   async () => {
     const { weekly, displayName, activeEventsData } =
       await FirebaseDashboardService.fetchTaskOverview();
-    console.log(`activeEventsData`, activeEventsData[0]);
+    const myProjects = await FirebaseDashboardService.fetchProjectsData();
+    console.log(`myProjects`, myProjects);
     const data = {
       userName: displayName,
       taskCount: weekly.total,
@@ -83,97 +84,7 @@ export const getProjectDashboardData = createAsyncThunk(
           // },
         },
       },
-      myTasksData: [
-        {
-          tgGroup: "Armors-sale",
-          projectName: "Sales notifications",
-          priority: 0,
-          assignees: [
-            {
-              id: "1",
-              name: "Carolyn Perkins",
-              email: "eileen_h@hotmail.com",
-              img: "/img/avatars/thumb-1.jpg",
-            },
-            {
-              id: "2",
-              name: "Terrance Moreno",
-              email: "",
-              img: "/img/avatars/thumb-2.jpg",
-            },
-          ],
-        },
-        {
-          tgGroup: "Armors-general",
-          projectName: "Update contact page",
-          priority: 1,
-          assignees: [
-            {
-              id: "1",
-              name: "Carolyn Perkins",
-              email: "eileen_h@hotmail.com",
-              img: "/img/avatars/thumb-1.jpg",
-            },
-          ],
-        },
-        {
-          tgGroup: "Armors-team",
-          projectName: "Document features 2.0",
-          priority: 1,
-          assignees: [
-            {
-              id: "1",
-              name: "Carolyn Perkins",
-              email: "eileen_h@hotmail.com",
-              img: "/img/avatars/thumb-1.jpg",
-            },
-            {
-              id: "2",
-              name: "Terrance Moreno",
-              email: "",
-              img: "/img/avatars/thumb-2.jpg",
-            },
-            {
-              id: "3",
-              name: "Ron Vargas",
-              email: "ronnie_vergas@infotech.io",
-              img: "/img/avatars/thumb-3.jpg",
-            },
-          ],
-        },
-        {
-          tgGroup: "Armors-content",
-          projectName: "Fix typo in home page",
-          priority: 2,
-          assignees: [
-            {
-              id: "1",
-              name: "Carolyn Perkins",
-              email: "eileen_h@hotmail.com",
-              img: "/img/avatars/thumb-1.jpg",
-            },
-            {
-              id: "5",
-              name: "Joyce Freeman",
-              email: "joyce991@infotech.io",
-              img: "/img/avatars/thumb-5.jpg",
-            },
-          ],
-        },
-        {
-          tgGroup: "Armors-marketing",
-          projectName: "Fix broken API",
-          priority: 0,
-          assignees: [
-            {
-              id: "1",
-              name: "Carolyn Perkins",
-              email: "eileen_h@hotmail.com",
-              img: "/img/avatars/thumb-1.jpg",
-            },
-          ],
-        },
-      ],
+      myProjects,
       projectsData: [
         {
           id: 27,
