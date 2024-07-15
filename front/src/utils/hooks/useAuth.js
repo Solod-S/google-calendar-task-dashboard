@@ -15,6 +15,7 @@ import {
 } from "constants/app.constant";
 import { useNavigate } from "react-router-dom";
 import useQuery from "./useQuery";
+import { USER } from "constants/roles.constant";
 
 function useAuth() {
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ function useAuth() {
               resp.user || {
                 avatar: "",
                 userName: "Anonymous",
-                authority: ["USER"],
+                authority: [USER],
                 email: "",
               }
             )

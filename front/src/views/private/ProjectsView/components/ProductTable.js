@@ -61,9 +61,9 @@ const ActionColumn = ({ row, onEdit }) => {
 
 const ProductColumn = ({ row }) => {
   const avatar = row.img ? (
-    <Avatar src={row.img} />
+    <Avatar shape="circle" src={row.img} />
   ) : (
-    <Avatar icon={<FiPackage />} />
+    <Avatar shape="circle" icon={<FiPackage />} />
   );
 
   return (

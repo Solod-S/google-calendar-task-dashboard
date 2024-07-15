@@ -22,6 +22,7 @@ import {
   setDoc,
   doc,
 } from "firebase/firestore";
+import { USER } from "constants/roles.constant";
 
 const BASE_FRONT_URL = process.env.REACT_APP_BASE_FRONT_URL;
 
@@ -165,7 +166,7 @@ FirebaseAouthService.handleNewUser = async ({
         email: email,
         displayName: name ? name : "",
         photoURL: userPhotoURL ? userPhotoURL : null,
-        authority: ["user"],
+        authority: [USER],
       };
 
       await setDoc(doc(db, "users", uid), newUser);
@@ -192,7 +193,7 @@ FirebaseAouthService.handleNewUser = async ({
         email: email,
         displayName: displayName ? displayName : "",
         photoURL,
-        authority: ["user"],
+        authority: [USER],
       };
 
       await setDoc(doc(db, "users", uid), newUser);

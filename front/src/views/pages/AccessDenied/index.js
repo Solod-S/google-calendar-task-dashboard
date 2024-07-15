@@ -6,9 +6,8 @@ const AccessDenied = () => {
     <Container className="h-full">
       <div className="h-full flex flex-col items-center justify-center">
         <DoubleSidedImage
-          src="/img/others/img-2.png"
-          className="max-h-64"
-          darkModeSrc="access_denied_dark.png"
+          src="/img/others/access_denied.png"
+          darkModeSrc="/img/others/img-2-dark.png"
           alt="Access Denied!"
         />
         <div className="mt-6 text-center">

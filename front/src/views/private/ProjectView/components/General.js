@@ -5,6 +5,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
+import { Modal } from "antd";
 import {
   Input,
   Avatar,
@@ -48,6 +49,8 @@ const General = forwardRef(
   ({ handleOk, generalData, setGeneralData, show }, ref) => {
     const [categoriesList, setCategoriesList] = useState([]);
     const [tgGroupsList, setTgGroupsList] = useState([]);
+    const [isWarningVisible, setisWarningVisible] = useState(false);
+    const [deleteOptions, setDeleteOptions] = useState(null);
 
     const fetchCategories = async () => {
       const result = await FirebaseMyProjectsService.fetchProjectsCategories();
@@ -80,8 +83,11 @@ const General = forwardRef(
             placement: "top-center",
           }
         );
+      } finally {
+        setDeleteOptions(null);
       }
     };
+
     const handleDeleteTgGroup = async categoryId => {
       try {
         await FirebaseMyProjectsService.deleteTelegramGroup(categoryId);
@@ -105,6 +111,8 @@ const General = forwardRef(
             placement: "top-center",
           }
         );
+      } finally {
+        setDeleteOptions(null);
       }
     };
 
@@ -129,6 +137,7 @@ const General = forwardRef(
         setSubmitting(false);
       }
     };
+
     const handleAddTgGroup = async (tgGroupName, tgGroupId, setSubmitting) => {
       try {
         const newTgGroup = await FirebaseMyProjectsService.addTelegramGroup({
@@ -161,6 +170,15 @@ const General = forwardRef(
         ...prevData,
         [name]: value,
       }));
+    };
+
+    const handleCancel = () => {
+      setDeleteOptions(null);
+      setisWarningVisible(false);
+    };
+
+    const closeAndReset = async () => {
+      setisWarningVisible(false);
     };
 
     const formikRef = useRef();
@@ -336,9 +354,13 @@ const General = forwardRef(
                             <Button
                               color="red"
                               type="button"
-                              onClick={() =>
-                                handleDeleteCategory(selectedCategory.id)
-                              }
+                              onClick={() => {
+                                setisWarningVisible(true);
+                                setDeleteOptions({
+                                  id: selectedCategory.id,
+                                  type: "group",
+                                });
+                              }}
                             >
                               Delete
                             </Button>
@@ -425,9 +447,16 @@ const General = forwardRef(
                             <Button
                               color="red"
                               type="button"
-                              onClick={() =>
-                                handleDeleteTgGroup(selectedTgGroup.id)
-                              }
+                              // onClick={() =>
+                              //   handleDeleteTgGroup(selectedTgGroup.id)
+                              // }
+                              onClick={() => {
+                                setisWarningVisible(true);
+                                setDeleteOptions({
+                                  id: selectedTgGroup.id,
+                                  type: "telegram",
+                                });
+                              }}
                             >
                               Delete
                             </Button>
@@ -515,6 +544,34 @@ const General = forwardRef(
                   </FormRow>
                 </FormContainer>
               </Form>
+
+              <Modal
+                title="Warning..."
+                okButtonProps={{
+                  style: { backgroundColor: "#4F46E5" },
+                }}
+                open={isWarningVisible}
+                onOk={() => {
+                  switch (true) {
+                    case deleteOptions?.type === "group":
+                      handleDeleteCategory(deleteOptions.id);
+                      closeAndReset();
+                      break;
+
+                    case deleteOptions?.type === "telegram":
+                      handleDeleteTgGroup(deleteOptions.id);
+                      closeAndReset();
+                      break;
+
+                    default:
+                      closeAndReset();
+                      break;
+                  }
+                }}
+                onCancel={() => handleCancel()}
+              >
+                <p>Are you sure you want to delete this?</p>
+              </Modal>
             </div>
           );
         }}

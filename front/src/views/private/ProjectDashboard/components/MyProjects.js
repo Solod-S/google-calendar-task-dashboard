@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
-import { Card, Button, Table, Badge } from "components/ui";
+import { Card, Button, Table, Badge, Avatar } from "components/ui";
 import { useNavigate } from "react-router-dom";
 import { UsersAvatarGroup, ActionLink } from "components/shared";
 import { useTable } from "react-table";
+import { FiPackage } from "react-icons/fi";
 
 const { Tr, Th, Td, THead, TBody } = Table;
 
@@ -19,11 +20,34 @@ const inventoryStatusColor = {
   },
 };
 
+const NameColumn = ({ row }) => {
+  const avatar = row.img ? (
+    <Avatar shape="circle" src={row.img} />
+  ) : (
+    <Avatar shape="circle" icon={<FiPackage />} />
+  );
+
+  return (
+    <div className="flex items-center">
+      {avatar}
+      <span className={`ml-2 rtl:mr-2 font-semibold`}>{row.name}</span>
+    </div>
+  );
+};
+
 const MyProjects = ({ data = [] }) => {
   const navigate = useNavigate();
 
   const columns = useMemo(
     () => [
+      {
+        Header: "Name",
+        accessor: "projectName",
+        Cell: props => {
+          const { projectName, img } = props.row.original;
+          return <NameColumn row={{ name: projectName, img }} />;
+        },
+      },
       {
         Header: "Telegram Group",
         accessor: "tgGroup",
@@ -41,13 +65,10 @@ const MyProjects = ({ data = [] }) => {
           );
         },
       },
-      {
-        Header: "Name",
-        accessor: "projectName",
-      },
+
       {
         Header: "Status",
-        accessor: "priority",
+        accessor: "active",
         Cell: props => {
           const { active } = props.row.original;
 

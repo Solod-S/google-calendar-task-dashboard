@@ -188,9 +188,11 @@ FirebaseDashboardService.fetchProjectsData = async () => {
     // Проходим по каждому документу в коллекции
     for (const doc of querySnapshot.docs) {
       const project = doc.data();
+      console.log(`project`, project);
       const result = {
         tgGroup: "",
         tgGroupId: "",
+        img: project.img,
         projectName: project.name,
         active: project.active,
         integrations: [],

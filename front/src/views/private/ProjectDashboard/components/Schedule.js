@@ -200,10 +200,9 @@ const Schedule = ({ activeEventsData = [] }) => {
       <Dialog isOpen={open} closable={false} onRequestClose={handleClose}>
         <h5 className="mb-4 text-center">Current task description</h5>
 
-        <div
-          className="mb-4 text-center"
-          dangerouslySetInnerHTML={{ __html: selectedEvent }}
-        />
+        <div className="max-h-64  overflow-y-auto mb-4 overflow-x-hidden">
+          <div dangerouslySetInnerHTML={{ __html: selectedEvent }} />
+        </div>
       </Dialog>
     </Card>
   );
