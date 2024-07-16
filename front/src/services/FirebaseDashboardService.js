@@ -199,14 +199,41 @@ FirebaseDashboardService.fetchProjectsData = async () => {
       };
 
       const googleCalendarIntegration = project.integrations.find(
-        integration => integration.name === "Google Calendar"
+        integration =>
+          integration.name === "Google Calendar" && integration.active
+      );
+
+      const firebaseIntegration = project.integrations.find(
+        integration =>
+          integration.name === "Firebase Schedule" && integration.active
+      );
+
+      const googleSheetsIntegration = project.integrations.find(
+        integration =>
+          integration.name === "Google Sheets" && integration.active
       );
 
       if (googleCalendarIntegration) {
         result.integrations.push({
-          id: googleCalendarIntegration.expiry_date,
+          id: "google calendar",
           name: "Google Calendar",
           img: "/img/thumbs/google-calendar.png",
+        });
+      }
+
+      if (firebaseIntegration) {
+        result.integrations.push({
+          id: "firebase schedule",
+          name: "Firebase Schedule",
+          img: "/img/thumbs/firebase-schedule.png",
+        });
+      }
+
+      if (googleSheetsIntegration) {
+        result.integrations.push({
+          id: "google sheets",
+          name: "Google Sheets",
+          img: "/img/thumbs/google-sheets.png",
         });
       }
       const tgGroups = await FirebaseMyProjectsService.fetchTelegramGroups();

@@ -10,7 +10,7 @@ import {
 import isEmpty from "lodash/isEmpty";
 
 import cloneDeep from "lodash/cloneDeep";
-import { Modal } from "antd";
+import { Divider, Modal } from "antd";
 
 import GoogleCalendarService from "services/GoogleCalendarService";
 
@@ -36,6 +36,41 @@ const initialData = {
       type: "Notifications and events",
       active: false,
     },
+    {
+      name: "Firebase Schedule",
+      key: "firebase_schedule",
+      desc: "Integrate with Firebase",
+      detailet: `
+      <p class="font-semibold text-gray-900 dark:text-gray-100">Firebase Schedule allows you to create recurring or scheduled events for sending messages to Telegram groups! This functionality provides you with the ability to:</p>
+      <ul class="list-disc mt-2 ltr:ml-4 rtl:mr-4">
+      <li class="mb-1"><strong>Schedule messages:</strong> You can create events to send messages to selected groups at a specified time.</li>
+      <li class="mb-1"><strong>Recurring events:</strong> Create recurring events to automatically send messages on a regular basis.</li>
+      <li class="mb-1"><strong>Easy management:</strong> Easily set up and manage scheduled events through your bot's intuitive interface.</li>
+      </ul>
+      <p class="font-semibold text-gray-900 dark:text-gray-100">Make communication in your Telegram groups more organized and efficient with the new scheduling features!</p>
+      `,
+      img: "/img/thumbs/firebase-schedule.png",
+      type: "Notifications and events",
+      active: false,
+    },
+    {
+      name: "Google Sheets",
+      key: "google_sheets",
+      desc: "Integrate with Google Sheets",
+      detailet: `
+      <p class="font-semibold text-gray-900 dark:text-gray-100">Google Sheets Schedule allows you to add your Google Sheets to create recurring or scheduled events for sending messages to Telegram groups! This functionality provides you with the ability to:</p>
+      <ul class="list-disc mt-2 ltr:ml-4 rtl:mr-4">
+      <li class="mb-1"><strong>Add Google Sheets:</strong> Easily integrate your Google Sheets to use them for scheduling messages.</li>
+      <li class="mb-1"><strong>Schedule messages:</strong> Create events to send messages to selected groups at a specified time based on data from the sheets.</li>
+      <li class="mb-1"><strong>Recurring events:</strong> Use data from the sheets to create recurring events to automatically send messages on a regular basis.</li>
+      <li class="mb-1"><strong>Easy management:</strong> Easily set up and manage scheduled events through your bot's intuitive interface.</li>
+      </ul>
+      <p class="font-semibold text-gray-900 dark:text-gray-100">Make communication in your Telegram groups more organized and efficient with the new scheduling features using Google Sheets!</p>
+      `,
+      img: "/img/thumbs/google-sheets.png",
+      type: "Notifications and events",
+      active: false,
+    },
   ],
   id: "1",
 };
@@ -45,10 +80,14 @@ const Integration = ({ show, generalData, setGeneralData }) => {
   const [viewIntegration, setViewIntegration] = useState(false);
   const [integrationDetails, setIntegrationDetails] = useState({});
   const [installing, setInstalling] = useState(false);
+  const [isWarningVisible, setisWarningVisible] = useState(false);
+
+  const closeAndReset = async () => {
+    setisWarningVisible(false);
+  };
 
   useEffect(() => {
     if (generalData?.integrations) {
-      console.log(`generalData?.integrations`, generalData?.integrations);
       const newData = { ...initialData, installed: [], available: [] };
 
       initialData.available.forEach(availableItem => {
@@ -69,17 +108,32 @@ const Integration = ({ show, generalData, setGeneralData }) => {
   }, [generalData]);
 
   const handleToggle = (bool, name, category) => {
-    const updatedIntegrations = data[category].map(app => ({
-      ...generalData.integrations.find(
-        integration => integration.key === app.key
-      ),
-      active: !bool,
+    const updatedIntegrations = data[category].map(app => {
+      if (app.name === name) {
+        return { ...app, active: !bool };
+      }
+      return app;
+    });
+
+    setData(prevData => ({
+      ...prevData,
+      [category]: updatedIntegrations,
     }));
 
-    setGeneralData(prevData => ({
-      ...prevData,
-      integrations: updatedIntegrations,
-    }));
+    setGeneralData(prevData => {
+      const updatedGeneralIntegrations = prevData.integrations.map(
+        integration => {
+          if (integration.name === name) {
+            return { ...integration, active: !bool };
+          }
+          return integration;
+        }
+      );
+      return {
+        ...prevData,
+        integrations: updatedGeneralIntegrations,
+      };
+    });
   };
 
   const onViewIntegrationOpen = (details, installed) => {
@@ -238,6 +292,7 @@ const Integration = ({ show, generalData, setGeneralData }) => {
           </Card>
         ))}
       </div>
+      <Divider />
       <div className="mt-10">
         <h5>Available</h5>
         <div className="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 mt-4">
@@ -287,7 +342,8 @@ const Integration = ({ show, generalData, setGeneralData }) => {
               danger
               style={{ background: "red", color: "white" }}
               loading={installing}
-              onClick={() => handleUninstall(integrationDetails)}
+              // onClick={() => handleUninstall(integrationDetails)}
+              onClick={() => setisWarningVisible(true)}
             >
               {installing ? "Uninstalling" : "Uninstall"}
             </Button>
@@ -322,6 +378,23 @@ const Integration = ({ show, generalData, setGeneralData }) => {
             dangerouslySetInnerHTML={{ __html: integrationDetails.detailet }}
           />
         </div>
+      </Modal>
+      <Modal
+        title="Warning..."
+        okButtonProps={{
+          style: { backgroundColor: "#4F46E5" },
+        }}
+        open={isWarningVisible}
+        onOk={() => {
+          handleUninstall(integrationDetails);
+          closeAndReset();
+        }}
+        onCancel={() => closeAndReset()}
+      >
+        <p>
+          Are you sure you want to delete integration with{" "}
+          {integrationDetails.name}?
+        </p>
       </Modal>
     </div>
   );

@@ -85,7 +85,7 @@ const MyProjects = ({ data = [] }) => {
         },
       },
       {
-        Header: "Integration",
+        Header: "Active Integration",
         accessor: "integrations",
         Cell: props => {
           const { integrations } = props.row.original;

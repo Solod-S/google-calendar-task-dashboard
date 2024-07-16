@@ -172,12 +172,8 @@ const General = forwardRef(
       }));
     };
 
-    const handleCancel = () => {
-      setDeleteOptions(null);
-      setisWarningVisible(false);
-    };
-
     const closeAndReset = async () => {
+      setDeleteOptions(null);
       setisWarningVisible(false);
     };
 
@@ -488,7 +484,11 @@ const General = forwardRef(
                       <Field name="newTgGroupId">
                         {({ field, form }) => (
                           <div className="flex items-center gap-2 ">
-                            <Input {...field} placeholder="Telegram Group ID" />
+                            <Input
+                              {...field}
+                              placeholder="Telegram Group ID"
+                              type="number"
+                            />
                             <Button
                               type="button"
                               onClick={() => {
@@ -568,7 +568,7 @@ const General = forwardRef(
                       break;
                   }
                 }}
-                onCancel={() => handleCancel()}
+                onCancel={() => closeAndReset()}
               >
                 <p>Are you sure you want to delete this?</p>
               </Modal>

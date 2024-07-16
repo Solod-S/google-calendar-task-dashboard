@@ -16,7 +16,6 @@ import General from "./components/General";
 import Integration from "./components/Integration";
 import Calendar from "./components/Calendar";
 import FirebaseSchedule from "./components/FirebaseSchedule";
-import GoogleSheets from "./components/GoogleSheets";
 
 const { TabNav, TabList } = Tabs;
 
@@ -105,42 +104,29 @@ const ProjectView = forwardRef(
     }, [currentProjectData]);
 
     useEffect(() => {
-      const hasActiveGoogleCalendar = generalData?.integrations?.find(
-        integration =>
-          integration.key === "google_calendar" && integration.active === true
+      const hasGoogleCalendar = generalData?.integrations?.find(
+        integration => integration.key === "google_calendar"
+      );
+      const googleCalendarIsActive = generalData?.integrations?.find(
+        integration => integration.active === true
       );
 
-      const hasActiveFirebaseSchedule = generalData?.integrations?.find(
-        integration =>
-          integration.key === "firebase_schedule" && integration.active === true
-      );
-
-      const hasActiveGoogleSheets = generalData?.integrations?.find(
-        integration =>
-          integration.key === "google_sheets" && integration.active === true
-      );
-
-      const options = {
-        general: { label: "General", path: "general" },
-        integration: { label: "Integration", path: "integration" },
-      };
-
-      if (hasActiveGoogleCalendar)
-        options.calendar = { label: "Calendar", path: "calendar" };
-
-      if (hasActiveFirebaseSchedule)
-        options.firebase_schedule = {
-          label: "Firebase Schedule",
-          path: "firebase-schedule",
-        };
-
-      if (hasActiveGoogleSheets)
-        options.google_sheets = {
-          label: "Google Sheets",
-          path: "google-sheets",
-        };
-
-      setSettingsMenu(options);
+      if (hasGoogleCalendar && googleCalendarIsActive) {
+        setSettingsMenu({
+          general: { label: "General", path: "general" },
+          integration: { label: "Integration", path: "integration" },
+          calendar: { label: "Calendar", path: "calendar" },
+          firebase_schedule: {
+            label: "Firebase Schedule",
+            path: "firebase schedule",
+          },
+        });
+      } else {
+        setSettingsMenu({
+          general: { label: "General", path: "general" },
+          integration: { label: "Integration", path: "integration" },
+        });
+      }
     }, [generalData]);
 
     useImperativeHandle(ref, () => ({
@@ -180,17 +166,9 @@ const ProjectView = forwardRef(
                 setGeneralData={setGeneralData}
               />
             )}
-
-            {settingsMenu.firebase_schedule && (
-              <FirebaseSchedule
-                show={currentTab === "firebase_schedule"}
-                generalData={generalData}
-                setGeneralData={setGeneralData}
-              />
-            )}
-            {settingsMenu.google_sheets && (
-              <GoogleSheets
-                show={currentTab === "google_sheets"}
+            {settingsMenu.calendar && (
+              <Calendar
+                show={currentTab === "calendar"}
                 generalData={generalData}
                 setGeneralData={setGeneralData}
               />
