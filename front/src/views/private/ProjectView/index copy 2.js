@@ -15,7 +15,7 @@ import { fetchProjects } from "store/projects/projectDataSlice";
 import General from "./components/General";
 import Integration from "./components/Integration";
 import Calendar from "./components/Calendar";
-import FirebaseSchedule from "./components/FirebaseSchedule";
+import FirebaseSchedule from "./components/FirebaseSchedule/FirebaseSchedule";
 
 const { TabNav, TabList } = Tabs;
 
