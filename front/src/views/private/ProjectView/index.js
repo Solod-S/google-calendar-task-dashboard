@@ -46,6 +46,7 @@ const ProjectView = forwardRef(
     const generalRef = useRef();
 
     const handleSubmit = async () => {
+      setIsSubmitting(true);
       if (generalRef.current) {
         const isValid = await generalRef.current.validateForm();
         if (!isValid) {

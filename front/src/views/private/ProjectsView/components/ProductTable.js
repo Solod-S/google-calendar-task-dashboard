@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Avatar, Badge } from "components/ui";
-import { DataTable } from "components/shared";
+import { DataTable, UsersAvatarGroup } from "components/shared";
 import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
 import { FiPackage } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
@@ -178,6 +178,55 @@ const ProductTable = ({ onEdit }) => {
               {dayjs.unix(dateUpdated.seconds).format("MM/DD/YYYY, HH:mm")}{" "}
             </span>
           );
+        },
+      },
+      {
+        Header: "Active Integration",
+        accessor: "integrations",
+        Cell: props => {
+          const { integrations } = props.row.original;
+          console.log(`integrations`, integrations);
+          const integrationsData = [];
+          const googleCalendarIntegration = integrations.find(
+            integration =>
+              integration.name === "Google Calendar" && integration.active
+          );
+
+          const firebaseIntegration = integrations.find(
+            integration =>
+              integration.name === "Firebase Schedule" && integration.active
+          );
+
+          const googleSheetsIntegration = integrations.find(
+            integration =>
+              integration.name === "Google Sheets" && integration.active
+          );
+
+          if (googleCalendarIntegration) {
+            integrationsData.push({
+              id: "google calendar",
+              name: "Google Calendar",
+              img: "/img/thumbs/google-calendar.png",
+            });
+          }
+
+          if (firebaseIntegration) {
+            integrationsData.push({
+              id: "firebase schedule",
+              name: "Firebase Schedule",
+              img: "/img/thumbs/firebase-schedule.png",
+            });
+          }
+
+          if (googleSheetsIntegration) {
+            integrationsData.push({
+              id: "google sheets",
+              name: "Google Sheets",
+              img: "/img/thumbs/google-sheets.png",
+            });
+          }
+
+          return <UsersAvatarGroup users={integrationsData} />;
         },
       },
       {
