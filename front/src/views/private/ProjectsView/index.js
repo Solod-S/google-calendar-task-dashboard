@@ -89,10 +89,6 @@ const ProjectList = () => {
           }}
           open={isWarningVisible}
           onOk={() => {
-            // setTimeout(() => {
-            //   setisWarningVisible(false);
-            // }, 1000);
-
             closeAndReset();
           }}
           onCancel={() => setisWarningVisible(false)}
