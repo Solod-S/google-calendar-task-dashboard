@@ -41,9 +41,11 @@ export const getCustomers = createAsyncThunk(
           tgName: "General",
           created: 1623430400,
           updated: 1632393600,
+          message:
+            "<p>Бездротовий зарядний пристрій ArmorStandart Resolute Power AWC-44 Square 15W Black<br />https://www.youtube.com/shorts/U-fxoJ3Bh7A</p><p>Автомобільний зарядний пристрій ArmorStandart Resolute Power ASPP-21 120W<br />https://www.youtube.com/shorts/QXbv9FVwEEY</p>",
           img: "/img/avatars/thumb-1.jpg",
           role: "Admin",
-          status: "active",
+          status: true,
           personalInfo: {
             location: "New York, US",
             title: "Product Manager",
@@ -118,9 +120,11 @@ export const getCustomers = createAsyncThunk(
           tgName: "Sales",
           created: 1632393600,
           updated: 1632393600,
+          message:
+            "<p>Бездротовий зарядний пристрій ArmorStandart Resolute Power AWC-44 Square 15W Black<br />https://www.youtube.com/shorts/U-fxoJ3Bh7A</p><p>Автомобільний зарядний пристрій ArmorStandart Resolute Power ASPP-21 120W<br />https://www.youtube.com/shorts/QXbv9FVwEEY</p>",
           img: "/img/avatars/thumb-2.jpg",
           role: "User",
-          status: "active",
+          status: true,
           personalInfo: {
             location: "New York, US",
             title: "Software Engineer",

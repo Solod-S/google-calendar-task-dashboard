@@ -33,41 +33,40 @@ const CustomerForm = forwardRef((props, ref) => {
   const { customer, onFormSubmit } = props;
 
   return (
-    <Tabs defaultValue="generalInfo">
-      <TabList>
-        <TabNav value="generalInfo">General Info</TabNav>
-        <TabNav value="schedule">Schedule</TabNav>
-      </TabList>
-      <div className="p-6">
-        <TabContent value="generalInfo">
-          {" "}
-          <Formik
-            innerRef={ref}
-            initialValues={{
-              name: customer.name || "",
-              status: customer?.status || false,
-              message: customer?.message || "",
-            }}
-            validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting }) => {
-              onFormSubmit?.(values);
-              setSubmitting(false);
-            }}
-          >
-            {({ touched, errors, resetForm }) => (
-              <Form className="test">
-                <FormContainer>
+    <Formik
+      innerRef={ref}
+      initialValues={{
+        name: customer.name || "",
+        status: customer?.status || false,
+        message: customer?.message || "",
+      }}
+      validationSchema={validationSchema}
+      onSubmit={(values, { setSubmitting }) => {
+        onFormSubmit?.(values);
+        setSubmitting(false);
+      }}
+    >
+      {({ touched, errors, resetForm }) => (
+        <Form className="test">
+          <FormContainer>
+            <Tabs defaultValue="generalInfo">
+              <TabList>
+                <TabNav value="generalInfo">General Info</TabNav>
+                <TabNav value="schedule">Schedule</TabNav>
+              </TabList>
+              <div className="p-6">
+                <TabContent value="generalInfo">
                   <InfoForm touched={touched} errors={errors} />
-                </FormContainer>
-              </Form>
-            )}
-          </Formik>
-        </TabContent>
-        <TabContent value="schedule">
-          <FirebaseScheduleForm />
-        </TabContent>
-      </div>
-    </Tabs>
+                </TabContent>
+                <TabContent value="schedule">
+                  <FirebaseScheduleForm />
+                </TabContent>
+              </div>
+            </Tabs>
+          </FormContainer>
+        </Form>
+      )}
+    </Formik>
   );
 });
 

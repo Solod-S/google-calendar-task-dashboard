@@ -19,6 +19,19 @@ const statusColor = {
   blocked: "bg-red-500",
 };
 
+const inventoryStatusColor = {
+  true: {
+    label: "Enabled",
+    dotClass: "bg-emerald-500",
+    textClass: "text-emerald-500",
+  },
+  false: {
+    label: "Disabled",
+    dotClass: "bg-red-500",
+    textClass: "text-red-500",
+  },
+};
+
 const ActionColumn = ({ row }) => {
   const { textTheme } = useThemeClass();
   const dispatch = useDispatch();
@@ -69,20 +82,19 @@ const columns = [
     },
   },
   {
-    Header: "Telegram group",
-    accessor: "tgName",
-    sortable: true,
-  },
-  {
     Header: "Status",
     accessor: "status",
     sortable: true,
     Cell: props => {
-      const row = props.row.original;
+      const { status } = props.row.original;
       return (
-        <div className="flex items-center">
-          <Badge className={statusColor[row.status]} />
-          <span className="ml-2 rtl:mr-2 capitalize">{row.status}</span>
+        <div className="flex items-center gap-2">
+          <Badge className={inventoryStatusColor[status].dotClass} />
+          <span
+            className={`capitalize font-semibold ${inventoryStatusColor[status].textClass}`}
+          >
+            {inventoryStatusColor[status].label}
+          </span>
         </div>
       );
     },
@@ -136,7 +148,7 @@ const Customers = () => {
   }, [pageIndex, pageSize, sort, query, filterData, dispatch]);
 
   useEffect(() => {
-    console.log(`uef`);
+    // console.log(`uef`);
     fetchData();
   }, [fetchData, pageIndex, pageSize, sort, filterData]);
 

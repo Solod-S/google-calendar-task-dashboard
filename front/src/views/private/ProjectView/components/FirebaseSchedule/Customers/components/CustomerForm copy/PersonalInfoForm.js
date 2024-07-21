@@ -27,7 +27,7 @@ const PersonalInfoForm = props => {
         invalid={errors.upload && touched.upload}
         errorMessage={errors.upload}
       >
-        <Field name="img">
+        {/* <Field name="img">
           {({ field, form }) => {
             const avatarProps = field.value ? { src: field.value } : {};
             return (
@@ -50,7 +50,7 @@ const PersonalInfoForm = props => {
               </div>
             );
           }}
-        </Field>
+        </Field> */}
       </FormItem>
       <FormItem
         label="Name"
