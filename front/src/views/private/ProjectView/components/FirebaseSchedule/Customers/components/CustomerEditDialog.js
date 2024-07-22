@@ -17,7 +17,7 @@ const DrawerFooter = ({ onSaveClick, onCancel }) => {
   );
 };
 
-const CustomerEditDialog = () => {
+const CustomerEditDialog = ({ generalData, setGeneralData }) => {
   const dispatch = useDispatch();
   const drawerOpen = useSelector(state => state.crmCustomers.state.drawerOpen);
 

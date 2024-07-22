@@ -9,7 +9,7 @@ const FirebaseSchedule = ({ show, generalData, setGeneralData }) => {
         position: show ? "" : "absolute",
       }}
     >
-      <Customers />
+      <Customers generalData={generalData} setGeneralData={setGeneralData} />
     </div>
   );
 };

@@ -1,36 +1,47 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
 import { Tabs, FormContainer } from "components/ui";
 import { Form, Formik } from "formik";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import * as Yup from "yup";
 import InfoForm from "./InfoForm";
-import ScheduleForm from "./ScheduleForm";
+// import ScheduleForm from "./ScheduleForm";
 import FirebaseScheduleForm from "./FirebaseScheduleForm";
 
 dayjs.extend(customParseFormat);
 
 const validationSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Email Required"),
   name: Yup.string().required("User Name Required"),
-  location: Yup.string(),
-  title: Yup.string(),
-  phoneNumber: Yup.string().matches(
-    /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/,
-    "Phone number is not valid"
-  ),
-  birthday: Yup.string(),
-  facebook: Yup.string(),
-  twitter: Yup.string(),
-  pinterest: Yup.string(),
-  linkedIn: Yup.string(),
-  img: Yup.string(),
+  message: Yup.string().required("Message Required"),
 });
 
 const { TabNav, TabList, TabContent } = Tabs;
 
 const CustomerForm = forwardRef((props, ref) => {
   const { customer, onFormSubmit } = props;
+
+  const [generationIntervalType, setGenerationIntervalType] =
+    useState("oncePerDays");
+  const [startDate, setStartDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [selectedTime, setSelectedTime] = useState("10:00");
+  const [repeatEndType, setRepeatEndType] = useState("never");
+
+  const [endDate, setEndDate] = useState(
+    dayjs().add(1, "day").format("YYYY-MM-DD")
+  );
+  const [monthlyIntervalLastDay, setMonthlyIntervalLastDay] =
+    useState("disable");
+
+  const handleScheduleData = () => {
+    return {
+      generationIntervalType,
+      startDate,
+      selectedTime,
+      repeatEndType,
+      endDate,
+      monthlyIntervalLastDay,
+    };
+  };
 
   return (
     <Tabs defaultValue="generalInfo">
@@ -40,7 +51,6 @@ const CustomerForm = forwardRef((props, ref) => {
       </TabList>
       <div className="p-6">
         <TabContent value="generalInfo">
-          {" "}
           <Formik
             innerRef={ref}
             initialValues={{
@@ -50,7 +60,8 @@ const CustomerForm = forwardRef((props, ref) => {
             }}
             validationSchema={validationSchema}
             onSubmit={(values, { setSubmitting }) => {
-              onFormSubmit?.(values);
+              const scheduleData = handleScheduleData();
+              onFormSubmit?.({ ...values, ...scheduleData });
               setSubmitting(false);
             }}
           >
@@ -64,7 +75,20 @@ const CustomerForm = forwardRef((props, ref) => {
           </Formik>
         </TabContent>
         <TabContent value="schedule">
-          <FirebaseScheduleForm />
+          <FirebaseScheduleForm
+            generationIntervalType={generationIntervalType}
+            setGenerationIntervalType={setGenerationIntervalType}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            selectedTime={selectedTime}
+            setSelectedTime={setSelectedTime}
+            repeatEndType={repeatEndType}
+            setRepeatEndType={setRepeatEndType}
+            endDate={endDate}
+            setEndDate={setEndDate}
+            monthlyIntervalLastDay={monthlyIntervalLastDay}
+            setMonthlyIntervalLastDay={setMonthlyIntervalLastDay}
+          />
         </TabContent>
       </div>
     </Tabs>

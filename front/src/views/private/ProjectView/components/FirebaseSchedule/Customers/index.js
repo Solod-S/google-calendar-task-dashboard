@@ -1,23 +1,26 @@
-import React from 'react'
-import { AdaptableCard } from 'components/shared'
-import CustomersTable from './components/CustomersTable'
-import CustomersTableTools from './components/CustomersTableTools'
-import CustomerStatistic from './components/CustomerStatistic'
-import { injectReducer } from 'store/index'
-import reducer from './store'
+import React from "react";
+import { AdaptableCard } from "components/shared";
+import CustomersTable from "./components/CustomersTable";
+import CustomersTableTools from "./components/CustomersTableTools";
+import CustomerStatistic from "./components/CustomerStatistic";
+import { injectReducer } from "store/index";
+import reducer from "./store";
 
-injectReducer('crmCustomers', reducer)
+injectReducer("crmCustomers", reducer);
 
-const Customers = () => {
-	return (
-		<>
-			<CustomerStatistic />
-			<AdaptableCard className="h-full" bodyClass="h-full">
-				<CustomersTableTools />
-				<CustomersTable />
-			</AdaptableCard>
-		</>
-	)
-}
+const Customers = ({ generalData, setGeneralData }) => {
+  return (
+    <>
+      <CustomerStatistic />
+      <AdaptableCard className="h-full" bodyClass="h-full">
+        <CustomersTableTools />
+        <CustomersTable
+          generalData={generalData}
+          setGeneralData={setGeneralData}
+        />
+      </AdaptableCard>
+    </>
+  );
+};
 
-export default Customers
+export default Customers;

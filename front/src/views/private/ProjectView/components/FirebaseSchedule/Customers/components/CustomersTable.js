@@ -133,7 +133,7 @@ const columns = [
   },
 ];
 
-const Customers = () => {
+const Customers = ({ generalData, setGeneralData }) => {
   const dispatch = useDispatch();
   const data = useSelector(state => state.crmCustomers.data.customerList);
   const loading = useSelector(state => state.crmCustomers.data.loading);
@@ -190,7 +190,10 @@ const Customers = () => {
         onSelectChange={onSelectChange}
         onSort={onSort}
       />
-      <CustomerEditDialog />
+      <CustomerEditDialog
+        generalData={generalData}
+        setGeneralData={setGeneralData}
+      />
     </>
   );
 };

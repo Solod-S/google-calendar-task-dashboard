@@ -4,21 +4,32 @@ import React, { useState } from "react";
 
 const { Option } = Select;
 
-const FirebaseSchedule = ({ generalData, setGeneralData }) => {
-  const [subjectTotalArticlesLength, setSubjectTotalArticlesLength] =
-    useState(0);
+const FirebaseSchedule = props => {
+  const {
+    generationIntervalType,
+    setGenerationIntervalType,
+    startDate,
+    setStartDate,
+    selectedTime,
+    setSelectedTime,
+    repeatEndType,
+    setRepeatEndType,
+    endDate,
+    setEndDate,
+    monthlyIntervalLastDay,
+    setMonthlyIntervalLastDay,
+  } = props;
+  // const [generationIntervalType, setGenerationIntervalType] =
+  //   useState("oncePerDays");
+  // const [startDate, setStartDate] = useState(dayjs().format("YYYY-MM-DD"));
+  // const [selectedTime, setSelectedTime] = useState("10:00");
+  // const [repeatEndType, setRepeatEndType] = useState("never");
 
-  const [generationIntervalType, setGenerationIntervalType] =
-    useState("oncePerDays");
-  const [startDate, setStartDate] = useState(dayjs().format("YYYY-MM-DD"));
-  const [selectedTime, setSelectedTime] = useState("10:00");
-  const [repeatEndType, setRepeatEndType] = useState("never");
-  const [repeatEndAttempts, setRepeatEndAttempts] = useState(1);
-  const [endDate, setEndDate] = useState(
-    dayjs().add(1, "day").format("YYYY-MM-DD")
-  );
-  const [monthlyIntervalLastDay, setMonthlyIntervalLastDay] =
-    useState("disable");
+  // const [endDate, setEndDate] = useState(
+  //   dayjs().add(1, "day").format("YYYY-MM-DD")
+  // );
+  // const [monthlyIntervalLastDay, setMonthlyIntervalLastDay] =
+  //   useState("disable");
 
   const getDayOfMonth = dateString => {
     return dayjs(dateString, "YYYY-MM-DD").date();
@@ -164,38 +175,8 @@ const FirebaseSchedule = ({ generalData, setGeneralData }) => {
               format="YYYY-MM-DD"
             />
           </div>
-
-          {generationIntervalType === "monthly" &&
-            dayjs(startDate).date() ===
-              dayjs(startDate).endOf("month").date() && (
-              <div>
-                <p style={{ color: "#455560", fontSize: "16px" }}>Repeat:</p>
-                <Radio.Group
-                  style={{
-                    paddingLeft: "10px",
-                    borderRadius: "10px",
-                    height: "40px",
-                    alignItems: "center",
-                    display: "flex",
-                    border: "1px solid #e6ebf1",
-                  }}
-                  defaultValue="disable"
-                  value={monthlyIntervalLastDay}
-                  onChange={e => setMonthlyIntervalLastDay(e.target.value)}
-                >
-                  <Radio value="disable" disabled={!isLastDayOfMonth}>
-                    {dayjs(startDate).date()}st
-                  </Radio>
-                  <Radio value="lastSunday" disabled={!isLastDayOfMonth}>
-                    last Sunday
-                  </Radio>
-                  <Radio value="lastDay" disabled={!isLastDayOfMonth}>
-                    last day
-                  </Radio>
-                </Radio.Group>
-              </div>
-            )}
         </div>
+
         <div>
           <p
             style={{ color: "#455560", fontSize: "16px", marginBottom: "6px" }}
@@ -213,6 +194,35 @@ const FirebaseSchedule = ({ generalData, setGeneralData }) => {
           />
         </div>
       </div>
+      {generationIntervalType === "monthly" &&
+        dayjs(startDate).date() === dayjs(startDate).endOf("month").date() && (
+          <div style={{ marginBottom: "24px" }}>
+            <p style={{ color: "#455560", fontSize: "16px" }}>Repeat:</p>
+            <Radio.Group
+              style={{
+                paddingLeft: "10px",
+                borderRadius: "10px",
+                height: "40px",
+                alignItems: "center",
+                display: "flex",
+                border: "1px solid #e6ebf1",
+              }}
+              defaultValue="disable"
+              value={monthlyIntervalLastDay}
+              onChange={e => setMonthlyIntervalLastDay(e.target.value)}
+            >
+              <Radio value="disable" disabled={!isLastDayOfMonth}>
+                {dayjs(startDate).date()}st
+              </Radio>
+              <Radio value="lastSunday" disabled={!isLastDayOfMonth}>
+                last Sunday
+              </Radio>
+              <Radio value="lastDay" disabled={!isLastDayOfMonth}>
+                last day
+              </Radio>
+            </Radio.Group>
+          </div>
+        )}
       <p
         style={{
           color: "#455560",
@@ -264,13 +274,6 @@ const FirebaseSchedule = ({ generalData, setGeneralData }) => {
                 ) {
                   setEndDate(newEndDate);
                 }
-
-                if (
-                  value === "attempts" &&
-                  repeatEndAttempts <= subjectTotalArticlesLength
-                ) {
-                  setRepeatEndAttempts(subjectTotalArticlesLength + 1);
-                }
               }}
               style={{ minWidth: "100px" }}
             >
@@ -291,7 +294,7 @@ const FirebaseSchedule = ({ generalData, setGeneralData }) => {
               Select date:
             </p>
             <DatePicker
-              dateRender={current => {
+              cellRender={current => {
                 const style = {
                   backgroundColor: "red",
                   color: "white",

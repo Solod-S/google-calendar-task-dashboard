@@ -17,6 +17,7 @@ const CustomerEditContent = forwardRef((_, ref) => {
   const { id } = customer;
 
   const onFormSubmit = values => {
+    console.log(`0 onFormSubmit`);
     const {
       name,
       birthday,
@@ -30,6 +31,7 @@ const CustomerEditContent = forwardRef((_, ref) => {
       pinterest,
       linkedIn,
     } = values;
+    console.log(`1 onFormSubmit`);
 
     const basicInfo = { name, email, img };
     const personalInfo = {
@@ -53,7 +55,6 @@ const CustomerEditContent = forwardRef((_, ref) => {
       return elm;
     });
     if (!isEmpty(editedCustomer)) {
-      console.log("editedCustomer", editedCustomer);
       dispatch(putCustomer(editedCustomer));
     }
     dispatch(setDrawerClose());
