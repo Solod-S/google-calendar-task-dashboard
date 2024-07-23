@@ -10,14 +10,8 @@ import {
 } from "../store/stateSlice";
 import useThemeClass from "utils/hooks/useThemeClass";
 import CustomerEditDialog from "./CustomerEditDialog";
-import { Link } from "react-router-dom";
-import dayjs from "dayjs";
-import cloneDeep from "lodash/cloneDeep";
 
-const statusColor = {
-  active: "bg-emerald-500",
-  blocked: "bg-red-500",
-};
+import cloneDeep from "lodash/cloneDeep";
 
 const inventoryStatusColor = {
   true: {
@@ -107,7 +101,8 @@ const columns = [
       const row = props.row.original;
       return (
         <div className="flex items-center">
-          {dayjs.unix(row.created).format("MM/DD/YYYY")}
+          {row.created}
+          {/* {dayjs.unix(row.created).format("MM/DD/YYYY")} */}
         </div>
       );
     },
@@ -120,7 +115,8 @@ const columns = [
       const row = props.row.original;
       return (
         <div className="flex items-center">
-          {dayjs.unix(row.updated).format("MM/DD/YYYY")}
+          {row.updated}
+          {/* {dayjs.unix(row.updated).format("MM/DD/YYYY")} */}
         </div>
       );
     },
@@ -144,8 +140,18 @@ const Customers = ({ generalData, setGeneralData }) => {
   );
 
   const fetchData = useCallback(() => {
-    dispatch(getCustomers({ pageIndex, pageSize, sort, query, filterData }));
-  }, [pageIndex, pageSize, sort, query, filterData, dispatch]);
+    console.log(`generalData`, generalData);
+    dispatch(
+      getCustomers({
+        pageIndex,
+        pageSize,
+        sort,
+        query,
+        filterData,
+        generalData,
+      })
+    );
+  }, [pageIndex, pageSize, sort, query, filterData, dispatch, generalData]);
 
   useEffect(() => {
     // console.log(`uef`);

@@ -45,7 +45,7 @@ const CustomerEditDialog = ({ generalData, setGeneralData }) => {
         <DrawerFooter onCancel={onDrawerClose} onSaveClick={formSubmit} />
       }
     >
-      <CustomerEditContent ref={formikRef} />
+      <CustomerEditContent ref={formikRef} setGeneralData={setGeneralData} />
     </Drawer>
   );
 };

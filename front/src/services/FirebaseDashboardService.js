@@ -1,17 +1,15 @@
 import {
   collection,
-  addDoc,
-  updateDoc,
   doc,
   getDocs,
   getDoc,
   query,
   orderBy,
-  deleteDoc,
+
 } from "firebase/firestore";
 
 import { AUTH_USER_DATA } from "constants/app.constant";
-import { db, auth } from "utils/Firebase";
+import { db } from "utils/Firebase";
 import GoogleCalendarService from "./GoogleCalendarService";
 
 import {

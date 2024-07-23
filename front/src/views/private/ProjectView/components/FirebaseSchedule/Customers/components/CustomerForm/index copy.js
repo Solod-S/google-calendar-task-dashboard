@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useEffect } from "react";
+import React, { forwardRef, useState } from "react";
 import { Tabs, FormContainer } from "components/ui";
 import { Form, Formik } from "formik";
 import dayjs from "dayjs";
@@ -25,27 +25,12 @@ const CustomerForm = forwardRef((props, ref) => {
   const [startDate, setStartDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [selectedTime, setSelectedTime] = useState("10:00");
   const [repeatEndType, setRepeatEndType] = useState("never");
+
   const [endDate, setEndDate] = useState(
     dayjs().add(1, "day").format("YYYY-MM-DD")
   );
   const [monthlyIntervalLastDay, setMonthlyIntervalLastDay] =
     useState("disable");
-
-  useEffect(() => {
-    console.log("generationIntervalType:", generationIntervalType);
-    console.log("startDate:", startDate);
-    console.log("selectedTime:", selectedTime);
-    console.log("repeatEndType:", repeatEndType);
-    console.log("endDate:", endDate);
-    console.log("monthlyIntervalLastDay:", monthlyIntervalLastDay);
-  }, [
-    generationIntervalType,
-    startDate,
-    selectedTime,
-    repeatEndType,
-    endDate,
-    monthlyIntervalLastDay,
-  ]);
 
   const handleScheduleData = () => {
     return {
