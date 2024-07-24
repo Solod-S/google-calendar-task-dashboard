@@ -36,11 +36,6 @@ const CustomerForm = forwardRef((props, ref) => {
     useState("disable");
 
   const [activeTab, setActiveTab] = useState("generalInfo");
-  const [formikValues, setFormikValues] = useState({
-    name: customer.name || "",
-    status: customer?.status || false,
-    message: customer?.message || "",
-  });
 
   useEffect(() => {
     const {
@@ -93,25 +88,22 @@ const CustomerForm = forwardRef((props, ref) => {
         <TabContent value="generalInfo">
           <Formik
             innerRef={formikRef}
-            initialValues={formikValues}
+            initialValues={{
+              name: customer.name || "",
+              status: customer?.status || false,
+              message: customer?.message || "",
+            }}
             validationSchema={validationSchema}
-            enableReinitialize
             onSubmit={(values, { setSubmitting }) => {
               const scheduleData = handleScheduleData();
               onFormSubmit?.({ ...values, ...scheduleData });
               setSubmitting(false);
             }}
           >
-            {({ values, touched, errors, handleBlur }) => (
+            {({ touched, errors, resetForm }) => (
               <Form className="test">
                 <FormContainer>
-                  <InfoForm
-                    values={values}
-                    touched={touched}
-                    errors={errors}
-                    handleBlur={handleBlur}
-                    setFormikValues={setFormikValues}
-                  />
+                  <InfoForm touched={touched} errors={errors} />
                 </FormContainer>
               </Form>
             )}

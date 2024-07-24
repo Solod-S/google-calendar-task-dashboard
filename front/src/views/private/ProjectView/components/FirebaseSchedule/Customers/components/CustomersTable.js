@@ -140,7 +140,6 @@ const Customers = ({ generalData, setGeneralData }) => {
   );
 
   const fetchData = useCallback(() => {
-    console.log(`generalData`, generalData);
     dispatch(
       getCustomers({
         pageIndex,

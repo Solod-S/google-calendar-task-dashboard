@@ -29,7 +29,6 @@ const CustomerEditDialog = ({ generalData, setGeneralData }) => {
   const formikRef = useRef();
 
   const formSubmit = () => {
-    console.log(`!`);
     formikRef.current?.submitForm();
   };
 

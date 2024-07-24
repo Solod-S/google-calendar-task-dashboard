@@ -1,6 +1,6 @@
 import { DatePicker, Form, InputNumber, Radio, Select, TimePicker } from "antd";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const { Option } = Select;
 
@@ -19,17 +19,26 @@ const FirebaseSchedule = props => {
     monthlyIntervalLastDay,
     setMonthlyIntervalLastDay,
   } = props;
-  // const [generationIntervalType, setGenerationIntervalType] =
-  //   useState("oncePerDays");
-  // const [startDate, setStartDate] = useState(dayjs().format("YYYY-MM-DD"));
-  // const [selectedTime, setSelectedTime] = useState("10:00");
-  // const [repeatEndType, setRepeatEndType] = useState("never");
 
-  // const [endDate, setEndDate] = useState(
-  //   dayjs().add(1, "day").format("YYYY-MM-DD")
-  // );
-  // const [monthlyIntervalLastDay, setMonthlyIntervalLastDay] =
-  //   useState("disable");
+  useEffect(() => {
+    // Найти кнопку OK и применить стили
+    const styleButton = () => {
+      const okButton = document.querySelector(
+        ".ant-picker-footer .ant-btn-primary"
+      );
+      if (okButton) {
+        okButton.style.backgroundColor = "#4F46E5";
+        okButton.style.borderColor = "#4F46E5";
+        okButton.style.color = "white"; //
+      }
+    };
+
+    // Проверка и применение стилей при каждом рендере
+    const observer = new MutationObserver(styleButton);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
 
   const getDayOfMonth = dateString => {
     return dayjs(dateString, "YYYY-MM-DD").date();
@@ -181,15 +190,13 @@ const FirebaseSchedule = props => {
           <p
             style={{ color: "#455560", fontSize: "16px", marginBottom: "6px" }}
           >
-            Select publication time:
+            Select time:
           </p>
           <TimePicker
             allowClear={false}
             defaultValue={dayjs(selectedTime, "HH:mm")}
             format="HH:mm"
-            onChange={(value, dateString) => {
-              setSelectedTime(dateString);
-            }}
+            onChange={(value, dateString) => setSelectedTime(dateString)}
             minuteStep={60}
           />
         </div>
@@ -232,9 +239,11 @@ const FirebaseSchedule = props => {
       >
         Select repeat interval:
       </p>
-      <Form.Item name="generationIntervalType" initialValue="oncePerDays">
+      <Form.Item
+        name="generationIntervalType"
+        initialValue={generationIntervalType}
+      >
         <Select
-          // defaultValue="oncePerDays"
           onChange={value => {
             if (value !== "monthly") {
               setMonthlyIntervalLastDay("disable");

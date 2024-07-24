@@ -1,33 +1,9 @@
 import React from "react";
-import {
-  DatePicker,
-  Input,
-  FormItem,
-  Avatar,
-  Upload,
-  Switcher,
-} from "components/ui";
-import {
-  HiUserCircle,
-  HiMail,
-  HiLocationMarker,
-  HiPhone,
-  HiCake,
-  HiOutlineUser,
-} from "react-icons/hi";
+import { Input, FormItem, Switcher } from "components/ui";
+import { HiUserCircle } from "react-icons/hi";
 import { Field } from "formik";
 
-// tgName: "General",
-//         created: 1623430400,
-//         updated: 1632393600,
-
-const InfoForm = props => {
-  const { touched, errors } = props;
-
-  const onSetFormFile = (form, field, file) => {
-    form.setFieldValue(field.name, URL.createObjectURL(file[0]));
-  };
-
+const InfoForm = ({ values, touched, errors, handleBlur, setFormikValues }) => {
   return (
     <>
       <FormItem
@@ -35,12 +11,20 @@ const InfoForm = props => {
         invalid={errors.name && touched.name}
         errorMessage={errors.name}
       >
-        <Field
+        <Input
           type="text"
           autoComplete="off"
           name="name"
           placeholder="Name"
-          component={Input}
+          value={values.name}
+          onChange={e => {
+            setFormikValues(prevValues => ({
+              ...prevValues,
+              name: e.target.value,
+            }));
+            // handleChange(e);
+          }}
+          onBlur={handleBlur}
           prefix={<HiUserCircle className="text-xl" />}
         />
       </FormItem>
@@ -49,20 +33,50 @@ const InfoForm = props => {
         invalid={errors.status && touched.status}
         errorMessage={errors.status}
       >
-        <Field component={Switcher} name="status" />
+        <Switcher
+          name="status"
+          checked={values.status}
+          onChange={e => {
+            console.log(!e);
+            setFormikValues(prevValues => ({
+              ...prevValues,
+              status: !e,
+            }));
+          }}
+        />
+        {/* <Field
+          checked={values.status}
+          component={Switcher}
+          name="status"
+          onChange={e => {
+            console.log(e.target.value);
+            setFormikValues(prevValues => ({
+              ...prevValues,
+              status: e.target.value,
+            }));
+            handleChange(e);
+          }}
+        /> */}
       </FormItem>
       <FormItem
         label="Message"
         invalid={errors.message && touched.message}
         errorMessage={errors.message}
       >
-        <Field
+        <textarea
           name="message"
-          as="textarea"
           placeholder="Enter your message here"
           rows="5"
           className="w-full h-40 p-2 border border-gray-300 rounded resize-y"
-          prefix={<HiUserCircle className="text-xl" />}
+          value={values.message}
+          onChange={e => {
+            setFormikValues(prevValues => ({
+              ...prevValues,
+              message: e.target.value,
+            }));
+            // handleChange(e);
+          }}
+          onBlur={handleBlur}
         />
       </FormItem>
     </>
