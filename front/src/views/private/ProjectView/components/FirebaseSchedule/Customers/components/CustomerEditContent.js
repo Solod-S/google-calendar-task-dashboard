@@ -17,8 +17,6 @@ const CustomerEditContent = forwardRef(({ setGeneralData }, ref) => {
   const data = useSelector(state => state.crmCustomers.data.customerList);
   const { id } = customer;
 
-  // created: dayjs().unix();
-  // updated: dayjs().unix();
   const projectId = id ? id : uuidv4();
   const onFormSubmit = values => {
     const {

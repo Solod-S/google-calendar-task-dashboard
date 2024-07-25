@@ -18,7 +18,6 @@ const transformEvents = ({ events, tgSelectors }) => {
     event => event?.summary && event?.description && event?.start
   );
 
-  console.log(`filteredEvents`, filteredEvents[0]);
   return filteredEvents.map(event => {
     const { id, summary, colorId = 3, htmlLink, hangoutLink } = event;
 

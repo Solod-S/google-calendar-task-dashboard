@@ -37,20 +37,21 @@ const CustomerForm = forwardRef((props, ref) => {
 
   const [activeTab, setActiveTab] = useState("generalInfo");
   const [formikValues, setFormikValues] = useState({
-    name: customer.name || "",
+    name: customer?.name || "",
     status: customer?.status || false,
     message: customer?.message || "",
   });
 
   useEffect(() => {
     const {
-      generationIntervalType,
-      startDate,
-      selectedTime,
-      repeatEndType,
-      endDate,
-      monthlyIntervalLastDay,
+      generationIntervalType = "oncePerDays",
+      startDate = dayjs().format("YYYY-MM-DD"),
+      selectedTime = "10:00",
+      repeatEndType = "never",
+      endDate = dayjs().add(1, "day").format("YYYY-MM-DD"),
+      monthlyIntervalLastDay = "disable",
     } = customer;
+
     setGenerationIntervalType(generationIntervalType);
     setStartDate(startDate);
     setSelectedTime(selectedTime);
@@ -71,7 +72,7 @@ const CustomerForm = forwardRef((props, ref) => {
   };
 
   const formikRef = React.useRef();
-
+  // TODO REF USE 2
   useImperativeHandle(ref, () => ({
     submitForm: () => {
       setActiveTab("generalInfo");
@@ -80,6 +81,10 @@ const CustomerForm = forwardRef((props, ref) => {
           formikRef.current.submitForm();
         }
       }, 0);
+    },
+    getScheduleFormData: () => {
+      const scheduleData = handleScheduleData();
+      return { ...customer, ...formikValues, ...scheduleData };
     },
   }));
 

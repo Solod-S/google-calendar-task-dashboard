@@ -185,7 +185,6 @@ const ProductTable = ({ onEdit }) => {
         accessor: "integrations",
         Cell: props => {
           const { integrations } = props.row.original;
-          console.log(`integrations`, integrations);
           const integrationsData = [];
           const googleCalendarIntegration = integrations.find(
             integration =>

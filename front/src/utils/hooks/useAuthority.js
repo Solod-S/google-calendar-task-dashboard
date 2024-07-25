@@ -11,7 +11,6 @@ function useAuthority(userAuthority = [], authority = [], emptyCheck = false) {
     isEmpty(userAuthority) ||
     typeof authority === "undefined"
   ) {
-    console.log(`invalid`);
     return !emptyCheck;
   }
 

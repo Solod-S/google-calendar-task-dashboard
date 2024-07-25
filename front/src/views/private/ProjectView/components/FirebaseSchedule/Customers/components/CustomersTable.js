@@ -2,7 +2,11 @@ import React, { useEffect, useCallback, useMemo } from "react";
 import { Avatar, Badge } from "components/ui";
 import { DataTable } from "components/shared";
 import { useDispatch, useSelector } from "react-redux";
-import { getCustomers, setTableData } from "../store/dataSlice";
+import {
+  getCustomers,
+  removeCustomerById,
+  setTableData,
+} from "../store/dataSlice";
 import {
   setSelectedCustomer,
   setDrawerOpen,
@@ -12,6 +16,7 @@ import useThemeClass from "utils/hooks/useThemeClass";
 import CustomerEditDialog from "./CustomerEditDialog";
 
 import cloneDeep from "lodash/cloneDeep";
+import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
 
 const inventoryStatusColor = {
   true: {
@@ -35,12 +40,26 @@ const ActionColumn = ({ row }) => {
     dispatch(setSelectedCustomer(row));
   };
 
+  const onDelete = () => {
+    console.log(`onDelete`, row.id);
+    dispatch(removeCustomerById(row.id));
+    // dispatch(setSelectedCustomer(row));
+  };
+
   return (
-    <div
-      className={`${textTheme} cursor-pointer select-none font-semibold`}
-      onClick={onEdit}
-    >
-      Edit
+    <div className="flex justify-end text-lg">
+      <span
+        className={`cursor-pointer p-2 hover:${textTheme}`}
+        onClick={() => onEdit(row)}
+      >
+        <HiOutlinePencil />
+      </span>
+      <span
+        className="cursor-pointer p-2 hover:text-red-500"
+        onClick={onDelete}
+      >
+        <HiOutlineTrash />
+      </span>
     </div>
   );
 };
@@ -151,6 +170,40 @@ const Customers = ({ generalData, setGeneralData }) => {
       })
     );
   }, [pageIndex, pageSize, sort, query, filterData, dispatch, generalData]);
+
+  useEffect(() => {
+    const integrations = generalData?.integrations;
+
+    const updateScheduleData = data => {
+      setGeneralData(prevState => {
+        const updatedIntegrations = prevState.integrations.map(integration => {
+          if (integration.key === "firebase_schedule") {
+            return {
+              ...integration,
+              scheduleData: data,
+            };
+          }
+          return integration;
+        });
+        return {
+          ...prevState,
+          integrations: updatedIntegrations,
+        };
+      });
+    };
+
+    if (integrations) {
+      const fireBaseSchedule = integrations.find(
+        integration => integration.key === "firebase_schedule"
+      );
+
+      if (fireBaseSchedule) {
+        updateScheduleData(data);
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   useEffect(() => {
     // console.log(`uef`);

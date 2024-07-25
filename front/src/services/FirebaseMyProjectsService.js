@@ -338,7 +338,7 @@ FirebaseMyProjectsService.edditProject = async data => {
       db,
       `users/${userUid}/projectsData/${projectId}`
     );
-    console.log(`users/${userUid}/projectsData/${projectId}`);
+
     const newData = {
       ...data,
       dateUpdated: new Date(),

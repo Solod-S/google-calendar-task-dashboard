@@ -4,8 +4,6 @@ import useAuthority from "utils/hooks/useAuthority";
 
 const AuthorityGuard = props => {
   const { userAuthority = [], authority = [], children } = props;
-  console.log(`userAuthority`, userAuthority);
-  console.log(`route.authority`, authority);
 
   const roleMatched = useAuthority(userAuthority, authority);
 

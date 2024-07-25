@@ -87,13 +87,6 @@ const dataSlice = createSlice({
     setFilterData: (state, action) => {
       state.filterData = action.payload;
     },
-    removeCustomerById: (state, action) => {
-      const id = action.payload;
-      state.customerList = state.customerList.filter(
-        customer => customer.id !== id
-      );
-      state.tableData.total -= 1;
-    },
   },
   extraReducers: {
     [getCustomers.fulfilled]: (state, action) => {
@@ -114,11 +107,7 @@ const dataSlice = createSlice({
   },
 });
 
-export const {
-  setTableData,
-  setCustomerList,
-  setFilterData,
-  removeCustomerById,
-} = dataSlice.actions;
+export const { setTableData, setCustomerList, setFilterData } =
+  dataSlice.actions;
 
 export default dataSlice.reducer;
