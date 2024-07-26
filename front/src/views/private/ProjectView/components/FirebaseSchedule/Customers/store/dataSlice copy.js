@@ -14,7 +14,7 @@ export const getCustomerStatistic = createAsyncThunk(
         value: 1897,
         growShrink: 32.7,
       },
-      newCustomers: {
+      inactiveCustomers: {
         value: 241,
         growShrink: -2.3,
       },

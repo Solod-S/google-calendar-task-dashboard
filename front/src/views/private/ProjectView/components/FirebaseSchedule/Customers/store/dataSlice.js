@@ -3,19 +3,20 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 export const getCustomerStatistic = createAsyncThunk(
   "crmCustomers/data/getCustomerStatistic",
   async values => {
-    // const response = await apiGetCrmCustomersStatistic()
-
+    const total = values?.length || 0;
+    const active = values?.filter(obj => obj.status)?.length || 0;
+    const inactive = values?.filter(obj => !obj.status)?.length || 0;
     const data = {
       totalCustomers: {
-        value: 2420,
+        value: total,
         growShrink: 17.2,
       },
       activeCustomers: {
-        value: 1897,
+        value: active,
         growShrink: 32.7,
       },
-      newCustomers: {
-        value: 241,
+      inactiveCustomers: {
+        value: inactive,
         growShrink: -2.3,
       },
     };
@@ -40,6 +41,7 @@ export const getCustomers = createAsyncThunk(
       data: scheduleData,
       total: scheduleData.length,
     };
+    console.log(`data`, data);
     return data;
   }
 );

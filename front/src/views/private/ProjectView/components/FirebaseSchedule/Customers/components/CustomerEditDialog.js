@@ -19,7 +19,7 @@ const DrawerFooter = ({ onSaveClick, onCancel }) => {
   );
 };
 
-const CustomerEditDialog = ({ generalData, setGeneralData }) => {
+const CustomerEditDialog = ({ setGeneralData }) => {
   const dispatch = useDispatch();
   const [isWarningVisible, setisWarningVisible] = useState(false);
   const drawerOpen = useSelector(state => state.crmCustomers.state.drawerOpen);

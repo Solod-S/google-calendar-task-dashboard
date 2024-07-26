@@ -93,6 +93,17 @@ const ProductTable = ({ onEdit }) => {
     setProjects(data);
   }, [data]);
 
+  // useEffect(() => {
+  //   console.log(`pageIndex, pageSize, sort, query, total`);
+  //   console.log(pageIndex, pageSize, sort, query, total);
+  //   const getCategories = async () => {
+  //     const result = await FirebaseMyProjectsService.fetchProjectsCategories();
+
+  //     if (result.data.length > 0) setCategoriesList(result.data);
+  //   };
+  //   getCategories();
+  // }, [projects]);
+
   useEffect(() => {
     const getCategories = async () => {
       const result = await FirebaseMyProjectsService.fetchProjectsCategories();

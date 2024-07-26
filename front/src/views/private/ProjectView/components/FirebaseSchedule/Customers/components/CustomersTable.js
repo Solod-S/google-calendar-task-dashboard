@@ -1,6 +1,6 @@
-import React, { useEffect, useCallback, useMemo } from "react";
+import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { Avatar, Badge } from "components/ui";
-import { DataTable } from "components/shared";
+import { ConfirmDialog, DataTable } from "components/shared";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getCustomers,
@@ -16,7 +16,12 @@ import useThemeClass from "utils/hooks/useThemeClass";
 import CustomerEditDialog from "./CustomerEditDialog";
 
 import cloneDeep from "lodash/cloneDeep";
-import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
+import {
+  HiOutlinePencil,
+  HiOutlineTrash,
+  HiOutlineExclamationCircle,
+} from "react-icons/hi";
+import { Modal } from "antd";
 
 const inventoryStatusColor = {
   true: {
@@ -33,6 +38,7 @@ const inventoryStatusColor = {
 
 const ActionColumn = ({ row }) => {
   const { textTheme } = useThemeClass();
+  const [isWarningVisible, setisWarningVisible] = useState(false);
   const dispatch = useDispatch();
 
   const onEdit = () => {
@@ -41,9 +47,7 @@ const ActionColumn = ({ row }) => {
   };
 
   const onDelete = () => {
-    console.log(`onDelete`, row.id);
     dispatch(removeCustomerById(row.id));
-    // dispatch(setSelectedCustomer(row));
   };
 
   return (
@@ -56,10 +60,32 @@ const ActionColumn = ({ row }) => {
       </span>
       <span
         className="cursor-pointer p-2 hover:text-red-500"
-        onClick={onDelete}
+        onClick={() => setisWarningVisible(true)}
       >
         <HiOutlineTrash />
       </span>
+      <Modal
+        title={
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <HiOutlineExclamationCircle size={60} color="#EF4444" />{" "}
+            <p style={{ marginLeft: "5px" }}> Warning</p>
+          </div>
+        }
+        okButtonProps={{
+          style: { backgroundColor: "#EF4444" },
+        }}
+        open={isWarningVisible}
+        onOk={() => {
+          onDelete();
+          setisWarningVisible(false);
+        }}
+        onCancel={() => setisWarningVisible(false)}
+      >
+        <p>
+          Are you sure you want to delete this?All data at this schedule will be
+          deleted as well.
+        </p>
+      </Modal>
     </div>
   );
 };
@@ -206,9 +232,9 @@ const Customers = ({ generalData, setGeneralData }) => {
   }, [data]);
 
   useEffect(() => {
-    // console.log(`uef`);
     fetchData();
-  }, [fetchData, pageIndex, pageSize, sort, filterData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageIndex, pageSize, sort, filterData]);
 
   const tableData = useMemo(
     () => ({ pageIndex, pageSize, sort, query, total }),
@@ -248,10 +274,7 @@ const Customers = ({ generalData, setGeneralData }) => {
         onSelectChange={onSelectChange}
         onSort={onSort}
       />
-      <CustomerEditDialog
-        generalData={generalData}
-        setGeneralData={setGeneralData}
-      />
+      <CustomerEditDialog setGeneralData={setGeneralData} />
     </>
   );
 };

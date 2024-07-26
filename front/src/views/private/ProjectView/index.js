@@ -50,6 +50,7 @@ const ProjectView = forwardRef(
       if (generalRef.current) {
         const isValid = await generalRef.current.validateForm();
         if (!isValid) {
+          setIsSubmitting(false);
           toast.push(
             <Notification title={"Validation failed"} type="danger" />,
             {
@@ -83,6 +84,7 @@ const ProjectView = forwardRef(
         setIsSubmitting(false);
         handleOk();
       } catch (error) {
+        setIsSubmitting(false);
         console.log(`error`, error);
       } finally {
         setIsSubmitting(false);

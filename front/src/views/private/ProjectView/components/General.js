@@ -185,7 +185,6 @@ const General = forwardRef(
       },
       validateForm: async () => {
         const errors = await formikRef.current.validateForm();
-        console.log(`errors`, errors);
         formikRef.current.setTouched({
           name: true,
           category: true,
