@@ -23,6 +23,8 @@ import { Field, Form, Formik } from "formik";
 
 import {
   HiOutlineBriefcase,
+  HiOutlinePhotograph,
+  HiOutlineChartBar,
   HiOutlineUser,
   HiPaperAirplane,
 } from "react-icons/hi";
@@ -300,6 +302,7 @@ const General = forwardRef(
                       autoComplete="off"
                       name="img"
                       placeholder="Image URL"
+                      prefix={<HiOutlinePhotograph className="text-xl" />}
                       component={Input}
                       onChange={e => handleFieldChange("img", e.target.value)}
                     />
@@ -376,7 +379,11 @@ const General = forwardRef(
                     <Field name="newCategory">
                       {({ field, form }) => (
                         <div className="flex items-center gap-2">
-                          <Input {...field} placeholder="New Category Name" />
+                          <Input
+                            {...field}
+                            placeholder="New Category Name"
+                            prefix={<HiOutlineChartBar className="text-xl" />}
+                          />
                           <Button
                             type="button"
                             onClick={() => {

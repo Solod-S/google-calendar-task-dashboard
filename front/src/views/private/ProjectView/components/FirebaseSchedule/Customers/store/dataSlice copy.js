@@ -1,21 +1,23 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import dayjs from "dayjs";
 
 export const getCustomerStatistic = createAsyncThunk(
   "crmCustomers/data/getCustomerStatistic",
   async values => {
-    // const response = await apiGetCrmCustomersStatistic()
-
+    const total = values?.length || 0;
+    const active = values?.filter(obj => obj.status)?.length || 0;
+    const inactive = values?.filter(obj => !obj.status)?.length || 0;
     const data = {
       totalCustomers: {
-        value: 2420,
+        value: total,
         growShrink: 17.2,
       },
       activeCustomers: {
-        value: 1897,
+        value: active,
         growShrink: 32.7,
       },
       inactiveCustomers: {
-        value: 241,
+        value: inactive,
         growShrink: -2.3,
       },
     };
@@ -23,24 +25,127 @@ export const getCustomerStatistic = createAsyncThunk(
   }
 );
 
+// export const getCustomers = createAsyncThunk(
+//   "crmCustomers/data/getCustomers",
+//   async params => {
+//     console.log(params);
+//     const { generalData, pageIndex, pageSize, sort } = params;
+//     const { integrations } = generalData;
+//     const firebaseScheduleIntegrations = integrations.find(
+//       int => int.name === "Firebase Schedule"
+//     );
+
+//     let scheduleData = firebaseScheduleIntegrations?.scheduleData
+//       ? firebaseScheduleIntegrations.scheduleData
+//       : [];
+
+//     const data = {
+//       data: scheduleData,
+//       total: scheduleData.length,
+//     };
+//     console.log("Before sorting:", scheduleData);
+//     console.log("Sort key:", sort.key);
+//     console.log("Sort order:", sort.order);
+//     if (sort.key && scheduleData.length > 0) {
+//       const sortedData = scheduleData.sort((a, b) => {
+//         // Добавьте дополнительные проверки и отладочные сообщения при необходимости
+//         if (sort.key === "dateCreated" || sort.key === "dateUpdated") {
+//           console.log(`1`);
+//           return sort.order === "asc"
+//             ? (a[sort.key]?.seconds || 0) - (b[sort.key]?.seconds || 0)
+//             : (b[sort.key]?.seconds || 0) - (a[sort.key]?.seconds || 0);
+//         } else if (sort.key === "status") {
+//           console.log(`2`);
+//           return sort.order === "asc"
+//             ? a[sort.key] === b[sort.key]
+//               ? 0
+//               : a[sort.key]
+//               ? -1
+//               : 1
+//             : a[sort.key] === b[sort.key]
+//             ? 0
+//             : a[sort.key]
+//             ? 1
+//             : -1;
+//         } else {
+//           console.log(`3`);
+//           return sort.order === "asc"
+//             ? a[sort.key]?.localeCompare(b[sort.key]) || 0
+//             : b[sort.key]?.localeCompare(a[sort.key]) || 0;
+//         }
+//       });
+//       console.log("After sorting:", sortedData);
+//     }
+
+//     const startIndex = (pageIndex - 1) * pageSize;
+//     const endIndex = startIndex + pageSize;
+//     const paginatedData = data.data.slice(startIndex, endIndex);
+
+//     return {
+//       ...data,
+//       data: paginatedData, // Обновляем только данные, которые будут возвращены
+//     };
+//   }
+// );
+
 export const getCustomers = createAsyncThunk(
   "crmCustomers/data/getCustomers",
   async params => {
-    const { generalData } = params;
+    const { generalData, pageIndex, pageSize, sort } = params;
     const { integrations } = generalData;
     const firebaseScheduleIntegrations = integrations.find(
       int => int.name === "Firebase Schedule"
     );
 
-    const scheduleData = firebaseScheduleIntegrations?.scheduleData
+    let scheduleData = firebaseScheduleIntegrations?.scheduleData
       ? firebaseScheduleIntegrations.scheduleData
       : [];
 
     const data = {
       data: scheduleData,
+      totalData: scheduleData,
       total: scheduleData.length,
     };
-    return data;
+
+    try {
+      if (sort.key && scheduleData.length > 0) {
+        const { key, order } = sort;
+
+        const sortedData = [...scheduleData]; // Создаем копию массива для сортировки
+
+        if (key === "dateCreated" || key === "dateUpdated") {
+          sortedData.sort((a, b) => {
+            const aDate = dayjs(a[key]);
+            const bDate = dayjs(b[key]);
+            return order === "asc" ? aDate.diff(bDate) : bDate.diff(aDate);
+          });
+        } else if (key === "status") {
+          sortedData.sort((a, b) => {
+            if (a[key] === b[key]) return 0;
+            return order === "asc" ? (a[key] ? -1 : 1) : a[key] ? 1 : -1;
+          });
+        } else if (typeof scheduleData[0][key] === "string") {
+          sortedData.sort((a, b) => {
+            return order === "asc"
+              ? (a[key] || "").localeCompare(b[key] || "")
+              : (b[key] || "").localeCompare(a[key] || "");
+          });
+        }
+
+        data.data = sortedData; // Обновляем данные после сортировки
+      }
+    } catch (error) {
+      console.error("Error during sorting:", error);
+    }
+
+    const startIndex = (pageIndex - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedData = data.data.slice(startIndex, endIndex);
+
+    return {
+      ...data,
+      data: paginatedData,
+    };
   }
 );
 
@@ -78,6 +183,9 @@ const dataSlice = createSlice({
     filterData: initialFilterData,
   },
   reducers: {
+    setStartIndex: (state, action) => {
+      state.tableData.pageIndex = action.payload;
+    },
     setTableData: (state, action) => {
       state.tableData = action.payload;
     },
@@ -86,6 +194,13 @@ const dataSlice = createSlice({
     },
     setFilterData: (state, action) => {
       state.filterData = action.payload;
+    },
+    removeCustomerById: (state, action) => {
+      const id = action.payload;
+      state.customerList = state.customerList.filter(
+        customer => customer.id !== id
+      );
+      state.tableData.total -= 1;
     },
   },
   extraReducers: {
@@ -107,7 +222,12 @@ const dataSlice = createSlice({
   },
 });
 
-export const { setTableData, setCustomerList, setFilterData } =
-  dataSlice.actions;
+export const {
+  setStartIndex,
+  setTableData,
+  setCustomerList,
+  setFilterData,
+  removeCustomerById,
+} = dataSlice.actions;
 
 export default dataSlice.reducer;

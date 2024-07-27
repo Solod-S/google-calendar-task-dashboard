@@ -1,10 +1,11 @@
 import React, { useEffect, useCallback, useMemo, useState } from "react";
-import { Avatar, Badge } from "components/ui";
+import { Avatar, Badge, toast, Notification } from "components/ui";
 import { ConfirmDialog, DataTable } from "components/shared";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getCustomers,
   removeCustomerById,
+  setStartIndex,
   setTableData,
 } from "../store/dataSlice";
 import {
@@ -22,6 +23,7 @@ import {
   HiOutlineExclamationCircle,
 } from "react-icons/hi";
 import { Modal } from "antd";
+import dayjs from "dayjs";
 
 const inventoryStatusColor = {
   true: {
@@ -36,9 +38,9 @@ const inventoryStatusColor = {
   },
 };
 
-const ActionColumn = ({ row }) => {
+const ActionColumn = ({ row, setGeneralData }) => {
   const { textTheme } = useThemeClass();
-  const [isWarningVisible, setisWarningVisible] = useState(false);
+  const [isWarningVisible, setIsWarningVisible] = useState(false);
   const dispatch = useDispatch();
 
   const onEdit = () => {
@@ -46,8 +48,51 @@ const ActionColumn = ({ row }) => {
     dispatch(setSelectedCustomer(row));
   };
 
-  const onDelete = () => {
-    dispatch(removeCustomerById(row.id));
+  const onDelete = async () => {
+    try {
+      dispatch(removeCustomerById(row.id));
+
+      const updateScheduleData = id => {
+        setGeneralData(prevState => {
+          const updatedIntegrations = prevState.integrations.map(
+            integration => {
+              if (integration.key === "firebase_schedule") {
+                return {
+                  ...integration,
+                  scheduleData: integration.scheduleData.filter(
+                    data => data.id !== id
+                  ),
+                };
+              }
+              return integration;
+            }
+          );
+          return {
+            ...prevState,
+            integrations: updatedIntegrations,
+          };
+        });
+      };
+      updateScheduleData(row.id);
+      toast.push(
+        <Notification
+          title={
+            "Firebase schedule event have been successfully removed from the list"
+          }
+          type="success"
+        />,
+        {
+          placement: "top-center",
+        }
+      );
+    } catch (error) {
+      toast.push(
+        <Notification title={"Oops, something went wrong"} type="danger" />,
+        {
+          placement: "top-center",
+        }
+      );
+    }
   };
 
   return (
@@ -60,7 +105,7 @@ const ActionColumn = ({ row }) => {
       </span>
       <span
         className="cursor-pointer p-2 hover:text-red-500"
-        onClick={() => setisWarningVisible(true)}
+        onClick={() => setIsWarningVisible(true)}
       >
         <HiOutlineTrash />
       </span>
@@ -77,13 +122,13 @@ const ActionColumn = ({ row }) => {
         open={isWarningVisible}
         onOk={() => {
           onDelete();
-          setisWarningVisible(false);
+          setIsWarningVisible(false);
         }}
-        onCancel={() => setisWarningVisible(false)}
+        onCancel={() => setIsWarningVisible(false)}
       >
         <p>
-          Are you sure you want to delete this?All data at this schedule will be
-          deleted as well.
+          Are you sure you want to delete this? All data at this schedule will
+          be deleted as well.
         </p>
       </Modal>
     </div>
@@ -96,18 +141,6 @@ const NameColumn = ({ row }) => {
       <span className="ml-2 rtl:mr-2 capitalize"> {row.name}</span>
     </div>
   );
-  // const { textTheme } = useThemeClass();
-
-  // return (
-  //   <div className="flex items-center">
-  //     <Link
-  //       className={`hover:${textTheme} ml-2 rtl:mr-2 font-semibold`}
-  //       to={`/app/crm/customer-details?id=${row.id}`}
-  //     >
-  //       {row.name}
-  //     </Link>
-  //   </div>
-  // );
 };
 
 const columns = [
@@ -139,15 +172,14 @@ const columns = [
     },
   },
   {
-    Header: "Ceated",
+    Header: "Created",
     accessor: "created",
     sortable: true,
     Cell: props => {
       const row = props.row.original;
       return (
         <div className="flex items-center">
-          {row.created}
-          {/* {dayjs.unix(row.created).format("MM/DD/YYYY")} */}
+          {dayjs.unix(row.createdUnix).format("MM/DD/YYYY, HH:mm")}
         </div>
       );
     },
@@ -160,8 +192,7 @@ const columns = [
       const row = props.row.original;
       return (
         <div className="flex items-center">
-          {row.updated}
-          {/* {dayjs.unix(row.updated).format("MM/DD/YYYY")} */}
+          {dayjs.unix(row.updatedUnix).format("MM/DD/YYYY, HH:mm")}
         </div>
       );
     },
@@ -170,7 +201,12 @@ const columns = [
     Header: "",
     id: "action",
     accessor: row => row,
-    Cell: props => <ActionColumn row={props.row.original} />,
+    Cell: props => (
+      <ActionColumn
+        row={props.row.original}
+        setGeneralData={props.setGeneralData}
+      />
+    ),
   },
 ];
 
@@ -198,43 +234,13 @@ const Customers = ({ generalData, setGeneralData }) => {
   }, [pageIndex, pageSize, sort, query, filterData, dispatch, generalData]);
 
   useEffect(() => {
-    const integrations = generalData?.integrations;
-
-    const updateScheduleData = data => {
-      setGeneralData(prevState => {
-        const updatedIntegrations = prevState.integrations.map(integration => {
-          if (integration.key === "firebase_schedule") {
-            return {
-              ...integration,
-              scheduleData: data,
-            };
-          }
-          return integration;
-        });
-        return {
-          ...prevState,
-          integrations: updatedIntegrations,
-        };
-      });
-    };
-
-    if (integrations) {
-      const fireBaseSchedule = integrations.find(
-        integration => integration.key === "firebase_schedule"
-      );
-
-      if (fireBaseSchedule) {
-        updateScheduleData(data);
-      }
-    }
-
+    dispatch(setStartIndex(1));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, []);
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageIndex, pageSize, sort, filterData]);
+  }, [pageIndex, pageSize, sort, filterData, fetchData]);
 
   const tableData = useMemo(
     () => ({ pageIndex, pageSize, sort, query, total }),
@@ -264,7 +270,20 @@ const Customers = ({ generalData, setGeneralData }) => {
   return (
     <>
       <DataTable
-        columns={columns}
+        columns={columns.map(col => ({
+          ...col,
+          Cell: props => {
+            if (col.id === "action") {
+              return (
+                <ActionColumn
+                  row={props.row.original}
+                  setGeneralData={setGeneralData}
+                />
+              );
+            }
+            return col.Cell(props);
+          },
+        }))}
         data={data}
         skeletonAvatarColumns={[0]}
         skeletonAvatarProps={{ width: 28, height: 28 }}

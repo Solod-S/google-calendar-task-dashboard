@@ -157,30 +157,32 @@ const Integration = ({ show, generalData, setGeneralData }) => {
           placement: "top-center",
         }
       );
-      let credentials = null;
+      const instalingData = {
+        credentials: null,
+        active: false,
+        key: details.key,
+        name: details.name,
+      };
+
       switch (details.name) {
         case "Google Calendar":
-          credentials = await exchangeCodeForTokens();
+          instalingData.tgSelectors = [];
+          instalingData.credentials = await exchangeCodeForTokens();
+          break;
+
+        case "Firebase Schedule":
+          instalingData.scheduleData = [];
           break;
 
         default:
           break;
       }
-      console.log(`credentials`, credentials);
+
       setGeneralData(prevData => {
         const integrations = prevData?.integrations ?? [];
         return {
           ...prevData,
-          integrations: [
-            ...integrations,
-            {
-              ...credentials,
-              active: false,
-              key: details.key,
-              name: details.name,
-              tgSelectors: [],
-            },
-          ],
+          integrations: [...integrations, instalingData],
         };
       });
       setData(prevState => {

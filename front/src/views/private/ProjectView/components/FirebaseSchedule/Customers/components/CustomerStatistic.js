@@ -63,13 +63,11 @@ const CustomerStatistic = () => {
     state => state.crmCustomers.data.statisticLoading
   );
 
-  const customerList = useSelector(
-    state => state.crmCustomers.data.customerList
-  );
+  const allData = useSelector(state => state.crmCustomers.data.allData);
 
   useEffect(() => {
-    dispatch(getCustomerStatistic(customerList));
-  }, [customerList, dispatch]);
+    dispatch(getCustomerStatistic(allData));
+  }, [allData, dispatch]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">

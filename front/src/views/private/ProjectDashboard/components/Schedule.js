@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { format, parseISO, isToday, parse } from "date-fns";
+import { format, parseISO, isToday } from "date-fns";
 import classNames from "classnames";
 import { Card, Calendar, Badge, Dialog } from "components/ui";
 import useThemeClass from "utils/hooks/useThemeClass";
@@ -13,6 +13,16 @@ const todayIsToday = someDate => {
     someDate.getFullYear() === today.getFullYear()
   );
 };
+
+// const formatText = text => {
+//   // Обработка текста с переносами строк
+//   return text.split("\n").map((item, index) => (
+//     <React.Fragment key={index}>
+//       {item}
+//       <br />
+//     </React.Fragment>
+//   ));
+// };
 
 const EventIcon = ({ type }) => {
   const baseClass =
@@ -62,36 +72,30 @@ const Schedule = ({ activeEventsData = [] }) => {
   const [allEvents, setallEvents] = useState([]);
   const [activeEvents, setactiveEvents] = useState([]);
   const [open, setOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState("");
 
   const { textTheme } = useThemeClass();
 
   const handleCalendar = value => {
     setValue(value);
     if (allEvents.length > 0) {
-      // Преобразуем value в объект Date
       const parsedDate = new Date(value);
-
-      // Отформатируем parsedDate в строку формата 'yyyy-MM-dd'
       const formattedValue = format(parsedDate, "yyyy-MM-dd");
-
-      // Фильтруем данные
       const filteredData = allEvents.filter(event => {
         return event.date === formattedValue;
       });
       setactiveEvents(filteredData);
-      // Делайте что-то с отфильтрованными данными (например, сохранение в состояние или дальнейшая обработка)
     }
   };
 
   const handleClickOpen = event => {
-    setSelectedEvent(JSON.stringify(event.desciption).slice(1, -1));
+    setSelectedEvent(event.description); // Предположим, что description - это строка
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
-    setSelectedEvent(null);
+    setSelectedEvent("");
   };
 
   useEffect(() => {
@@ -102,7 +106,7 @@ const Schedule = ({ activeEventsData = [] }) => {
         date: event.start,
         time: event.time,
         eventName: event.name,
-        desciption: event.description,
+        description: event.description,
         type: "task",
       }));
 
@@ -140,33 +144,16 @@ const Schedule = ({ activeEventsData = [] }) => {
           }}
           renderDay={date => {
             const day = date.getDate();
-            // console.log(`date`, date);
             let useBadge = false;
             if (allEvents.length > 0) {
-              // Преобразуем value в объект Date
               const parsedDate = new Date(date);
-
-              // Отформатируем parsedDate в строку формата 'yyyy-MM-dd'
               const formattedValue = format(parsedDate, "yyyy-MM-dd");
-
-              // проверяем есть ли таска на эту дату
               const isSameDate = allEvents.find(event => {
                 return event.date === formattedValue;
               });
 
               if (isSameDate) useBadge = true;
             }
-            if (!todayIsToday(date)) {
-              return (
-                <span className="relative flex justify-center items-center w-full h-full">
-                  {day}
-                  {useBadge && (
-                    <Badge className="absolute bottom-1" innerClass="h-1 w-1" />
-                  )}
-                </span>
-              );
-            }
-
             return (
               <span className="relative flex justify-center items-center w-full h-full">
                 {day}
@@ -200,7 +187,8 @@ const Schedule = ({ activeEventsData = [] }) => {
       <Dialog isOpen={open} closable={false} onRequestClose={handleClose}>
         <h5 className="mb-4 text-center">Current task description</h5>
 
-        <div className="max-h-64  overflow-y-auto mb-4 overflow-x-hidden">
+        <div className="max-h-64 overflow-y-auto mb-4 overflow-x-hidden">
+          {/* Отображаем HTML-контент */}
           <div dangerouslySetInnerHTML={{ __html: selectedEvent }} />
         </div>
       </Dialog>
