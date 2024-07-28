@@ -7,7 +7,6 @@ export const getProjectDashboardData = createAsyncThunk(
     const { weekly, displayName, activeEventsData } =
       await FirebaseDashboardService.fetchTaskOverview();
     const myProjects = await FirebaseDashboardService.fetchProjectsData();
-    console.log(`myProjects`, myProjects);
     const data = {
       userName: displayName,
       taskCount: weekly.total,

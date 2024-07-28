@@ -91,7 +91,7 @@ export const getCustomerStatistic = createAsyncThunk(
 export const getCustomers = createAsyncThunk(
   "crmCustomers/data/getCustomers",
   async params => {
-    const { generalData, pageIndex, pageSize, sort } = params;
+    const { generalData, pageIndex, pageSize, sort, query } = params;
     const { integrations } = generalData;
     const firebaseScheduleIntegrations = integrations.find(
       int => int.name === "Firebase Schedule"
@@ -100,10 +100,16 @@ export const getCustomers = createAsyncThunk(
     let scheduleData = firebaseScheduleIntegrations?.scheduleData
       ? firebaseScheduleIntegrations.scheduleData
       : [];
-
+    if (query) {
+      scheduleData = scheduleData.filter(project =>
+        project.name.toLowerCase().includes(query.toLowerCase())
+      );
+    }
     const data = {
       data: scheduleData,
-      totalData: scheduleData,
+      totalData: firebaseScheduleIntegrations?.scheduleData
+        ? firebaseScheduleIntegrations.scheduleData
+        : [],
       total: scheduleData.length,
     };
 
@@ -111,7 +117,7 @@ export const getCustomers = createAsyncThunk(
       if (sort.key && scheduleData.length > 0) {
         const { key, order } = sort;
 
-        const sortedData = [...scheduleData]; // Создаем копию массива для сортировки
+        const sortedData = [...scheduleData];
 
         if (key === "dateCreated" || key === "dateUpdated") {
           sortedData.sort((a, b) => {

@@ -72,7 +72,7 @@ const Schedule = ({ activeEventsData = [] }) => {
   const [allEvents, setallEvents] = useState([]);
   const [activeEvents, setactiveEvents] = useState([]);
   const [open, setOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const { textTheme } = useThemeClass();
 
@@ -89,13 +89,13 @@ const Schedule = ({ activeEventsData = [] }) => {
   };
 
   const handleClickOpen = event => {
-    setSelectedEvent(event.description); // Предположим, что description - это строка
+    setSelectedEvent(event);
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
-    setSelectedEvent("");
+    setSelectedEvent(null);
   };
 
   useEffect(() => {
@@ -185,11 +185,30 @@ const Schedule = ({ activeEventsData = [] }) => {
       ))}
 
       <Dialog isOpen={open} closable={false} onRequestClose={handleClose}>
-        <h5 className="mb-4 text-center">Current task description</h5>
-
+        <h6 className="mb-4 text-center">Details</h6>
         <div className="max-h-64 overflow-y-auto mb-4 overflow-x-hidden">
-          {/* Отображаем HTML-контент */}
-          <div dangerouslySetInnerHTML={{ __html: selectedEvent }} />
+          <div>
+            <div className="flex mb-4">
+              <h6 className="text-sm font-bold mr-1">Project:</h6>
+              <p className="text-sm">{selectedEvent?.eventName}</p>
+            </div>
+            <div className="flex mb-4">
+              <h6 className="text-sm font-bold mr-1">Name:</h6>
+              <p className="text-sm">{selectedEvent?.title}</p>
+            </div>
+            <div className="flex mb-4">
+              <h6 className="text-sm font-bold mr-1">Date:</h6>
+              <p className="text-sm">{selectedEvent?.date}</p>
+            </div>
+            <div className="flex mb-3">
+              <h6 className="text-sm font-bold mr-1">Time:</h6>
+              <p className="text-sm">{selectedEvent?.time}</p>
+            </div>
+          </div>
+          <h6 className="mb-4 text-center">Description</h6>
+          <div
+            dangerouslySetInnerHTML={{ __html: selectedEvent?.description }}
+          />
         </div>
       </Dialog>
     </Card>

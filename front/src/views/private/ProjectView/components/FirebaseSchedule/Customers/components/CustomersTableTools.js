@@ -47,8 +47,8 @@ const CustomersTableTools = () => {
   return (
     <div className="md:flex items-center justify-between">
       <div className="md:flex items-center gap-4">
-        {/* <CustomerTableSearch ref={inputRef} onInputChange={handleInputChange} />
-        <CustomerTableFilter /> */}
+        <CustomerTableSearch ref={inputRef} onInputChange={handleInputChange} />
+        {/* <CustomerTableFilter /> */}
       </div>
       <div className="mb-4">
         <Button size="sm" onClick={addNewSchedule}>

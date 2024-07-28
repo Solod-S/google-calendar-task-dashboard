@@ -5,7 +5,6 @@ import {
   getDoc,
   query,
   orderBy,
-
 } from "firebase/firestore";
 
 import { AUTH_USER_DATA } from "constants/app.constant";
@@ -186,7 +185,6 @@ FirebaseDashboardService.fetchProjectsData = async () => {
     // Проходим по каждому документу в коллекции
     for (const doc of querySnapshot.docs) {
       const project = doc.data();
-      console.log(`project`, project);
       const result = {
         tgGroup: "",
         tgGroupId: "",

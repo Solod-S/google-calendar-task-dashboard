@@ -37,7 +37,6 @@ const InfoForm = ({ values, touched, errors, handleBlur, setFormikValues }) => {
           name="status"
           checked={values.status}
           onChange={e => {
-            console.log(!e);
             setFormikValues(prevValues => ({
               ...prevValues,
               status: !e,
