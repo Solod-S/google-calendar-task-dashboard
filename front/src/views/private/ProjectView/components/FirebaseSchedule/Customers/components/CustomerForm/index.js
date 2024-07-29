@@ -17,13 +17,14 @@ dayjs.extend(customParseFormat);
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("User Name Required"),
   message: Yup.string().required("Message Required"),
+  img: Yup.string().url("Invalid URL"),
 });
 
 const { TabNav, TabList, TabContent } = Tabs;
 
 const CustomerForm = forwardRef((props, ref) => {
   const { customer, onFormSubmit } = props;
-
+  console.log("customer", customer);
   const [generationIntervalType, setGenerationIntervalType] =
     useState("oncePerDays");
   const [startDate, setStartDate] = useState(dayjs().format("YYYY-MM-DD"));
@@ -40,6 +41,7 @@ const CustomerForm = forwardRef((props, ref) => {
     name: customer?.name || "",
     status: customer?.status || false,
     message: customer?.message || "",
+    img: customer?.img || "",
   });
 
   useEffect(() => {

@@ -1,7 +1,10 @@
 import React from "react";
 import { Input, FormItem, Switcher } from "components/ui";
-import { HiUserCircle } from "react-icons/hi";
+import { HiOutlineUser, HiUserCircle } from "react-icons/hi";
+import { MdOutlineNoPhotography } from "react-icons/md";
+
 import { Field } from "formik";
+import { Avatar } from "antd";
 
 const InfoForm = ({ values, touched, errors, handleBlur, setFormikValues }) => {
   return (
@@ -43,19 +46,35 @@ const InfoForm = ({ values, touched, errors, handleBlur, setFormikValues }) => {
             }));
           }}
         />
-        {/* <Field
-          checked={values.status}
-          component={Switcher}
-          name="status"
+      </FormItem>
+      <FormItem
+        invalid={errors.img && touched.img}
+        errorMessage={errors.img}
+        name="img"
+        label="Message Image URL 🖼️ "
+      >
+        <Field
+          type="text"
+          autoComplete="off"
+          name="img"
+          placeholder="Image URL"
+          component={Input}
           onChange={e => {
-            console.log(e.target.value);
             setFormikValues(prevValues => ({
               ...prevValues,
-              status: e.target.value,
+              img: e.target.value,
             }));
-            handleChange(e);
           }}
-        /> */}
+        />
+        {values.img && (
+          <Avatar
+            className="border-2 border-white dark:border-gray-800 shadow-lg mt-4"
+            size={60}
+            shape="circle"
+            src={values.img}
+            icon={<MdOutlineNoPhotography />}
+          />
+        )}
       </FormItem>
       <FormItem
         label="Message"

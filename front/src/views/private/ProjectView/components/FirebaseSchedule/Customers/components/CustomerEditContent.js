@@ -25,6 +25,7 @@ const CustomerEditContent = forwardRef(({ setGeneralData }, ref) => {
       const {
         name,
         message,
+        img,
         status,
         generationIntervalType,
         monthlyIntervalLastDay,
@@ -34,7 +35,7 @@ const CustomerEditContent = forwardRef(({ setGeneralData }, ref) => {
         endDate,
       } = values;
 
-      const basicInfo = { name, message, status };
+      const basicInfo = { name, img, message, status };
       const scheduleInfo = {
         generationIntervalType,
         monthlyIntervalLastDay,
