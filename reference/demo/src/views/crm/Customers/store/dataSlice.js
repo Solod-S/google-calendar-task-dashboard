@@ -9,7 +9,7 @@ export const getCustomerStatistic = createAsyncThunk(
   "crmCustomers/data/getCustomerStatistic",
   async () => {
     const response = await apiGetCrmCustomersStatistic();
-    console.log(`getCustomerStatistic`, response.data);
+
     return response.data;
   }
 );
@@ -18,7 +18,7 @@ export const getCustomers = createAsyncThunk(
   "crmCustomers/data/getCustomers",
   async params => {
     const response = await apiGetCrmCustomers(params);
-    console.log(`getCustomers`, response.data);
+
     return response.data;
   }
 );

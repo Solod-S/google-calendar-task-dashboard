@@ -43,7 +43,6 @@ const Settings = () => {
   const fetchData = async () => {
     const response = await apiGetAccountSettingData();
     setData(response.data);
-    console.log(`response.data`, response.data);
   };
 
   useEffect(() => {

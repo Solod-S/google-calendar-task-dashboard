@@ -177,7 +177,7 @@ const Integration = ({ show, generalData, setGeneralData }) => {
         default:
           break;
       }
-
+      console.log(`instalingData`, instalingData);
       setGeneralData(prevData => {
         const integrations = prevData?.integrations ?? [];
         return {
@@ -185,6 +185,7 @@ const Integration = ({ show, generalData, setGeneralData }) => {
           integrations: [...integrations, instalingData],
         };
       });
+
       setData(prevState => {
         const nextState = cloneDeep(prevState);
         const nextAvailableApp = prevState.available.filter(

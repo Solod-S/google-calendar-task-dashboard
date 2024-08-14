@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Avatar, Badge } from "components/ui";
-import { DataTable, UsersAvatarGroup } from "components/shared";
+import { ActionLink, DataTable, UsersAvatarGroup } from "components/shared";
 import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
 import { FiPackage } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
@@ -149,6 +149,27 @@ const ProductTable = ({ onEdit }) => {
                 className={`capitalize font-semibold ${inventoryStatusColor[active].textClass}`}
               >
                 {inventoryStatusColor[active].label}
+              </span>
+            </div>
+          );
+        },
+      },
+      {
+        Header: "Telegram Group",
+        accessor: "tgGroup",
+        Cell: props => {
+          const { tgGroup } = props.row.original;
+          return (
+            <div className="flex items-center gap-2">
+              <Badge
+                className={inventoryStatusColor[Boolean(tgGroup)].dotClass}
+              />
+              <span
+                className={`capitalize font-semibold ${
+                  inventoryStatusColor[Boolean(tgGroup)].textClass
+                }`}
+              >
+                {inventoryStatusColor[Boolean(tgGroup)].label}
               </span>
             </div>
           );

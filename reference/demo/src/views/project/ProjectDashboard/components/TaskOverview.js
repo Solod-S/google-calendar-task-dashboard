@@ -28,7 +28,7 @@ const TaskOverview = ({ data = {}, className }) => {
   );
 
   useEffect(() => {
-    console.log(`sideNavCollapse`, sideNavCollapse);
+
     setRepaint(true);
     const timer1 = setTimeout(() => setRepaint(false), 300);
 

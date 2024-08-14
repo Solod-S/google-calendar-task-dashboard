@@ -47,9 +47,6 @@ const ProjectList = () => {
 
   const handleCancel = () => {
     const data = projectViewRef.current?.getGeneralData();
-    // console.log(`data`, data);
-    // console.log(`currentProjectData`, currentProjectData);
-    // console.log(`isEqual`, isEqual(data, currentProjectData));
 
     if (!isEqual(data, currentProjectData) && !isEqual(data, initialUserData)) {
       setisWarningVisible(true);

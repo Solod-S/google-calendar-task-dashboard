@@ -94,7 +94,6 @@ const GoogleCalendarService = {
       const res = await axios.post(`${SERVER_URL}/exchange-code-to-token`, {
         code: response.code,
       });
-
       return res.data;
     } catch (error) {
       console.error("Error exchanging code:", error);
@@ -144,6 +143,7 @@ const GoogleCalendarService = {
       console.error("Error listing events:", error);
     }
   },
+
   // async getGoogleCalendarEvents(credentials) {
   //   try {
   //     gapi.client.setToken({ access_token: credentials.access_token });
@@ -209,7 +209,7 @@ const GoogleCalendarService = {
       });
   },
 
-  async refreshGoogleCalendarTokens(credentials) {
+  async refreshGoogleCalendarTokens({ credentials }) {
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: {
@@ -222,7 +222,6 @@ const GoogleCalendarService = {
         grant_type: "refresh_token",
       }),
     });
-
     if (!response.ok) {
       throw new Error("Failed to refresh access token");
     }

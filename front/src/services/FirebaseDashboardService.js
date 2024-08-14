@@ -79,20 +79,21 @@ FirebaseDashboardService.fetchTaskOverview = async () => {
       const project = doc.data();
 
       // Проверяем, активен ли проект и есть ли тг группа
-      if (!project.active && !project?.tgGroup?.length <= 0) continue;
+      if (!project.active || !project.tgGroup) continue;
       const googleCalendarIntegration = project.integrations.find(
         integration => integration.name === "Google Calendar"
       );
-
+      console.log(`project`, googleCalendarIntegration);
       // Проверяем, активна ли интеграция с Google Calendar
       if (
         !googleCalendarIntegration ||
-        !googleCalendarIntegration.refresh_token ||
+        !googleCalendarIntegration.credentials.refresh_token ||
         googleCalendarIntegration.tgSelectors.length <= 0 ||
         !googleCalendarIntegration.active
       )
         continue;
       // Обновляем токены Google Calendar
+
       const updatedCredentials = await refreshGoogleCalendarTokens(
         googleCalendarIntegration
       );
