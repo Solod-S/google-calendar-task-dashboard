@@ -17,7 +17,9 @@ dayjs.extend(customParseFormat);
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("User Name Required"),
   message: Yup.string().required("Message Required"),
-  img: Yup.string().url("Invalid URL"),
+  img: Yup.array()
+    .of(Yup.string().url("Invalid URL"))
+    .max(5, "Cannot have more than 5 images"),
 });
 
 const { TabNav, TabList, TabContent } = Tabs;
@@ -41,7 +43,7 @@ const CustomerForm = forwardRef((props, ref) => {
     name: customer?.name || "",
     status: customer?.status || false,
     message: customer?.message || "",
-    img: customer?.img || "",
+    img: customer?.img || [],
   });
 
   useEffect(() => {
@@ -104,8 +106,19 @@ const CustomerForm = forwardRef((props, ref) => {
             validationSchema={validationSchema}
             enableReinitialize
             onSubmit={(values, { setSubmitting }) => {
+              // Clean up values.img by trimming and removing empty URLs
+              const cleanedImg = values.img
+                .map(url => url.trim())
+                .filter(url => url.length > 0);
+
+              const updatedValues = {
+                ...values,
+                img: cleanedImg,
+              };
+
               const scheduleData = handleScheduleData();
-              onFormSubmit?.({ ...values, ...scheduleData });
+              onFormSubmit?.({ ...updatedValues, ...scheduleData });
+
               setSubmitting(false);
             }}
           >
