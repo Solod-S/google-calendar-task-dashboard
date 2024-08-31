@@ -97,7 +97,6 @@ const Calendar = ({ show, generalData, setGeneralData }) => {
       if (googleCalendarCredentials) {
         if (googleCalendarCredentials?.tgSelectors)
           setSelectors(googleCalendarCredentials.tgSelectors);
-        console.log(`googleCalendarCredentials`, googleCalendarCredentials);
         setTimeout(() => {
           getGoogleEvents(googleCalendarCredentials);
         }, 1000);

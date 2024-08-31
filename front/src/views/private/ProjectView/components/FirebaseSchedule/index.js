@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Customers from "./Customers";
+import ScheduleView from "./ScheduleView";
 
 const FirebaseSchedule = ({ show, generalData, setGeneralData }) => {
   return (
@@ -9,7 +9,7 @@ const FirebaseSchedule = ({ show, generalData, setGeneralData }) => {
         position: show ? "" : "absolute",
       }}
     >
-      <Customers generalData={generalData} setGeneralData={setGeneralData} />
+      <ScheduleView generalData={generalData} setGeneralData={setGeneralData} />
     </div>
   );
 };

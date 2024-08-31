@@ -14,7 +14,7 @@ import {
   setSortedColumn,
 } from "../store/stateSlice";
 import useThemeClass from "utils/hooks/useThemeClass";
-import CustomerEditDialog from "./CustomerEditDialog";
+import EditDialog from "./EditDialog";
 
 import cloneDeep from "lodash/cloneDeep";
 import {
@@ -210,7 +210,7 @@ const columns = [
   },
 ];
 
-const Customers = ({ generalData, setGeneralData }) => {
+const Table = ({ generalData, setGeneralData }) => {
   const dispatch = useDispatch();
   const data = useSelector(state => state.crmCustomers.data.customerList);
   const loading = useSelector(state => state.crmCustomers.data.loading);
@@ -293,9 +293,9 @@ const Customers = ({ generalData, setGeneralData }) => {
         onSelectChange={onSelectChange}
         onSort={onSort}
       />
-      <CustomerEditDialog setGeneralData={setGeneralData} />
+      <EditDialog setGeneralData={setGeneralData} />
     </>
   );
 };
 
-export default Customers;
+export default Table;

@@ -177,7 +177,7 @@ const Integration = ({ show, generalData, setGeneralData }) => {
         default:
           break;
       }
-      console.log(`instalingData`, instalingData);
+
       setGeneralData(prevData => {
         const integrations = prevData?.integrations ?? [];
         return {

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Button, Drawer } from "components/ui";
-import CustomerEditContent from "./CustomerEditContent";
+import CustomerEditContent from "./EditContent";
 import { useDispatch, useSelector } from "react-redux";
 import { setDrawerClose, setSelectedCustomer } from "../store/stateSlice";
 import { Modal } from "antd";
@@ -19,7 +19,7 @@ const DrawerFooter = ({ onSaveClick, onCancel }) => {
   );
 };
 
-const CustomerEditDialog = ({ setGeneralData }) => {
+const EditDialog = ({ setGeneralData }) => {
   const dispatch = useDispatch();
   const [isWarningVisible, setisWarningVisible] = useState(false);
   const drawerOpen = useSelector(state => state.crmCustomers.state.drawerOpen);
@@ -86,4 +86,4 @@ const CustomerEditDialog = ({ setGeneralData }) => {
   );
 };
 
-export default CustomerEditDialog;
+export default EditDialog;

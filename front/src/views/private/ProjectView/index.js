@@ -5,17 +5,19 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import { Tabs, toast, Notification } from "components/ui";
-import { AdaptableCard, Container } from "components/shared";
 
-import Button from "../../../components/ui/Buttons";
 import FirebaseMyProjectsService from "services/FirebaseMyProjectsService";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjects } from "store/projects/projectDataSlice";
+
+import Button from "../../../components/ui/Buttons";
+import { Tabs, toast, Notification } from "components/ui";
+import { AdaptableCard, Container } from "components/shared";
+
 import General from "./components/General";
 import Integration from "./components/Integration";
 import Calendar from "./components/Calendar";
-import FirebaseSchedule from "./components/FirebaseSchedule/FirebaseSchedule";
+import FirebaseSchedule from "./components/FirebaseSchedule";
 import GoogleSheets from "./components/GoogleSheets";
 
 const { TabNav, TabList } = Tabs;

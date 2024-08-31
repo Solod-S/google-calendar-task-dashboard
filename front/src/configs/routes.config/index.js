@@ -20,7 +20,7 @@ export const protectedRoutes = [
   {
     key: "pages.accessDenied",
     path: "/access-denied",
-    component: React.lazy(() => import("views/pages/AccessDenied")),
+    component: React.lazy(() => import("views/private/AccessDenied")),
     authority: [ADMIN, USER],
   },
 ];

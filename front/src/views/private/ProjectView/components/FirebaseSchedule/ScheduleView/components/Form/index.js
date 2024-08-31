@@ -24,7 +24,7 @@ const validationSchema = Yup.object().shape({
 
 const { TabNav, TabList, TabContent } = Tabs;
 
-const CustomerForm = forwardRef((props, ref) => {
+const ScheduleForm = forwardRef((props, ref) => {
   const { customer, onFormSubmit } = props;
   console.log("customer", customer);
   const [generationIntervalType, setGenerationIntervalType] =
@@ -158,4 +158,4 @@ const CustomerForm = forwardRef((props, ref) => {
   );
 });
 
-export default CustomerForm;
+export default ScheduleForm;

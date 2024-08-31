@@ -5,11 +5,11 @@ import { setCustomerList, putCustomer } from "../store/dataSlice";
 import { setDrawerClose, setSelectedCustomer } from "../store/stateSlice";
 import cloneDeep from "lodash/cloneDeep";
 
-import CustomerForm from "./CustomerForm";
+import ScheduleForm from "./Form";
 import { v4 as uuidv4 } from "uuid";
 import dayjs from "dayjs";
 
-const CustomerEditContent = forwardRef(({ setGeneralData }, ref) => {
+const EditContent = forwardRef(({ setGeneralData }, ref) => {
   const dispatch = useDispatch();
 
   const customer = useSelector(
@@ -117,8 +117,8 @@ const CustomerEditContent = forwardRef(({ setGeneralData }, ref) => {
   };
 
   return (
-    <CustomerForm ref={ref} onFormSubmit={onFormSubmit} customer={customer} />
+    <ScheduleForm ref={ref} onFormSubmit={onFormSubmit} customer={customer} />
   );
 });
 
-export default CustomerEditContent;
+export default EditContent;

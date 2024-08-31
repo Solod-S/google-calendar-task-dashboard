@@ -3,9 +3,6 @@ import { Card, Avatar } from "components/ui";
 import { GrowShrinkTag, MediaSkeleton, Loading } from "components/shared";
 import { getCustomerStatistic } from "../store/dataSlice";
 import {
-  HiOutlineUserGroup,
-  HiOutlineUserAdd,
-  HiOutlineUsers,
   HiOutlineEye,
   HiOutlineEyeOff,
   HiOutlineChartBar,
@@ -53,7 +50,7 @@ const StatisticCard = props => {
   );
 };
 
-const CustomerStatistic = () => {
+const Statistic = () => {
   const dispatch = useDispatch();
 
   const statisticData = useSelector(
@@ -99,4 +96,4 @@ const CustomerStatistic = () => {
   );
 };
 
-export default CustomerStatistic;
+export default Statistic;

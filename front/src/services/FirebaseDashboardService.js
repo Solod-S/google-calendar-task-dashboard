@@ -101,6 +101,7 @@ FirebaseDashboardService.fetchTaskOverview = async () => {
       if (!updatedCredentials.access_token) continue;
 
       await initGoogleCalendar();
+
       // Получаем события из Google Calendar
       const events = await getGoogleCalendarEvents({
         ...updatedCredentials,

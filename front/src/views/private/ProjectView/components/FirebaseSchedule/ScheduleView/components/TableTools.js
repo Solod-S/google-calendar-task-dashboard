@@ -1,13 +1,13 @@
 import React, { useRef } from "react";
 import { Button, toast, Notification } from "components/ui";
 import { getCustomers, setTableData, setFilterData } from "../store/dataSlice";
-import CustomerTableSearch from "./CustomerTableSearch";
-import CustomerTableFilter from "./CustomerTableFilter";
+import CustomerTableSearch from "./TableSearch";
+import TableFilter from "./TableFilter";
 import { useDispatch, useSelector } from "react-redux";
 import cloneDeep from "lodash/cloneDeep";
 import { setDrawerOpen } from "../store/stateSlice";
 
-const CustomersTableTools = () => {
+const TableTools = () => {
   const dispatch = useDispatch();
 
   const inputRef = useRef();
@@ -48,7 +48,7 @@ const CustomersTableTools = () => {
     <div className="md:flex items-center justify-between">
       <div className="md:flex items-center gap-4">
         <CustomerTableSearch ref={inputRef} onInputChange={handleInputChange} />
-        {/* <CustomerTableFilter /> */}
+        {/* <TableFilter /> */}
       </div>
       <div className="mb-4">
         <Button size="sm" onClick={addNewSchedule}>
@@ -59,4 +59,4 @@ const CustomersTableTools = () => {
   );
 };
 
-export default CustomersTableTools;
+export default TableTools;

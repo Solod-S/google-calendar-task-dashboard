@@ -210,24 +210,29 @@ const GoogleCalendarService = {
   },
 
   async refreshGoogleCalendarTokens({ credentials }) {
-    const response = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        client_id: GOOGLE_CALENDAR_CLIENT_ID,
-        client_secret: process.env.REACT_APP_GOOGLE_CALENDAR_SECRET_ID,
-        refresh_token: credentials.refresh_token,
-        grant_type: "refresh_token",
-      }),
-    });
-    if (!response.ok) {
+    try {
+      const response = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          client_id: GOOGLE_CALENDAR_CLIENT_ID,
+          client_secret: process.env.REACT_APP_GOOGLE_CALENDAR_SECRET_ID,
+          refresh_token: credentials.refresh_token,
+          grant_type: "refresh_token",
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to refresh access token");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log(`error`, error);
       throw new Error("Failed to refresh access token");
     }
-
-    const data = await response.json();
-    return data;
   },
 };
 

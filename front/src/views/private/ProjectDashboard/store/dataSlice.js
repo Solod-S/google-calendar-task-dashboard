@@ -6,6 +6,7 @@ export const getProjectDashboardData = createAsyncThunk(
   async () => {
     const { weekly, displayName, activeEventsData } =
       await FirebaseDashboardService.fetchTaskOverview();
+
     const myProjects = await FirebaseDashboardService.fetchProjectsData();
     const data = {
       userName: displayName,
@@ -260,12 +261,18 @@ const dataSlice = createSlice({
   },
   reducers: {},
   extraReducers: {
+    [getProjectDashboardData.pending]: state => {
+      console.log(`Loading data...`);
+      state.loading = true;
+    },
     [getProjectDashboardData.fulfilled]: (state, action) => {
+      console.log(`Data loaded successfully`);
       state.dashboardData = action.payload;
       state.loading = false;
     },
-    [getProjectDashboardData.pending]: state => {
-      state.loading = true;
+    [getProjectDashboardData.rejected]: (state, action) => {
+      console.error(`Failed to load data: ${action.error.message}`);
+      state.loading = false;
     },
   },
 });
