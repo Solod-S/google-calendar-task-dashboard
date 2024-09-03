@@ -47,7 +47,9 @@ const CustomControl = ({ children, ...props }) => {
 const TableFilter = () => {
   const dispatch = useDispatch();
 
-  const { status } = useSelector(state => state.crmCustomers.data.filterData);
+  const { status } = useSelector(
+    state => state.firebaseSchedule.data.filterData
+  );
 
   const onStatusFilterChange = selected => {
     dispatch(setFilterData({ status: selected.value }));

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Card, Avatar } from "components/ui";
 import { GrowShrinkTag, MediaSkeleton, Loading } from "components/shared";
-import { getCustomerStatistic } from "../store/dataSlice";
+import { getScheduleStatistic } from "../store/dataSlice";
 import {
   HiOutlineEye,
   HiOutlineEyeOff,
@@ -54,16 +54,16 @@ const Statistic = () => {
   const dispatch = useDispatch();
 
   const statisticData = useSelector(
-    state => state.crmCustomers.data.statisticData
+    state => state.firebaseSchedule.data.statisticData
   );
   const loading = useSelector(
-    state => state.crmCustomers.data.statisticLoading
+    state => state.firebaseSchedule.data.statisticLoading
   );
 
-  const allData = useSelector(state => state.crmCustomers.data.allData);
+  const allData = useSelector(state => state.firebaseSchedule.data.allData);
 
   useEffect(() => {
-    dispatch(getCustomerStatistic(allData));
+    dispatch(getScheduleStatistic(allData));
   }, [allData, dispatch]);
 
   return (
@@ -72,23 +72,23 @@ const Statistic = () => {
         icon={<HiOutlineChartBar />}
         avatarClass="!bg-indigo-600"
         label="Total Schedules"
-        value={statisticData?.totalCustomers?.value}
-        // growthRate={statisticData?.totalCustomers?.growShrink}
+        value={statisticData?.totalSchedule?.value}
+        // growthRate={statisticData?.totalSchedule?.growShrink}
         loading={loading}
       />
       <StatisticCard
         icon={<HiOutlineEye />}
         avatarClass="!bg-emerald-500"
         label="Active Schedules"
-        value={statisticData?.activeCustomers?.value}
-        // growthRate={statisticData?.activeCustomers?.growShrink}
+        value={statisticData?.activeSchedule?.value}
+        // growthRate={statisticData?.activeSchedule?.growShrink}
         loading={loading}
       />
       <StatisticCard
         icon={<HiOutlineEyeOff />}
         avatarClass="!bg-red-500"
         label="Inactive Schedules"
-        value={statisticData?.inactiveCustomers?.value}
+        value={statisticData?.inactiveSchedule?.value}
         // growthRate={statisticData?.newCustomers?.growShrink}
         loading={loading}
       />

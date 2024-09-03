@@ -1,8 +1,8 @@
 import React, { forwardRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast, Notification } from "components/ui";
-import { setCustomerList, putCustomer } from "../store/dataSlice";
-import { setDrawerClose, setSelectedCustomer } from "../store/stateSlice";
+import { setScheduleList, putSchedule } from "../store/dataSlice";
+import { setDrawerClose, setSelectedSchedule } from "../store/stateSlice";
 import cloneDeep from "lodash/cloneDeep";
 
 import ScheduleForm from "./Form";
@@ -12,11 +12,11 @@ import dayjs from "dayjs";
 const EditContent = forwardRef(({ setGeneralData }, ref) => {
   const dispatch = useDispatch();
 
-  const customer = useSelector(
-    state => state.crmCustomers.state.selectedCustomer
+  const schedule = useSelector(
+    state => state.firebaseSchedule.state.selectedSchedule
   );
-  const data = useSelector(state => state.crmCustomers.data.customerList);
-  const { id } = customer;
+  const data = useSelector(state => state.firebaseSchedule.data.scheduleList);
+  const { id } = schedule;
 
   const projectId = id ? id : uuidv4();
 
@@ -95,8 +95,8 @@ const EditContent = forwardRef(({ setGeneralData }, ref) => {
         };
       });
       dispatch(setDrawerClose());
-      // dispatch(setCustomerList(newData));
-      dispatch(setSelectedCustomer({}));
+      // dispatch(setScheduleList(newData));
+      dispatch(setSelectedSchedule({}));
       toast.push(
         <Notification
           title={"Firebase schedule event has been successfully created"}
@@ -117,7 +117,7 @@ const EditContent = forwardRef(({ setGeneralData }, ref) => {
   };
 
   return (
-    <ScheduleForm ref={ref} onFormSubmit={onFormSubmit} customer={customer} />
+    <ScheduleForm ref={ref} onFormSubmit={onFormSubmit} schedule={schedule} />
   );
 });
 

@@ -3,13 +3,13 @@ import { Avatar, Badge, toast, Notification } from "components/ui";
 import { ConfirmDialog, DataTable } from "components/shared";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getCustomers,
-  removeCustomerById,
+  getSchedule,
+  removeScheduleById,
   setStartIndex,
   setTableData,
 } from "../store/dataSlice";
 import {
-  setSelectedCustomer,
+  setSelectedSchedule,
   setDrawerOpen,
   setSortedColumn,
 } from "../store/stateSlice";
@@ -45,12 +45,12 @@ const ActionColumn = ({ row, setGeneralData }) => {
 
   const onEdit = () => {
     dispatch(setDrawerOpen());
-    dispatch(setSelectedCustomer(row));
+    dispatch(setSelectedSchedule(row));
   };
 
   const onDelete = async () => {
     try {
-      dispatch(removeCustomerById(row.id));
+      dispatch(removeScheduleById(row.id));
 
       const updateScheduleData = id => {
         setGeneralData(prevState => {
@@ -212,17 +212,19 @@ const columns = [
 
 const Table = ({ generalData, setGeneralData }) => {
   const dispatch = useDispatch();
-  const data = useSelector(state => state.crmCustomers.data.customerList);
-  const loading = useSelector(state => state.crmCustomers.data.loading);
-  const filterData = useSelector(state => state.crmCustomers.data.filterData);
+  const data = useSelector(state => state.firebaseSchedule.data.scheduleList);
+  const loading = useSelector(state => state.firebaseSchedule.data.loading);
+  const filterData = useSelector(
+    state => state.firebaseSchedule.data.filterData
+  );
 
   const { pageIndex, pageSize, sort, query, total } = useSelector(
-    state => state.crmCustomers.data.tableData
+    state => state.firebaseSchedule.data.tableData
   );
 
   const fetchData = useCallback(() => {
     dispatch(
-      getCustomers({
+      getSchedule({
         pageIndex,
         pageSize,
         sort,

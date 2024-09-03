@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
 import { Button, Drawer } from "components/ui";
-import CustomerEditContent from "./EditContent";
+import EditContent from "./EditContent";
 import { useDispatch, useSelector } from "react-redux";
-import { setDrawerClose, setSelectedCustomer } from "../store/stateSlice";
+import { setDrawerClose, setSelectedSchedule } from "../store/stateSlice";
 import { Modal } from "antd";
 import { isEqual } from "lodash";
 
@@ -22,14 +22,16 @@ const DrawerFooter = ({ onSaveClick, onCancel }) => {
 const EditDialog = ({ setGeneralData }) => {
   const dispatch = useDispatch();
   const [isWarningVisible, setisWarningVisible] = useState(false);
-  const drawerOpen = useSelector(state => state.crmCustomers.state.drawerOpen);
-  const customer = useSelector(
-    state => state.crmCustomers.state.selectedCustomer
+  const drawerOpen = useSelector(
+    state => state.firebaseSchedule.state.drawerOpen
+  );
+  const schedule = useSelector(
+    state => state.firebaseSchedule.state.selectedSchedule
   );
 
   const onDrawerClose = () => {
     dispatch(setDrawerClose());
-    dispatch(setSelectedCustomer({}));
+    dispatch(setSelectedSchedule({}));
   };
   // TODO REF USE 1
   const formikRef = useRef();
@@ -40,7 +42,7 @@ const EditDialog = ({ setGeneralData }) => {
 
   const handleScheduleFormCancel = () => {
     const result = formikRef.current?.getScheduleFormData();
-    const noChange = isEqual(customer, result);
+    const noChange = isEqual(schedule, result);
     if (noChange) {
       onDrawerClose();
       setisWarningVisible(false);
@@ -80,7 +82,7 @@ const EditDialog = ({ setGeneralData }) => {
           />
         }
       >
-        <CustomerEditContent ref={formikRef} setGeneralData={setGeneralData} />
+        <EditContent ref={formikRef} setGeneralData={setGeneralData} />
       </Drawer>
     </>
   );

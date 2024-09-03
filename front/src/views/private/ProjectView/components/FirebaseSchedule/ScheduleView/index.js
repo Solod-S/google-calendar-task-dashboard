@@ -6,7 +6,7 @@ import Statistic from "./components/Statistic";
 import { injectReducer } from "store/index";
 import reducer from "./store";
 
-injectReducer("crmCustomers", reducer);
+injectReducer("firebaseSchedule", reducer);
 
 const ScheduleView = ({ generalData, setGeneralData }) => {
   return (

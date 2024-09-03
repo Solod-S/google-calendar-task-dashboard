@@ -1,22 +1,22 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import dayjs from "dayjs";
 
-export const getCustomerStatistic = createAsyncThunk(
-  "crmCustomers/data/getCustomerStatistic",
+export const getScheduleStatistic = createAsyncThunk(
+  "firebaseSchedule/data/getScheduleStatistic",
   async values => {
     const total = values?.length || 0;
     const active = values?.filter(obj => obj.status)?.length || 0;
     const inactive = values?.filter(obj => !obj.status)?.length || 0;
     const data = {
-      totalCustomers: {
+      totalSchedule: {
         value: total,
         growShrink: 17.2,
       },
-      activeCustomers: {
+      activeSchedule: {
         value: active,
         growShrink: 32.7,
       },
-      inactiveCustomers: {
+      inactiveSchedule: {
         value: inactive,
         growShrink: -2.3,
       },
@@ -25,71 +25,8 @@ export const getCustomerStatistic = createAsyncThunk(
   }
 );
 
-// export const getCustomers = createAsyncThunk(
-//   "crmCustomers/data/getCustomers",
-//   async params => {
-//     console.log(params);
-//     const { generalData, pageIndex, pageSize, sort } = params;
-//     const { integrations } = generalData;
-//     const firebaseScheduleIntegrations = integrations.find(
-//       int => int.name === "Firebase Schedule"
-//     );
-
-//     let scheduleData = firebaseScheduleIntegrations?.scheduleData
-//       ? firebaseScheduleIntegrations.scheduleData
-//       : [];
-
-//     const data = {
-//       data: scheduleData,
-//       total: scheduleData.length,
-//     };
-//     console.log("Before sorting:", scheduleData);
-//     console.log("Sort key:", sort.key);
-//     console.log("Sort order:", sort.order);
-//     if (sort.key && scheduleData.length > 0) {
-//       const sortedData = scheduleData.sort((a, b) => {
-//         // Добавьте дополнительные проверки и отладочные сообщения при необходимости
-//         if (sort.key === "dateCreated" || sort.key === "dateUpdated") {
-//           console.log(`1`);
-//           return sort.order === "asc"
-//             ? (a[sort.key]?.seconds || 0) - (b[sort.key]?.seconds || 0)
-//             : (b[sort.key]?.seconds || 0) - (a[sort.key]?.seconds || 0);
-//         } else if (sort.key === "status") {
-//           console.log(`2`);
-//           return sort.order === "asc"
-//             ? a[sort.key] === b[sort.key]
-//               ? 0
-//               : a[sort.key]
-//               ? -1
-//               : 1
-//             : a[sort.key] === b[sort.key]
-//             ? 0
-//             : a[sort.key]
-//             ? 1
-//             : -1;
-//         } else {
-//           console.log(`3`);
-//           return sort.order === "asc"
-//             ? a[sort.key]?.localeCompare(b[sort.key]) || 0
-//             : b[sort.key]?.localeCompare(a[sort.key]) || 0;
-//         }
-//       });
-//       console.log("After sorting:", sortedData);
-//     }
-
-//     const startIndex = (pageIndex - 1) * pageSize;
-//     const endIndex = startIndex + pageSize;
-//     const paginatedData = data.data.slice(startIndex, endIndex);
-
-//     return {
-//       ...data,
-//       data: paginatedData, // Обновляем только данные, которые будут возвращены
-//     };
-//   }
-// );
-
-export const getCustomers = createAsyncThunk(
-  "crmCustomers/data/getCustomers",
+export const getSchedule = createAsyncThunk(
+  "firebaseSchedule/data/getSchedule",
   async params => {
     const { generalData, pageIndex, pageSize, sort, query } = params;
     const { integrations } = generalData;
@@ -155,12 +92,11 @@ export const getCustomers = createAsyncThunk(
   }
 );
 
-export const putCustomer = createAsyncThunk(
-  "crmCustomers/data/putCustomer",
+export const putSchedule = createAsyncThunk(
+  "firebaseSchedule/data/putSchedule",
   async data => {
     return data;
-    // const response = await apPutCrmCustomer(data);
-    // return response.data;
+
   }
 );
 
@@ -180,10 +116,10 @@ export const initialFilterData = {
 };
 
 const dataSlice = createSlice({
-  name: "crmCustomers/data",
+  name: "firebaseSchedule/data",
   initialState: {
     loading: false,
-    customerList: [],
+    scheduleList: [],
     statisticData: {},
     tableData: initialTableData,
     allData: [],
@@ -196,34 +132,34 @@ const dataSlice = createSlice({
     setTableData: (state, action) => {
       state.tableData = action.payload;
     },
-    setCustomerList: (state, action) => {
-      state.customerList = action.payload;
+    setScheduleList: (state, action) => {
+      state.scheduleList = action.payload;
     },
     setFilterData: (state, action) => {
       state.filterData = action.payload;
     },
-    removeCustomerById: (state, action) => {
+    removeScheduleById: (state, action) => {
       const id = action.payload;
-      state.customerList = state.customerList.filter(
-        customer => customer.id !== id
+      state.scheduleList = state.scheduleList.filter(
+        schedule => schedule.id !== id
       );
       state.tableData.total -= 1;
     },
   },
   extraReducers: {
-    [getCustomers.fulfilled]: (state, action) => {
-      state.customerList = action.payload.data;
+    [getSchedule.fulfilled]: (state, action) => {
+      state.scheduleList = action.payload.data;
       state.allData = action.payload.totalData;
       state.tableData.total = action.payload.total;
       state.loading = false;
     },
-    [getCustomers.pending]: state => {
+    [getSchedule.pending]: state => {
       state.loading = true;
     },
-    [getCustomerStatistic.pending]: state => {
+    [getScheduleStatistic.pending]: state => {
       state.statisticLoading = true;
     },
-    [getCustomerStatistic.fulfilled]: (state, action) => {
+    [getScheduleStatistic.fulfilled]: (state, action) => {
       state.statisticData = action.payload;
       state.statisticLoading = false;
     },
@@ -233,9 +169,9 @@ const dataSlice = createSlice({
 export const {
   setStartIndex,
   setTableData,
-  setCustomerList,
+  setScheduleList,
   setFilterData,
-  removeCustomerById,
+  removeScheduleById,
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

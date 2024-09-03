@@ -4,6 +4,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
+
 import { Tabs, FormContainer } from "components/ui";
 import { Form, Formik } from "formik";
 import dayjs from "dayjs";
@@ -16,7 +17,9 @@ dayjs.extend(customParseFormat);
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("User Name Required"),
-  message: Yup.string().required("Message Required"),
+  message: Yup.string()
+    .required("Message Required")
+    .max(1024, "Message cannot be longer than 1024 characters"),
   img: Yup.array()
     .of(Yup.string().url("Invalid URL"))
     .max(5, "Cannot have more than 5 images"),
@@ -25,8 +28,8 @@ const validationSchema = Yup.object().shape({
 const { TabNav, TabList, TabContent } = Tabs;
 
 const ScheduleForm = forwardRef((props, ref) => {
-  const { customer, onFormSubmit } = props;
-  console.log("customer", customer);
+  const { schedule, onFormSubmit } = props;
+
   const [generationIntervalType, setGenerationIntervalType] =
     useState("oncePerDays");
   const [startDate, setStartDate] = useState(dayjs().format("YYYY-MM-DD"));
@@ -40,10 +43,10 @@ const ScheduleForm = forwardRef((props, ref) => {
 
   const [activeTab, setActiveTab] = useState("generalInfo");
   const [formikValues, setFormikValues] = useState({
-    name: customer?.name || "",
-    status: customer?.status || false,
-    message: customer?.message || "",
-    img: customer?.img || [],
+    name: schedule?.name || "",
+    status: schedule?.status || false,
+    message: schedule?.message || "",
+    img: schedule?.img || [],
   });
 
   useEffect(() => {
@@ -54,7 +57,7 @@ const ScheduleForm = forwardRef((props, ref) => {
       repeatEndType = "never",
       endDate = dayjs().add(1, "day").format("YYYY-MM-DD"),
       monthlyIntervalLastDay = "disable",
-    } = customer;
+    } = schedule;
 
     setGenerationIntervalType(generationIntervalType);
     setStartDate(startDate);
@@ -62,7 +65,7 @@ const ScheduleForm = forwardRef((props, ref) => {
     setRepeatEndType(repeatEndType);
     setEndDate(endDate);
     setMonthlyIntervalLastDay(monthlyIntervalLastDay);
-  }, [customer]);
+  }, [schedule]);
 
   const handleScheduleData = () => {
     return {
@@ -88,7 +91,7 @@ const ScheduleForm = forwardRef((props, ref) => {
     },
     getScheduleFormData: () => {
       const scheduleData = handleScheduleData();
-      return { ...customer, ...formikValues, ...scheduleData };
+      return { ...schedule, ...formikValues, ...scheduleData };
     },
   }));
 

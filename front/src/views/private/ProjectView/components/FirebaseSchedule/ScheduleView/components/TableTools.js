@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { Button, toast, Notification } from "components/ui";
-import { getCustomers, setTableData, setFilterData } from "../store/dataSlice";
-import CustomerTableSearch from "./TableSearch";
+import { getSchedule, setTableData, setFilterData } from "../store/dataSlice";
+import TableSearch from "./TableSearch";
 import TableFilter from "./TableFilter";
 import { useDispatch, useSelector } from "react-redux";
 import cloneDeep from "lodash/cloneDeep";
@@ -12,7 +12,7 @@ const TableTools = () => {
 
   const inputRef = useRef();
 
-  const tableData = useSelector(state => state.crmCustomers.data.tableData);
+  const tableData = useSelector(state => state.firebaseSchedule.data.tableData);
 
   const handleInputChange = val => {
     const newTableData = cloneDeep(tableData);
@@ -29,7 +29,7 @@ const TableTools = () => {
 
   const fetchData = data => {
     dispatch(setTableData(data));
-    dispatch(getCustomers(data));
+    dispatch(getSchedule(data));
   };
 
   const onClearAll = () => {
@@ -47,7 +47,7 @@ const TableTools = () => {
   return (
     <div className="md:flex items-center justify-between">
       <div className="md:flex items-center gap-4">
-        <CustomerTableSearch ref={inputRef} onInputChange={handleInputChange} />
+        <TableSearch ref={inputRef} onInputChange={handleInputChange} />
         {/* <TableFilter /> */}
       </div>
       <div className="mb-4">
