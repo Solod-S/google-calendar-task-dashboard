@@ -18,7 +18,7 @@ const ChartLegend = ({ label, value, badgeClass, showBadge = true }) => {
   );
 };
 
-const TaskOverview = ({ data = {}, className }) => {
+const TaskOverviewFireBase = ({ data = {}, className }) => {
   const [timeRange, setTimeRange] = useState(["weekly"]);
 
   const [repaint, setRepaint] = useState(false);
@@ -39,7 +39,7 @@ const TaskOverview = ({ data = {}, className }) => {
   return (
     <Card className={className}>
       <div className="flex sm:flex-row flex-col md:items-center justify-between mb-6 gap-4">
-        <h4>Task Overview</h4>
+        <h4>Firebase Task Overview</h4>
         <Segment
           value={timeRange}
           onChange={val => setTimeRange(val)}
@@ -98,7 +98,7 @@ const TaskOverview = ({ data = {}, className }) => {
   );
 };
 
-export default TaskOverview;
+export default TaskOverviewFireBase;
 
 // data exmpl
 // {
