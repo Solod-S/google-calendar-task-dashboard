@@ -18,7 +18,7 @@ injectReducer("projectDashboard", reducer);
 
 const ProjectDashboard = () => {
   const dispatch = useDispatch();
-  const [dashboardType, setDashboardType] = useState("google-calendar");
+  const [dashboardType, setDashboardType] = useState("firebase");
   const {
     userName,
     taskCount,
@@ -33,11 +33,21 @@ const ProjectDashboard = () => {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dashboardType]);
 
   const fetchData = () => {
-    // dispatch(getProjectGoogleCalendarDashboardData());
-    dispatch(getProjectFireBaseDashboardData());
+    switch (true) {
+      case dashboardType === "google-calendar":
+        dispatch(getProjectGoogleCalendarDashboardData());
+        break;
+
+      case dashboardType === "firebase":
+        dispatch(getProjectFireBaseDashboardData());
+        break;
+
+      default:
+        break;
+    }
   };
 
   return (

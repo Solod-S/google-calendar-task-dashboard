@@ -30,7 +30,7 @@ const TaskOverviewGoogleCalendar = ({ data = {}, className }) => {
   useEffect(() => {
     setRepaint(true);
     const timer1 = setTimeout(() => setRepaint(false), 300);
-
+    console.log(`data`, data);
     return () => {
       clearTimeout(timer1);
     };

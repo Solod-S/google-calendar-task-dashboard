@@ -47,11 +47,11 @@ const generateEvents = ({
   endDate,
   data,
 }) => {
-  let result = [];
-  let maxDays = 110;
-  let start = dayjs(startDate); // Преобразуем стартовую дату в dayjs объект
-  let today = dayjs(); // Получаем сегодняшнюю дату
-  let finalDate = endDate && endDate !== "" ? dayjs(endDate) : null; // Преобразуем конечную дату, если она не пустая
+  const result = [];
+  const maxDays = 50;
+  const start = dayjs(startDate); // Преобразуем стартовую дату в dayjs объект
+  const today = dayjs(); // Получаем сегодняшнюю дату
+  const finalDate = endDate && endDate !== "" ? dayjs(endDate) : null; // Преобразуем конечную дату, если она не пустая
 
   // Если стартовая дата в будущем, начинаем с сегодняшней даты
   if (start.isAfter(today)) {
@@ -87,31 +87,31 @@ const generateEvents = ({
       }
       break;
 
-    case "weekly":
-      const startDayOfWeek = start.day(); // Определяем день недели стартовой даты (0 - воскресенье, 1 - понедельник, ..., 6 - суббота)
-      let currentWeekday = start.clone().day(startDayOfWeek); // Получаем первую дату соответствующего дня недели
-      if (currentWeekday.isBefore(today)) {
-        currentWeekday = currentWeekday.add(1, "week"); // Если первая неделя уже прошла, переходим на следующую
-      }
-      let counter = 0;
+    // case "weekly":
+    //   const startDayOfWeek = start.day(); // Определяем день недели стартовой даты (0 - воскресенье, 1 - понедельник, ..., 6 - суббота)
+    //   let currentWeekday = start.clone().day(startDayOfWeek); // Получаем первую дату соответствующего дня недели
+    //   if (currentWeekday.isBefore(today)) {
+    //     currentWeekday = currentWeekday.add(1, "week"); // Если первая неделя уже прошла, переходим на следующую
+    //   }
+    //   count = 0;
 
-      while (counter < maxDays) {
-        // Формируем объект события
-        result.push({
-          start: currentWeekday.format("YYYY-MM-DD"), // Дата в формате строки
-          id: uuidv4(), // Уникальный идентификатор
-          ...data, // Вставляем дополнительные данные
-        });
+    //   while (count < maxDays) {
+    //     // Формируем объект события
+    //     result.push({
+    //       start: currentWeekday.format("YYYY-MM-DD"), // Дата в формате строки
+    //       id: uuidv4(), // Уникальный идентификатор
+    //       ...data, // Вставляем дополнительные данные
+    //     });
 
-        currentWeekday = currentWeekday.add(1, "week"); // Переходим к следующему соответствующему дню недели
-        counter++;
+    //     currentWeekday = currentWeekday.add(1, "week"); // Переходим к следующему соответствующему дню недели
+    //     count++;
 
-        // Если достигли конечной даты, выходим из цикла
-        if (finalDate && currentWeekday.isAfter(finalDate)) {
-          break;
-        }
-      }
-      break;
+    //     // Если достигли конечной даты, выходим из цикла
+    //     if (finalDate && currentWeekday.isAfter(finalDate)) {
+    //       break;
+    //     }
+    //   }
+    //   break;
 
     default:
       return []; // Возвращаем пустой массив для неподдерживаемых типов
@@ -400,7 +400,6 @@ FirebaseDashboardService.fetchFirebaseTaskOverview = async () => {
       for (const schedule of activeScheduleData) {
         const endDate =
           schedule.repeatEndType !== "never" ? schedule.endDate : "";
-
         const formatedEvents = generateEvents({
           startDate: schedule.startDate,
           generationIntervalType: schedule.generationIntervalType,
@@ -413,11 +412,10 @@ FirebaseDashboardService.fetchFirebaseTaskOverview = async () => {
             img: schedule.img,
           },
         });
-        console.log(`formatedEvents 3`, formatedEvents);
-        // activeEvents = [...activeEvents, ...formatedEvents];
-        activeEvents.push(...formatedEvents);
+        console.log(`formatedEvents`, formatedEvents);
+        activeEvents = [...activeEvents, ...formatedEvents];
       }
-      console.log(`activeEvents 4`, activeEvents);
+
       if (activeEvents.length <= 0) continue;
       // console.log(`activeEvents`, activeEvents);
       activeEventsData.push(
@@ -454,10 +452,8 @@ FirebaseDashboardService.fetchFirebaseTaskOverview = async () => {
       activeEventsData,
       weekly: { series: projectsData, total, range },
     };
-
     return result;
   } catch (error) {
-    console.log(`error in fetchFirebaseTaskOverview`, error);
     throw error;
   }
 };
