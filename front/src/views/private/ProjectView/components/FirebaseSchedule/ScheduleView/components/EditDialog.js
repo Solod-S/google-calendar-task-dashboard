@@ -42,6 +42,8 @@ const EditDialog = ({ setGeneralData }) => {
 
   const handleScheduleFormCancel = () => {
     const result = formikRef.current?.getScheduleFormData();
+    console.log(`result`, result);
+    console.log(`schedule`, schedule);
     const noChange = isEqual(schedule, result);
     if (noChange) {
       onDrawerClose();

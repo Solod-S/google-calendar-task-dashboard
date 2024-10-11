@@ -95,6 +95,16 @@ const generateEvents = ({
       }
       let counter = 0;
 
+      // Включаем стартовую дату, если она меньше или равна сегодняшней
+      if (start.isSame(today, "day") || start.isBefore(today)) {
+        result.push({
+          start: start.format("YYYY-MM-DD"), // Дата в формате строки
+          id: uuidv4(), // Уникальный идентификатор
+          ...data, // Вставляем дополнительные данные
+        });
+        counter++;
+      }
+
       while (counter < maxDays) {
         // Формируем объект события
         result.push({
@@ -113,8 +123,44 @@ const generateEvents = ({
       }
       break;
 
+    case "monthly":
+      // Определяем день месяца из стартовой даты
+      let startDayOfMonth = start.date(); // Получаем день месяца стартовой даты
+      let currentMonthDate = start.clone().date(startDayOfMonth); // Получаем первую дату этого дня месяца
+      if (currentMonthDate.isBefore(today)) {
+        currentMonthDate = currentMonthDate.add(1, "month"); // Если этот месяц уже прошёл, переходим к следующему
+      }
+      let monthCounter = 0;
+
+      // Включаем стартовую дату, если она меньше или равна сегодняшней
+      if (start.isSame(today, "day") || start.isBefore(today)) {
+        result.push({
+          start: start.format("YYYY-MM-DD"), // Дата в формате строки
+          id: uuidv4(), // Уникальный идентификатор
+          ...data, // Вставляем дополнительные данные
+        });
+        monthCounter++;
+      }
+
+      while (monthCounter < maxDays) {
+        // Формируем объект события
+        result.push({
+          start: currentMonthDate.format("YYYY-MM-DD"), // Дата в формате строки
+          id: uuidv4(), // Уникальный идентификатор
+          ...data, // Вставляем дополнительные данные
+        });
+
+        currentMonthDate = currentMonthDate.add(1, "month"); // Переходим к следующему месяцу
+        monthCounter++;
+
+        // Если достигли конечной даты, выходим из цикла
+        if (finalDate && currentMonthDate.isAfter(finalDate)) {
+          break;
+        }
+      }
+      break;
     default:
-      return []; // Возвращаем пустой массив для неподдерживаемых типов
+      return [];
   }
 
   return result;
@@ -413,13 +459,10 @@ FirebaseDashboardService.fetchFirebaseTaskOverview = async () => {
             img: schedule.img,
           },
         });
-        console.log(`formatedEvents 3`, formatedEvents);
-        // activeEvents = [...activeEvents, ...formatedEvents];
         activeEvents.push(...formatedEvents);
       }
-      console.log(`activeEvents 4`, activeEvents);
+
       if (activeEvents.length <= 0) continue;
-      // console.log(`activeEvents`, activeEvents);
       activeEventsData.push(
         ...activeEvents.map(event => ({ ...event, name: project.name }))
       );
