@@ -42,11 +42,10 @@ const ScheduleForm = forwardRef((props, ref) => {
     useState("disable");
 
   const [activeTab, setActiveTab] = useState("generalInfo");
-  const [name, setName] = useState(schedule?.name || "");
-  const [message, setMessage] = useState(schedule?.message || "");
-  const [status, setStatus] = useState(schedule?.status || false);
-
-  const [formikMediaValues, setFormikMediaValues] = useState({
+  const [formikValues, setFormikValues] = useState({
+    name: schedule?.name || "",
+    status: schedule?.status || false,
+    message: schedule?.message || "",
     img: schedule?.img || [],
   });
 
@@ -83,33 +82,16 @@ const ScheduleForm = forwardRef((props, ref) => {
   // TODO REF USE 2
   useImperativeHandle(ref, () => ({
     submitForm: () => {
-      try {
-        console.log(`Form`);
-        setActiveTab("generalInfo");
-        setTimeout(() => {
-          if (formikRef.current) {
-            console.log(`Form 2`);
-            formikRef.current.submitForm();
-          }
-        }, 0);
-      } catch (error) {
-        console.log(`error in submitForm`, error);
-      }
+      setActiveTab("generalInfo");
+      setTimeout(() => {
+        if (formikRef.current) {
+          formikRef.current.submitForm();
+        }
+      }, 0);
     },
     getScheduleFormData: () => {
-      try {
-        const scheduleData = handleScheduleData();
-        return {
-          ...schedule,
-          ...formikMediaValues,
-          ...scheduleData,
-          name,
-          message,
-          status,
-        };
-      } catch (error) {
-        console.log(`error in getScheduleFormData`, error);
-      }
+      const scheduleData = handleScheduleData();
+      return { ...schedule, ...formikValues, ...scheduleData };
     },
   }));
 
@@ -123,28 +105,24 @@ const ScheduleForm = forwardRef((props, ref) => {
         <TabContent value="generalInfo">
           <Formik
             innerRef={formikRef}
-            initialValues={{ ...formikMediaValues, name, message, status }}
+            initialValues={formikValues}
             validationSchema={validationSchema}
             enableReinitialize
             onSubmit={(values, { setSubmitting }) => {
-              try {
-                // Clean up values.img by trimming and removing empty URLs
-                const cleanedImg = values.img
-                  .map(url => url.trim())
-                  .filter(url => url.length > 0);
+              // Clean up values.img by trimming and removing empty URLs
+              const cleanedImg = values.img
+                .map(url => url.trim())
+                .filter(url => url.length > 0);
 
-                const updatedValues = {
-                  ...values,
-                  img: cleanedImg,
-                };
+              const updatedValues = {
+                ...values,
+                img: cleanedImg,
+              };
 
-                const scheduleData = handleScheduleData();
-                onFormSubmit?.({ ...updatedValues, ...scheduleData });
+              const scheduleData = handleScheduleData();
+              onFormSubmit?.({ ...updatedValues, ...scheduleData });
 
-                setSubmitting(false);
-              } catch (error) {
-                console.log(`error in onSubmit`, error);
-              }
+              setSubmitting(false);
             }}
           >
             {({ values, touched, errors, handleBlur }) => (
@@ -155,13 +133,7 @@ const ScheduleForm = forwardRef((props, ref) => {
                     touched={touched}
                     errors={errors}
                     handleBlur={handleBlur}
-                    setFormikMediaValues={setFormikMediaValues}
-                    name={name}
-                    setName={setName}
-                    message={message}
-                    setMessage={setMessage}
-                    status={status}
-                    setStatus={setStatus}
+                    setFormikValues={setFormikValues}
                   />
                 </FormContainer>
               </Form>

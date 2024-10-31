@@ -20,13 +20,27 @@ async function transformGoogleDriveLink(url) {
   }
 }
 
-const InfoForm = ({ values, touched, errors, handleBlur, setFormikValues }) => {
+const InfoForm = ({
+  values,
+  touched,
+  errors,
+  handleBlur,
+  setFormikMediaValues,
+  name,
+  setName,
+  message,
+  setMessage,
+  status,
+  setStatus,
+  img,
+  setImg,
+}) => {
   const handleAddImage = () => {
     if (
       values.img.length < 5 &&
       !values.img.some(value => value.trim() === "")
     ) {
-      setFormikValues(prevValues => ({
+      setFormikMediaValues(prevValues => ({
         ...prevValues,
         img: [...prevValues.img, ""],
       }));
@@ -34,7 +48,7 @@ const InfoForm = ({ values, touched, errors, handleBlur, setFormikValues }) => {
   };
 
   const handleRemoveImage = index => {
-    setFormikValues(prevValues => ({
+    setFormikMediaValues(prevValues => ({
       ...prevValues,
       img: prevValues.img.filter((_, i) => i !== index),
     }));
@@ -43,7 +57,7 @@ const InfoForm = ({ values, touched, errors, handleBlur, setFormikValues }) => {
   const handleImageChange = async (index, event) => {
     const url = event.target.value.trim();
     if (url === "") {
-      setFormikValues(prevValues => ({
+      setFormikMediaValues(prevValues => ({
         ...prevValues,
         img: prevValues.img.filter((_, i) => i !== index),
       }));
@@ -68,7 +82,7 @@ const InfoForm = ({ values, touched, errors, handleBlur, setFormikValues }) => {
         return;
       }
 
-      setFormikValues(prevValues => {
+      setFormikMediaValues(prevValues => {
         const newImg = [...prevValues.img];
         newImg[index] = link;
         return {
@@ -91,13 +105,8 @@ const InfoForm = ({ values, touched, errors, handleBlur, setFormikValues }) => {
           autoComplete="off"
           name="name"
           placeholder="Name"
-          value={values.name}
-          onChange={e => {
-            setFormikValues(prevValues => ({
-              ...prevValues,
-              name: e.target.value,
-            }));
-          }}
+          value={name}
+          onChange={e => setName(e.target.value)}
           onBlur={handleBlur}
           prefix={<HiUserCircle className="text-xl" />}
         />
@@ -109,13 +118,8 @@ const InfoForm = ({ values, touched, errors, handleBlur, setFormikValues }) => {
       >
         <Switcher
           name="status"
-          checked={values.status}
-          onChange={e => {
-            setFormikValues(prevValues => ({
-              ...prevValues,
-              status: !e,
-            }));
-          }}
+          checked={status}
+          onChange={e => setStatus(!e)}
         />
       </FormItem>
       <FormItem
@@ -182,13 +186,8 @@ const InfoForm = ({ values, touched, errors, handleBlur, setFormikValues }) => {
           placeholder="Enter your message here"
           rows="5"
           className="w-full h-40 p-2 border border-gray-300 rounded resize-y"
-          value={values.message}
-          onChange={e => {
-            setFormikValues(prevValues => ({
-              ...prevValues,
-              message: e.target.value,
-            }));
-          }}
+          value={message}
+          onChange={e => setMessage(e.target.value)}
           onBlur={handleBlur}
         />
       </FormItem>
