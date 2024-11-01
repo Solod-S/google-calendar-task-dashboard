@@ -421,6 +421,9 @@ FirebaseDashboardService.fetchFirebaseTaskOverview = async () => {
 
       // Проверяем, активен ли проект и есть ли тг группа
       if (!project.active || !project.tgGroup) continue;
+
+      const tgGroups = await FirebaseMyProjectsService.fetchTelegramGroups();
+
       const fireBaseIntegration = project.integrations.find(
         integration => integration.name === "Firebase Schedule"
       );
@@ -457,6 +460,10 @@ FirebaseDashboardService.fetchFirebaseTaskOverview = async () => {
             time: schedule.selectedTime,
             end: endDate,
             img: schedule.img,
+            video: schedule.video,
+            tgData: await tgGroups.data.find(
+              group => group.id === project.tgGroup
+            ),
           },
         });
         activeEvents.push(...formatedEvents);
